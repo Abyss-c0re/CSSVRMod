@@ -1,13 +1,13 @@
-# Cycle 58 — 2026-09-18
+# Cycle 59 — 2026-09-18
 
 ## Focus
 
-`cmd-wrap-on-vk-present` — Vulkan present waited on RenderView locate before probing the engine, so `cssvr_start` could never attach.
+`console-strip-crlf` — `cssvr_start\n` became Help, so typed console start never enabled XR.
 
 ## Did
 
-- `WrapPresent` probes the engine until the console wrap is ready (does not wait on `CViewRender`).
-- Do not freeze the wrap plan until slot 106 is on, or it is present and not `engine.so`.
+- Treat CR/LF as token whitespace in `CssvrParseConsole`.
+- `cssvr_start\n` / `\r\n` now parse as Start.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 114 passed, 0 failed (908 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 114 passed, 0 failed (914 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

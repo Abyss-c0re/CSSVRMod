@@ -17,16 +17,20 @@ inline bool CssvrIsVerb(const char* s) {
   return std::strncmp(s, "cssvr", 5) == 0;
 }
 
+inline bool CssvrIsWs(char c) {
+  return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+}
+
 inline bool CssvrParseConsole(const char* line, CssvrConsole* out) {
   if (!out) return false;
   *out = {};
   if (!line) return false;
-  while (*line == ' ' || *line == '\t') ++line;
+  while (CssvrIsWs(*line)) ++line;
   if (!CssvrIsVerb(line)) return false;
   char tok[8][64]{};
   int nt = 0, ti = 0;
   for (const char* p = line; *p && nt < 8; ++p) {
-    if (*p == ' ' || *p == '\t') {
+    if (CssvrIsWs(*p)) {
       if (ti) {
         tok[nt++][ti] = 0;
         ti = 0;

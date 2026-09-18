@@ -19,6 +19,12 @@ TEST(console_parse_start_stop_menu) {
   ASSERT_STREQ(c.key, "eyescale");
   ASSERT_STREQ(c.val, "0.20");
   ASSERT_FALSE(CssvrParseConsole("say hello", &c));
+  ASSERT_TRUE(CssvrParseConsole("cssvr_start\n", &c));
+  ASSERT_TRUE(c.cmd == CssvrCmd::Start);
+  ASSERT_TRUE(CssvrParseConsole("cssvr_start\r\n", &c));
+  ASSERT_TRUE(c.cmd == CssvrCmd::Start);
+  ASSERT_TRUE(CssvrParseConsole("  cssvr stop\n", &c));
+  ASSERT_TRUE(c.cmd == CssvrCmd::Stop);
 }
 
 TEST(cssvr_ctl_override) {

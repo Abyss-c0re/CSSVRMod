@@ -284,6 +284,10 @@ Wrap ClientCmd_Unrestricted (slot 106) so typed `cssvr_start` reaches the filter
 
 VK present probes the engine until the console wrap is ready — do not wait on RenderView locate. Retry slot 106 until it is on or proven not engine.so. Offline 114/114. Not HMD-proven.
 
+## 2026-09-18 cycle 59
+
+Console parser treats CR/LF as whitespace so `cssvr_start\n` is Start, not Help. Offline 114/114. Not HMD-proven.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
