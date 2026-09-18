@@ -14,6 +14,13 @@ unset STEAM_RUNTIME_LIBRARY_PATH
 export DISPLAY="${DISPLAY:-:0}"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-x11}"
+# engine.so NEEDED libcurl-gnutls.so.4 — not on Arch. CSSVR also searches this.
+if [[ -z "${CSSVR_LIBDIR:-}" ]]; then
+  for d in "$ROOT/.scratch/fakelibs" \
+           "${HOME}/Dev/GMod/gVRMod/.scratch/cssvrmod/fakelibs"; do
+    if [[ -e "$d/libcurl-gnutls.so.4" ]]; then export CSSVR_LIBDIR="$d"; break; fi
+  done
+fi
 if [[ -z "${XR_RUNTIME_JSON:-}" ]]; then
   for c in /usr/share/openxr/1/openxr_wivrn.json /usr/local/share/openxr/1/openxr_wivrn.json \
            /usr/share/openxr/1/openxr_monado.json; do

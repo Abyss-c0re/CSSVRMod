@@ -3,6 +3,7 @@
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/window_chrome.hpp"
 #include "test_framework.h"
+#include <cstdlib>
 #include <cstring>
 #include <string>
 #include <unistd.h>
@@ -76,6 +77,13 @@ TEST(launch_default_vk_bordered) {
   }
   ASSERT_TRUE(has_windowed);
   ASSERT_TRUE(has_videomode);
+}
+
+TEST(launch_detects_curl_gnutls_libdir) {
+  // Host may or may not have Steam sniper; env override must win when set.
+  setenv("CSSVR_LIBDIR", "/tmp", 1);
+  ASSERT_STREQ(DetectCssExtraLibDir().c_str(), "/tmp");
+  unsetenv("CSSVR_LIBDIR");
 }
 
 TEST(sdl_window_flags_force_decorated) {

@@ -48,6 +48,8 @@ CssInstall InspectCssRoot(const std::string& root);
 SpawnPlan PlanSpawn(const CssInstall& inst, const LaunchOpts& opts);
 std::string DefaultHookSearchPath();
 std::string DetectXrRuntimeJson();
+/// Dir with libcurl-gnutls.so.4 (engine.so NEEDED). Empty if none found.
+std::string DetectCssExtraLibDir();
 
 /// Pure: never skip spawn unless hook path is empty (tests).
 inline bool SpawnNeedsHook(const LaunchOpts& o) { return !o.hook_so.empty(); }

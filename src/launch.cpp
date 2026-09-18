@@ -1,5 +1,6 @@
 #include "cssvrmod/launch.hpp"
 #include <cstdlib>
+#include <dirent.h>
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h>
@@ -114,6 +115,45 @@ std::string DetectXrRuntimeJson() {
   return {};
 }
 
+static bool DirHasCurlGnutls(const std::string& dir) {
+  return IsFile(dir + "/libcurl-gnutls.so.4") || IsFile(dir + "/libcurl-gnutls.so.4.7.0");
+}
+
+static void ScanSniperCurl(const std::string& sniperRoot, std::vector<std::string>& out) {
+  if (!IsDir(sniperRoot)) return;
+  DIR* d = opendir(sniperRoot.c_str());
+  if (!d) return;
+  while (dirent* e = readdir(d)) {
+    if (e->d_name[0] == '.') continue;
+    const std::string name = e->d_name;
+    if (name.rfind("sniper_platform_", 0) != 0) continue;
+    const std::string lib = sniperRoot + "/" + name + "/files/lib/x86_64-linux-gnu";
+    if (DirHasCurlGnutls(lib)) out.push_back(lib);
+  }
+  closedir(d);
+}
+
+std::string DetectCssExtraLibDir() {
+  if (const char* e = std::getenv("CSSVR_LIBDIR")) {
+    if (e[0] && IsDir(e)) return e;
+  }
+  std::vector<std::string> cands;
+  if (const char* root = std::getenv("CSSVR_ROOT")) {
+    cands.push_back(std::string(root) + "/.scratch/fakelibs");
+    cands.push_back(std::string(root) + "/lib");
+  }
+  const std::string home = Home();
+  if (!home.empty()) {
+    cands.push_back(home + "/Dev/GMod/CSSVRMod/.scratch/fakelibs");
+    cands.push_back(home + "/Dev/GMod/gVRMod/.scratch/cssvrmod/fakelibs");
+    ScanSniperCurl(home + "/.steam/steam/steamapps/common/SteamLinuxRuntime_sniper", cands);
+    ScanSniperCurl(home + "/.local/share/Steam/steamapps/common/SteamLinuxRuntime_sniper", cands);
+  }
+  for (const auto& d : cands)
+    if (DirHasCurlGnutls(d)) return d;
+  return {};
+}
+
 std::string DefaultHookSearchPath() {
   if (const char* e = std::getenv("CSSVR_HOOK")) return e;
   const char* self = std::getenv("CSSVR_ROOT");
@@ -171,9 +211,8 @@ SpawnPlan PlanSpawn(const CssInstall& inst, const LaunchOpts& opts) {
   const std::string plat = inst.linux64 ? "linux64" : "";
   p.ld_library_path = inst.root + "/bin";
   if (inst.linux64) p.ld_library_path = inst.root + "/bin/linux64:" + p.ld_library_path;
-  if (const char* extra = std::getenv("CSSVR_LIBDIR")) {
-    if (extra[0]) p.ld_library_path = std::string(extra) + ":" + p.ld_library_path;
-  }
+  const std::string extra = DetectCssExtraLibDir();
+  if (!extra.empty()) p.ld_library_path = extra + ":" + p.ld_library_path;
 
   p.ld_preload = opts.hook_so;
   if (const char* old = std::getenv("LD_PRELOAD")) {

@@ -98,10 +98,11 @@ int main(int argc, char** argv) {
   if (find_only) return inst.found ? 0 : 1;
 
   cssvr::SpawnPlan plan = cssvr::PlanSpawn(inst, opts);
-  std::fprintf(stdout, "cssvr: spawn ok=%d backend=%s reason=%s exe=%s preload=%s sdl=%s xr=%s\n",
+  std::fprintf(stdout,
+               "cssvr: spawn ok=%d backend=%s reason=%s exe=%s preload=%s sdl=%s xr=%s libdir=%s\n",
                plan.ok ? 1 : 0, plan.backend, plan.reason, plan.exe.c_str(),
                plan.ld_preload.c_str(), plan.sdl_videodriver.c_str(),
-               plan.xr_runtime_json.c_str());
+               plan.xr_runtime_json.c_str(), cssvr::DetectCssExtraLibDir().c_str());
   if (print_only || !plan.ok) return plan.ok ? 0 : 1;
   setenv("CSSVR_NOBORDER", opts.noborder ? "1" : "0", 1);
   return Spawn(plan);
