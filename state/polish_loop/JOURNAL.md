@@ -172,6 +172,10 @@ VISION title lights when the laser is on it. Offline 84/84. Not HMD-proven. Menu
 
 Start script + spawn seed CSSVR_LEFT_HANDED from launch.cfg. Offline 85/85. Not HMD-proven.
 
+## 2026-09-18 cycle 31 follow
+
+Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.
+
 
 
 
