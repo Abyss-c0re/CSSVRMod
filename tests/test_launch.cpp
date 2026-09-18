@@ -10,6 +10,13 @@
 
 using namespace cssvr;
 
+TEST(css_root_from_in_process_exe) {
+  ASSERT_TRUE(CssRootFromExe("/opt/css/cstrike_linux64") == "/opt/css");
+  ASSERT_TRUE(CssRootFromExe("/opt/css/cstrike.sh") == "/opt/css");
+  ASSERT_TRUE(CssRootFromExe("cstrike_linux64").empty());
+  ASSERT_TRUE(CssRootFromExe(nullptr).empty());
+}
+
 TEST(launch_inspect_and_find) {
   auto missing = InspectCssRoot("/no/such/css");
   ASSERT_FALSE(missing.found);

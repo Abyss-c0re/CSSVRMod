@@ -68,6 +68,15 @@ CssInstall FindCssInstall() {
   std::vector<std::string> candidates;
   if (const char* e = std::getenv("CSSVR_CSS_ROOT")) candidates.push_back(e);
   if (const char* e = std::getenv("CSS_ROOT")) candidates.push_back(e);
+  // Hook is inside CSS. cwd / this exe are the install — do not depend on HOME.
+  char self[4096];
+  const ssize_t n = readlink("/proc/self/exe", self, sizeof(self) - 1);
+  if (n > 0) {
+    self[n] = 0;
+    candidates.push_back(CssRootFromExe(self));
+  }
+  char cwd[4096];
+  if (getcwd(cwd, sizeof(cwd))) candidates.push_back(cwd);
   const std::string home = Home();
   candidates.push_back(home + "/.steam/steam/steamapps/common/Counter-Strike Source");
   candidates.push_back(home + "/.local/share/Steam/steamapps/common/Counter-Strike Source");

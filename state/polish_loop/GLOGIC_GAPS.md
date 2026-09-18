@@ -56,6 +56,7 @@
 - [x] Console filter wraps ClientCmd_Unrestricted (slot 106, cycle 57). Typed `cssvr_start` never hit restricted ClientCmd (slot 7).
 - [x] VK present probes engine / cmd wrap without waiting on RenderView locate (cycle 58). Retry 106 until engine.so or give up.
 - [x] Console parser strips CR/LF (cycle 59). `cssvr_start\n` was Help, not Start.
+- [x] Find CSS from `/proc/self/exe` + cwd (cycle 60). Hook-in-CSS must not depend on HOME Steam paths.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.

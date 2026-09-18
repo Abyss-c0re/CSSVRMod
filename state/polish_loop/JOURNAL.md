@@ -288,6 +288,10 @@ VK present probes the engine until the console wrap is ready — do not wait on 
 
 Console parser treats CR/LF as whitespace so `cssvr_start\n` is Start, not Help. Offline 114/114. Not HMD-proven.
 
+## 2026-09-18 cycle 60
+
+In-process hook finds CSS from `/proc/self/exe` and cwd, not only HOME Steam paths. Offline 115/115. Not HMD-proven.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

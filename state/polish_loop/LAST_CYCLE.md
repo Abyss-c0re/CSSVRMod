@@ -1,13 +1,13 @@
-# Cycle 59 — 2026-09-18
+# Cycle 60 — 2026-09-18
 
 ## Focus
 
-`console-strip-crlf` — `cssvr_start\n` became Help, so typed console start never enabled XR.
+`find-css-from-self` — the in-process hook found CSS only via HOME Steam paths, so RenderView locate could miss inside a Steam runtime.
 
 ## Did
 
-- Treat CR/LF as token whitespace in `CssvrParseConsole`.
-- `cssvr_start\n` / `\r\n` now parse as Start.
+- `FindCssInstall` tries `/proc/self/exe` parent and cwd after env, before HOME.
+- `CssRootFromExe` is the pure helper.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 114 passed, 0 failed (914 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 115 passed, 0 failed (918 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

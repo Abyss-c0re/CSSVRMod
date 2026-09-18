@@ -73,6 +73,14 @@ std::string DetectXrRuntimeJson();
 /// Dir with libcurl-gnutls.so.4 (engine.so NEEDED). Empty if none found.
 std::string DetectCssExtraLibDir();
 
+/// Game root from a CSS binary (`.../cstrike_linux64` / `cstrike.sh`). Empty if no slash.
+inline std::string CssRootFromExe(const char* exe) {
+  if (!exe || !exe[0]) return {};
+  const char* slash = std::strrchr(exe, '/');
+  if (!slash || slash == exe) return {};
+  return std::string(exe, static_cast<size_t>(slash - exe));
+}
+
 /// Pure: never skip spawn unless hook path is empty (tests).
 inline bool SpawnNeedsHook(const LaunchOpts& o) { return !o.hook_so.empty(); }
 
