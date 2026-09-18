@@ -136,6 +136,10 @@ Dropped GENERAL retry after an 8 ms fence timeout (in-flight cmd buffer). Next i
 
 Laser ray vs Vision panel: hover + trigger clicks the aimed row. Offline 77/77. Not HMD-proven.
 
+## 2026-09-18 cycle 23
+
+Laser cursor at Vision-panel hit UV (cyan crosshair). Offline 78/78. Not HMD-proven.
+
 
 
 

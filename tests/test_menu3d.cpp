@@ -30,6 +30,49 @@ TEST(menu3d_laser_hits_panel) {
   ASSERT_FALSE(behind.hit);
   const Vec3 aim = Menu3d_AimFromQuat(0.f, 0.f, 0.f, 1.f);
   ASSERT_NEAR(aim.z, -1.f, 0.001);
+  ASSERT_TRUE(mid.on_quad);
+  ASSERT_FALSE(high.on_quad);
+  ASSERT_FALSE(behind.on_quad);
+}
+
+TEST(menu3d_laser_cursor_at_uv) {
+  int x = -1, y = -1;
+  Menu3d_UvPx(0.5f, 0.5f, 100, 80, &x, &y);
+  ASSERT_EQ(x, 50);
+  ASSERT_EQ(y, 40);
+  Menu3d_UvPx(0.f, 0.f, 64, 48, &x, &y);
+  ASSERT_EQ(x, 0);
+  ASSERT_EQ(y, 0);
+  ASSERT_TRUE(Menu3d_OnQuad(0.f, 1.f));
+  ASSERT_FALSE(Menu3d_OnQuad(-0.01f, 0.5f));
+
+  unsigned char pix[128 * 96 * 4];
+  Menu3d m;
+  Menu3d_Raster(pix, 128, 96, m);
+  auto cyan = [&](const unsigned char* p) {
+    int n = 0;
+    for (int i = 0; i < 128 * 96; ++i)
+      if (p[i * 4 + 0] < 40 && p[i * 4 + 1] > 180 && p[i * 4 + 2] > 200) n++;
+    return n;
+  };
+  ASSERT_EQ(cyan(pix), 0);
+
+  const auto mid = Menu3d_RayHit({0.f, kMenuY, 0.f}, {0.f, 0.f, -1.f});
+  Menu3d_SetCursor(&m, mid);
+  ASSERT_TRUE(m.cursor);
+  ASSERT_NEAR(m.cu, 0.5f, 0.02);
+  ASSERT_NEAR(m.cv, 0.5f, 0.02);
+  Menu3d_Raster(pix, 128, 96, m);
+  ASSERT_TRUE(cyan(pix) > 8);
+
+  int cx = 0, cy = 0;
+  Menu3d_UvPx(m.cu, m.cv, 128, 96, &cx, &cy);
+  const unsigned char* c = pix + ((size_t)cy * 128 + (size_t)cx) * 4;
+  ASSERT_TRUE(c[0] > 200 && c[1] > 200 && c[2] > 200);
+
+  const auto miss = Menu3d_RayHit({0.f, kMenuY + kMenuH * 0.6f, 0.f}, {0.f, 0.f, -1.f});
+  Menu3d_SetCursor(&m, miss);
+  ASSERT_FALSE(m.cursor);
 }
 
 TEST(menu3d_raster_not_empty) {

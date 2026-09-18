@@ -21,6 +21,9 @@ struct Menu3d {
   bool visible = true;
   int focus = 0;
   Calib calib;
+  bool cursor = false;
+  float cu = 0.5f;
+  float cv = 0.5f;
 };
 
 inline int Menu3d_HitRow(float u, float v) {
@@ -32,9 +35,35 @@ inline int Menu3d_HitRow(float u, float v) {
 
 struct Menu3dLaserHit {
   bool hit = false;
+  bool on_quad = false;
   float u = 0.f, v = 0.f, t = 0.f;
   int row = -1;
 };
+
+inline bool Menu3d_OnQuad(float u, float v) {
+  return u >= 0.f && u <= 1.f && v >= 0.f && v <= 1.f;
+}
+
+inline void Menu3d_UvPx(float u, float v, int w, int h, int* x, int* y) {
+  if (!x || !y || w < 1 || h < 1) return;
+  const float uu = Clamp(u, 0.f, 1.f);
+  const float vv = Clamp(v, 0.f, 1.f);
+  *x = (int)(uu * (float)(w - 1) + 0.5f);
+  *y = (int)(vv * (float)(h - 1) + 0.5f);
+  if (*x < 0) *x = 0;
+  if (*y < 0) *y = 0;
+  if (*x >= w) *x = w - 1;
+  if (*y >= h) *y = h - 1;
+}
+
+inline void Menu3d_SetCursor(Menu3d* m, const Menu3dLaserHit& h) {
+  if (!m) return;
+  m->cursor = h.on_quad;
+  if (h.on_quad) {
+    m->cu = h.u;
+    m->cv = h.v;
+  }
+}
 
 // STAGE metres. Identity quad at (0, kMenuY, kMenuZ) faces +Z (OpenXR quad).
 inline Vec3 Menu3d_QuatRotate(float qx, float qy, float qz, float qw, const Vec3& v) {
@@ -59,6 +88,7 @@ inline Menu3dLaserHit Menu3d_RayHit(const Vec3& origin, const Vec3& dir) {
   h.t = t;
   h.u = 0.5f + dlt.x / kMenuW;
   h.v = 0.5f - dlt.y / kMenuH;
+  h.on_quad = Menu3d_OnQuad(h.u, h.v);
   h.row = Menu3d_HitRow(h.u, h.v);
   h.hit = h.row >= 0;
   return h;
@@ -181,6 +211,25 @@ inline void Menu3d_DrawText(unsigned char* rgba, int w, int h, int x, int y, int
   }
 }
 
+// Cyan crosshair at panel UV (v=0 is the title, y-down raster). Outline so it reads on hot rows.
+inline void Menu3d_DrawCursor(unsigned char* rgba, int w, int h, float u, float v) {
+  if (!rgba || w < 8 || h < 8) return;
+  if (!Menu3d_OnQuad(u, v)) return;
+  int cx = 0, cy = 0;
+  Menu3d_UvPx(u, v, w, h, &cx, &cy);
+  const int arm = std::max(4, std::min(w, h) / 28);
+  const int thick = 1;
+  auto cross = [&](int r, int g, int b, int pad) {
+    Menu3d_Fill(rgba, w, h, cx - arm - pad, cy - thick - pad, arm * 2 + 1 + pad * 2,
+                thick * 2 + 1 + pad * 2, r, g, b);
+    Menu3d_Fill(rgba, w, h, cx - thick - pad, cy - arm - pad, thick * 2 + 1 + pad * 2,
+                arm * 2 + 1 + pad * 2, r, g, b);
+  };
+  cross(8, 10, 16, 1);
+  cross(0, 230, 255, 0);
+  Menu3d_Fill(rgba, w, h, cx - 1, cy - 1, 3, 3, 255, 255, 255);
+}
+
 inline void Menu3d_Raster(unsigned char* rgba, int w, int h, const Menu3d& m) {
   if (!rgba || w < 8 || h < 8) return;
   std::memset(rgba, 18, (size_t)w * (size_t)h * 4);
@@ -200,6 +249,7 @@ inline void Menu3d_Raster(unsigned char* rgba, int w, int h, const Menu3d& m) {
     Menu3d_DrawText(rgba, w, h, 16, y + 2, sc, Menu3d_RowLabel(i), 240, 240, 240);
     Menu3d_DrawText(rgba, w, h, w / 2, y + 2, sc, val, 255, 220, 80);
   }
+  if (m.cursor) Menu3d_DrawCursor(rgba, w, h, m.cu, m.cv);
 }
 
 } // namespace cssvr

@@ -474,6 +474,19 @@ void BlitToSwapchain(unsigned int src, int srcW, int srcH, int eye, bool vflip) 
   xrReleaseSwapchainImage(g_sc[eye], &rel);
 }
 
+Menu3dLaserHit LocateMenuLaser() {
+  Menu3dLaserHit laser{};
+  if (!g_menu3d.visible || !g_aim[1] || !g_fs.predictedDisplayTime || !g_stage || !xrLocateSpace)
+    return laser;
+  XrSpaceLocation loc{XR_TYPE_SPACE_LOCATION};
+  if (xrLocateSpace(g_aim[1], g_stage, g_fs.predictedDisplayTime, &loc) != XR_SUCCESS) return laser;
+  if (!(loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT)) return laser;
+  const Vec3 o{loc.pose.position.x, loc.pose.position.y, loc.pose.position.z};
+  const Vec3 d = Menu3d_AimFromQuat(loc.pose.orientation.x, loc.pose.orientation.y,
+                                    loc.pose.orientation.z, loc.pose.orientation.w);
+  return Menu3d_RayHit(o, d);
+}
+
 bool UploadMenuSwapchain() {
   if (!g_menu_sc) return false;
   uint32_t idx = 0;
@@ -485,6 +498,7 @@ bool UploadMenuSwapchain() {
   GLuint dst = (idx < g_menu_img.n) ? g_menu_img.img[idx].image : 0;
   if (dst) {
     static unsigned char pix[1024 * 576 * 4];
+    Menu3d_SetCursor(&g_menu3d, LocateMenuLaser());
     Menu3d_Raster(pix, (int)g_menuW, (int)g_menuH, g_menu3d);
     glBindTexture(GL_TEXTURE_2D, dst);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -721,18 +735,9 @@ bool XrHostPollInput(XrSample* out) {
   out->a_click = bval(g_abxy, 1);
   pose(0, &out->left);
   pose(1, &out->right);
-  Menu3dLaserHit laser{};
-  if (g_menu3d.visible && g_aim[1] && g_fs.predictedDisplayTime && g_stage) {
-    XrSpaceLocation loc{XR_TYPE_SPACE_LOCATION};
-    xrLocateSpace(g_aim[1], g_stage, g_fs.predictedDisplayTime, &loc);
-    if (loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT) {
-      const Vec3 o{loc.pose.position.x, loc.pose.position.y, loc.pose.position.z};
-      const Vec3 d = Menu3d_AimFromQuat(loc.pose.orientation.x, loc.pose.orientation.y,
-                                        loc.pose.orientation.z, loc.pose.orientation.w);
-      laser = Menu3d_RayHit(o, d);
-      if (laser.hit) g_menu3d.focus = laser.row;
-    }
-  }
+  const Menu3dLaserHit laser = LocateMenuLaser();
+  Menu3d_SetCursor(&g_menu3d, laser);
+  if (laser.hit) g_menu3d.focus = laser.row;
   if (out->menu && !g_prev_menu_btn) g_menu3d.visible = !g_menu3d.visible;
   g_prev_menu_btn = out->menu;
   const bool trig = out->trigger_r > 0.55f;
