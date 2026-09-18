@@ -200,6 +200,10 @@ Only persist the last CSS window. Destroy/SetWindowSize on a splash or popup mus
 
 `--help` documents CSSVR_LAUNCH and that resize persists width/height. Offline 91/91. Not HMD-proven.
 
+## 2026-09-18 cycle 38
+
+First `--print`/`--settings`/spawn seeds default launch.cfg if missing (no overwrite). Offline 92/92. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

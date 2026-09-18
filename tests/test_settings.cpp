@@ -100,6 +100,30 @@ TEST(settings_note_win_size_and_debounce) {
   ASSERT_FALSE(Settings_ResizePersistReady(1920, 1080, 32, 32, 0, 1000, 400, true, &w, &h));
 }
 
+TEST(settings_seed_launch_if_missing) {
+  char dir[] = "/tmp/cssvr_seedXXXXXX";
+  ASSERT_TRUE(mkdtemp(dir) != nullptr);
+  std::string launch = std::string(dir) + "/launch.cfg";
+  setenv("CSSVR_LAUNCH", launch.c_str(), 1);
+  ASSERT_STREQ(LaunchPrefsPath(), launch.c_str());
+  ASSERT_FALSE(Settings_LaunchExists());
+  Settings s;
+  s.win_w = 1600;
+  s.win_h = 900;
+  s.left_handed = true;
+  ASSERT_TRUE(Settings_SeedLaunchIfMissing(s));
+  ASSERT_TRUE(Settings_LaunchExists());
+  ASSERT_FALSE(Settings_SeedLaunchIfMissing(s)); // never overwrite
+  s.win_w = 1280;
+  ASSERT_FALSE(Settings_SeedLaunchIfMissing(s));
+  Settings b;
+  ASSERT_TRUE(Settings_Load(&b));
+  ASSERT_EQ(b.win_w, 1600);
+  ASSERT_EQ(b.win_h, 900);
+  ASSERT_TRUE(b.left_handed);
+  unsetenv("CSSVR_LAUNCH");
+}
+
 TEST(settings_roundtrip_tmp) {
   char dir[] = "/tmp/cssvr_setXXXXXX";
   ASSERT_TRUE(mkdtemp(dir) != nullptr);

@@ -138,6 +138,7 @@ int main(int argc, char** argv) {
   if (!cli_w) opts.win_w = cssvr::Settings_ClampWin(set.win_w, 640, 3840);
   if (!cli_h) opts.win_h = cssvr::Settings_ClampWin(set.win_h, 480, 2160);
   if (did_set) cssvr::Settings_Save(set);
+  else if (!find_only) cssvr::Settings_SeedLaunchIfMissing(set);
   if (settings_only || (did_set && !play && !find_only && !print_only)) {
     std::fputs(cssvr::Settings_Format(set).c_str(), stdout);
     PrintLaunchPath();

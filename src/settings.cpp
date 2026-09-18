@@ -32,8 +32,13 @@ const char* LaunchPrefsPath() {
     g_launch_path = e;
     return g_launch_path.c_str();
   }
-  if (g_launch_path.empty()) g_launch_path = Home() + "/.config/gvrmod/cssvr_launch.cfg";
+  g_launch_path = Home() + "/.config/gvrmod/cssvr_launch.cfg";
   return g_launch_path.c_str();
+}
+
+bool Settings_LaunchExists() {
+  const char* p = LaunchPrefsPath();
+  return p && p[0] && access(p, R_OK) == 0;
 }
 
 bool Settings_Load(Settings* s) {
@@ -74,6 +79,11 @@ bool Settings_SaveLaunch(const Settings& s) {
 
 bool Settings_Save(const Settings& s) {
   if (!CalibSave(s.calib)) return false;
+  return Settings_SaveLaunch(s);
+}
+
+bool Settings_SeedLaunchIfMissing(const Settings& s) {
+  if (Settings_LaunchExists()) return false;
   return Settings_SaveLaunch(s);
 }
 

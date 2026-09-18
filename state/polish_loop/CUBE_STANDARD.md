@@ -23,7 +23,7 @@ Same framebuffer submitted twice is **not** stereo. gVRMod forbids submitting on
 | Controls from XR | yes | CreateMove overlay; primary hand seeded at Start; not HMD-proven |
 | Wall / hand collision | last-free hull | TraceRay self-test + miss toast; not HMD-proven |
 | Vision cal | scale→V→H→eye | settings host + 3D panel + laser + grip + HAND + title hot/HOME |
-| Framed window | yes | yes (SDL/X11 hook); size persist + live resize; `--help` names CSSVR_LAUNCH |
+| Framed window | yes | yes (SDL/X11 hook); size persist + live resize; first run seeds launch.cfg |
 | Honest no-HMD | toast | toast + fail banner; MONO on desktop until dual paint |
 
 ## Standalone launcher

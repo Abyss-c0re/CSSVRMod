@@ -154,9 +154,12 @@ inline bool Settings_LeftHandedFromLaunchText(const char* text) {
 }
 
 const char* LaunchPrefsPath();
+bool Settings_LaunchExists();
 bool Settings_Load(Settings* s);
 bool Settings_SaveLaunch(const Settings& s); // launch.cfg only — resize must not rewrite Vision
 bool Settings_Save(const Settings& s);
+/// Write defaults only if launch.cfg is missing. False if already present or write failed.
+bool Settings_SeedLaunchIfMissing(const Settings& s);
 
 /// One --print / --settings line: "launch.cfg /path ok" or "launch.cfg /path missing".
 inline std::string FormatLaunchPath(const char* path, bool exists) {
