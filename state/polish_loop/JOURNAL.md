@@ -188,6 +188,10 @@ Persist desktop window width/height in launch.cfg; spawn uses them. Offline 85/8
 
 User-resized framed window persists to launch.cfg (debounce, ignore minimize). Offline 89/89. Not HMD-proven.
 
+## 2026-09-18 cycle 35 follow
+
+Only persist the last CSS window. Destroy/SetWindowSize on a splash or popup must not overwrite the game size.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

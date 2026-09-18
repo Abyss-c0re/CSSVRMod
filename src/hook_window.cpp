@@ -215,12 +215,12 @@ void* SDL_CreateWindow(const char* title, int x, int y, int w, int h, uint32_t f
 void SDL_SetWindowSize(void* window, int w, int h) {
   EnsureSdl();
   if (g_set_size) g_set_size(window, w, h);
-  PersistWinSize(w, h, false);
+  if (window == g_last_win) PersistWinSize(w, h, false);
 }
 
 void SDL_DestroyWindow(void* window) {
   EnsureSdl();
-  if (window && g_get_size) {
+  if (window && window == g_last_win && g_get_size) {
     int w = 0, h = 0;
     g_get_size(window, &w, &h);
     PersistWinSize(w, h, true);
