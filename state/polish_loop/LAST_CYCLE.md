@@ -1,13 +1,13 @@
-# Cycle 54 — 2026-09-18
+# Cycle 55 — 2026-09-18
 
 ## Focus
 
-`dual-origin-honors-swap-eyes` — Vision SWAP did nothing after pose/UV IPD went to 0.
+`hook-retry-no-patch` — one failed vtable write permanently killed RenderView/CreateMove.
 
 ## Did
 
-- Dual world origins swap when `swap_eyes` is set.
-- VIEW pose and UV stay identity (no second plane).
+- `no_patch` retries each present (splash / mprotect / not-yet-live vtable).
+- Still toasts once. Locate misses (`no_xref`, empty vtable) stay permanent.
 
 ## Did not
 
@@ -16,7 +16,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 106 passed, 0 failed (851 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 106 passed, 0 failed (855 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

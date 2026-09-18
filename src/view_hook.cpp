@@ -228,8 +228,9 @@ void ViewHookTryInstall() {
        g_loc.fields.origin_off);
   if (!patched) {
     g_orig = nullptr;
-    NoteLocateToast(g_loc.slot_rva.empty() ? "fn_no_vtable" : "no_patch", false);
-    g_rv_permanent = true;
+    const char* why = g_loc.slot_rva.empty() ? "fn_no_vtable" : "no_patch";
+    NoteLocateToast(why, false);
+    if (!HookInstall_ShouldRetry(why, false)) g_rv_permanent = true;
   }
   ProbeLiveEngine(g_eng);
   Logf("engine angles_ok=%d get=%d set=%d %s", g_eng.angles_ok ? 1 : 0, g_eng.get_angles_idx,

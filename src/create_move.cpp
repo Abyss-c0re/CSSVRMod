@@ -107,8 +107,9 @@ bool UserCmd_HookLive() {
        patched);
   if (!patched) {
     g_orig = nullptr;
-    NoteCreateMoveToast(g_loc.slot_rva.empty() ? "no_vtable" : "no_patch", false);
-    g_attempted = true;
+    const char* why = g_loc.slot_rva.empty() ? "no_vtable" : "no_patch";
+    NoteCreateMoveToast(why, false);
+    if (!HookInstall_ShouldRetry(why, false)) g_attempted = true;
   }
   return g_installed;
 }

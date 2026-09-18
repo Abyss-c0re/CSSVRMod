@@ -229,10 +229,15 @@ inline bool HookInstall_Transient(const char* reason) {
   return reason && std::strcmp(reason, "no_client_base") == 0;
 }
 
+/// vtable *p != fn can miss on the splash present. Retry. Still toast once.
+inline bool HookInstall_RetryPatch(const char* reason) {
+  return reason && std::strcmp(reason, "no_patch") == 0;
+}
+
 inline bool HookInstall_ShouldRetry(const char* reason, bool hooked) {
   if (hooked) return false;
   if (!reason || !reason[0] || std::strcmp(reason, "idle") == 0) return true;
-  return HookInstall_Transient(reason);
+  return HookInstall_Transient(reason) || HookInstall_RetryPatch(reason);
 }
 
 inline bool RenderView_IsMissReason(const char* reason) {

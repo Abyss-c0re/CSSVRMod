@@ -5,6 +5,7 @@
 - [x] Dual-origin law: cyclopean ± head-right × halfIPD; pose IPD gated on `painted_dual` (cycle 2).
 - [x] Locate + vtable-hook `CViewRender::RenderView` via string xref (cycle 4). `painted_dual` only after two captures.
 - [x] Retry hook until `client.so` is mapped (cycle 44). First present can be splash; `no_client_base` is transient, not a toast.
+- [x] Retry `no_patch` (cycle 55). Splash present + vtable miss used to permanently kill dual paint. Toast once.
 - [x] VK present clears the dual-paint frame gate (cycle 45). `ViewHookOnSwap` was GL-only; `g_did_frame` stayed true so dual ran at most once.
 - [x] `client.so` base via full path + `/proc/self/maps` (cycle 42). Short-name `dlopen(NOLOAD)` misses a path-loaded CSS module — hook never attached.
 - [x] Maps basename match (cycle 48). `client.so` must not bind `steamclient.so`.

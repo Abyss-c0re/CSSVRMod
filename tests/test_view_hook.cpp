@@ -128,10 +128,14 @@ TEST(locate_renderview_fixture_and_css) {
 TEST(hook_install_retries_until_client_mapped) {
   ASSERT_TRUE(HookInstall_Transient("no_client_base"));
   ASSERT_FALSE(HookInstall_Transient("no_xref"));
+  ASSERT_FALSE(HookInstall_Transient("no_patch"));
+  ASSERT_TRUE(HookInstall_RetryPatch("no_patch"));
   ASSERT_TRUE(HookInstall_ShouldRetry("no_client_base", false));
+  ASSERT_TRUE(HookInstall_ShouldRetry("no_patch", false));
   ASSERT_TRUE(HookInstall_ShouldRetry("idle", false));
   ASSERT_FALSE(HookInstall_ShouldRetry("no_xref", false));
   ASSERT_FALSE(HookInstall_ShouldRetry("no_client_base", true));
+  ASSERT_FALSE(HookInstall_ShouldRetry("no_patch", true));
   RenderViewToastIn in;
   in.locate_reason = "no_client_base";
   ASSERT_FALSE(RenderView_ToastDecide(in).should_toast);

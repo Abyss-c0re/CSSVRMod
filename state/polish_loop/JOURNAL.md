@@ -268,6 +268,10 @@ Mono UV IPD dropped. Same framebuffer + per-eye UV shift is two planes. Shared V
 
 Dual origins honor swap_eyes. Pose/UV IPD stay 0. Offline 106/106. Not HMD-proven.
 
+## 2026-09-18 cycle 55
+
+Retry no_patch. One splash vtable miss no longer permanently kills dual paint. Offline 106/106. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.
