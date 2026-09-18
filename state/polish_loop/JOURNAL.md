@@ -144,6 +144,10 @@ Laser cursor at Vision-panel hit UV (cyan crosshair). Offline 78/78. Not HMD-pro
 
 Grip-drag the world-locked Vision panel (offset-lock while grab+laser on quad). Offline 79/79. Not HMD-proven.
 
+## 2026-09-18 cycle 25
+
+Vision panel yaws toward the HMD (STAGE XZ). Laser plane matches the quad. Offline 80/80. Not HMD-proven.
+
 
 
 

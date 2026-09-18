@@ -25,6 +25,7 @@ struct Menu3d {
   float cu = 0.5f;
   float cv = 0.5f;
   Vec3 pos{0.f, kMenuY, kMenuZ};
+  float yaw = 0.f; // STAGE +Y; 0 = identity, local +Z toward +STAGE Z
   bool gripping = false;
   Vec3 grip_off{};
 };
@@ -79,17 +80,45 @@ inline Vec3 Menu3d_AimFromQuat(float qx, float qy, float qz, float qw) {
   return Menu3d_QuatRotate(qx, qy, qz, qw, {0.f, 0.f, -1.f});
 }
 
+struct Menu3dQuat {
+  float x = 0.f, y = 0.f, z = 0.f, w = 1.f;
+};
+
+// OpenXR quad faces local +Z. Yaw so that axis points at the HMD on the STAGE XZ plane.
+inline float Menu3d_FaceYaw(const Vec3& panel, const Vec3& hmd) {
+  const float dx = hmd.x - panel.x;
+  const float dz = hmd.z - panel.z;
+  if (dx * dx + dz * dz < 1e-6f) return 0.f;
+  return std::atan2(dx, dz);
+}
+
+inline Menu3dQuat Menu3d_YawQuat(float yaw) {
+  const float h = yaw * 0.5f;
+  return {0.f, std::sin(h), 0.f, std::cos(h)};
+}
+
+inline Vec3 Menu3d_Normal(float yaw) { return {std::sin(yaw), 0.f, std::cos(yaw)}; }
+
+inline Vec3 Menu3d_Right(float yaw) { return {std::cos(yaw), 0.f, -std::sin(yaw)}; }
+
+inline void Menu3d_FaceHmd(Menu3d* m, const Vec3& hmd) {
+  if (!m) return;
+  m->yaw = Menu3d_FaceYaw(m->pos, hmd);
+}
+
 inline Menu3dLaserHit Menu3d_RayHit(const Vec3& origin, const Vec3& dir,
-                                    const Vec3& center = Vec3{0.f, kMenuY, kMenuZ}) {
+                                    const Vec3& center = Vec3{0.f, kMenuY, kMenuZ},
+                                    float yaw = 0.f) {
   Menu3dLaserHit h;
-  const Vec3 N{0.f, 0.f, 1.f};
+  const Vec3 N = Menu3d_Normal(yaw);
   const float denom = dir.Dot(N);
   if (std::fabs(denom) < 1e-6f) return h;
   const float t = (center - origin).Dot(N) / denom;
   if (t < 0.02f || t > 8.f) return h;
   const Vec3 dlt = origin + dir * t - center;
+  const Vec3 R = Menu3d_Right(yaw);
   h.t = t;
-  h.u = 0.5f + dlt.x / kMenuW;
+  h.u = 0.5f + dlt.Dot(R) / kMenuW;
   h.v = 0.5f - dlt.y / kMenuH;
   h.on_quad = Menu3d_OnQuad(h.u, h.v);
   h.row = Menu3d_HitRow(h.u, h.v);

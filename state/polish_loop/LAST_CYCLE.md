@@ -1,24 +1,24 @@
-# Cycle 24 — 2026-09-18
+# Cycle 25 — 2026-09-18
 
 ## Focus
 
-`menu3d-grip-move` — world-locked Vision panel could not be repositioned.
+`menu3d-face-hmd` — dragged Vision panel stayed +Z, so it could sit edge-on.
 
 ## Did
 
-- Panel origin is STAGE-movable. Right-hand grab while the laser is on the quad offset-locks the panel to the hand.
-- Laser / trigger / stick ignore the panel while gripping. Quad submit uses `Menu3d.pos`.
+- Yaw-only billboard: local +Z points at the HMD on the STAGE XZ plane.
+- Laser plane and quad pose share that yaw. Default in front of origin stays identity.
 
 ## Did not
 
 - HMD walk (user-gated).
-- Yaw the quad toward the HMD (next).
-- Claim live grip UX from offline green.
+- Pitch the panel or persist yaw.
+- Claim live billboard UX from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 79 passed, 0 failed (576 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 80 passed, 0 failed (587 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`menu3d-face-hmd` — yaw the world-locked panel toward the headset so a dragged panel stays readable.
+`menu3d-primary-hand` — laser + grip from the primary hand, not hardcoded right.

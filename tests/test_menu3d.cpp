@@ -110,6 +110,33 @@ TEST(menu3d_grip_moves_panel) {
   ASSERT_TRUE(c.pos.z <= -0.29f);
 }
 
+TEST(menu3d_faces_hmd_yaw) {
+  const Vec3 panel{0.f, kMenuY, kMenuZ};
+  const Vec3 hmd0{0.f, 1.6f, 0.f};
+  ASSERT_NEAR(Menu3d_FaceYaw(panel, hmd0), 0.f, 0.01);
+  const float left = Menu3d_FaceYaw({-1.f, kMenuY, kMenuZ}, hmd0);
+  ASSERT_TRUE(left > 0.4f && left < 0.9f);
+  const float right = Menu3d_FaceYaw({1.f, kMenuY, kMenuZ}, hmd0);
+  ASSERT_TRUE(right < -0.4f && right > -0.9f);
+  const Menu3dQuat id = Menu3d_YawQuat(0.f);
+  ASSERT_NEAR(id.x, 0.f, 0.001);
+  ASSERT_NEAR(id.y, 0.f, 0.001);
+  ASSERT_NEAR(id.w, 1.f, 0.001);
+
+  const float yaw90 = 1.5707963f;
+  const Vec3 c{0.f, kMenuY, kMenuZ};
+  const auto side = Menu3d_RayHit({1.f, kMenuY, kMenuZ}, {-1.f, 0.f, 0.f}, c, yaw90);
+  ASSERT_TRUE(side.on_quad);
+  ASSERT_NEAR(side.u, 0.5f, 0.02);
+  ASSERT_NEAR(side.v, 0.5f, 0.02);
+  ASSERT_FALSE(Menu3d_RayHit({0.f, kMenuY, 0.f}, {0.f, 0.f, -1.f}, c, yaw90).on_quad);
+
+  Menu3d m;
+  m.pos = {-1.f, kMenuY, kMenuZ};
+  Menu3d_FaceHmd(&m, hmd0);
+  ASSERT_NEAR(m.yaw, left, 0.001);
+}
+
 TEST(menu3d_raster_not_empty) {
   unsigned char pix[64 * 48 * 4];
   Menu3d m;

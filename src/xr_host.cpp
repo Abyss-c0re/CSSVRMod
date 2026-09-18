@@ -486,10 +486,26 @@ bool LocateAimHand(Vec3* o, Vec3* d) {
   return true;
 }
 
+bool LocateHmdStage(Vec3* p) {
+  if (!p || !xrLocateSpace || !g_view || !g_stage || !g_fs.predictedDisplayTime) return false;
+  XrSpaceLocation loc{XR_TYPE_SPACE_LOCATION};
+  if (xrLocateSpace(g_view, g_stage, g_fs.predictedDisplayTime, &loc) != XR_SUCCESS) return false;
+  if (!(loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT)) return false;
+  *p = {loc.pose.position.x, loc.pose.position.y, loc.pose.position.z};
+  return true;
+}
+
+void FaceMenuToHmd() {
+  if (!g_menu3d.visible) return;
+  Vec3 hmd;
+  if (LocateHmdStage(&hmd)) Menu3d_FaceHmd(&g_menu3d, hmd);
+}
+
 Menu3dLaserHit LocateMenuLaser() {
   Vec3 o, d;
   if (!g_menu3d.visible || !LocateAimHand(&o, &d)) return {};
-  return Menu3d_RayHit(o, d, g_menu3d.pos);
+  FaceMenuToHmd();
+  return Menu3d_RayHit(o, d, g_menu3d.pos, g_menu3d.yaw);
 }
 
 bool UploadMenuSwapchain() {
@@ -648,7 +664,12 @@ bool XrHostSubmitEyes(unsigned int gl_l, unsigned int gl_r, int src_w, int src_h
     quad.subImage.swapchain = g_menu_sc;
     quad.subImage.imageRect.offset = {0, 0};
     quad.subImage.imageRect.extent = {(int32_t)g_menuW, (int32_t)g_menuH};
-    quad.pose.orientation.w = 1.f;
+    FaceMenuToHmd();
+    const Menu3dQuat q = Menu3d_YawQuat(g_menu3d.yaw);
+    quad.pose.orientation.x = q.x;
+    quad.pose.orientation.y = q.y;
+    quad.pose.orientation.z = q.z;
+    quad.pose.orientation.w = q.w;
     quad.pose.position.x = g_menu3d.pos.x;
     quad.pose.position.y = g_menu3d.pos.y;
     quad.pose.position.z = g_menu3d.pos.z;
@@ -743,8 +764,10 @@ bool XrHostPollInput(XrSample* out) {
   pose(1, &out->right);
   Vec3 hand{}, dir{};
   const bool have_hand = LocateAimHand(&hand, &dir);
-  const Menu3dLaserHit laser =
-      (have_hand && g_menu3d.visible) ? Menu3d_RayHit(hand, dir, g_menu3d.pos) : Menu3dLaserHit{};
+  if (g_menu3d.visible) FaceMenuToHmd();
+  const Menu3dLaserHit laser = (have_hand && g_menu3d.visible)
+                                   ? Menu3d_RayHit(hand, dir, g_menu3d.pos, g_menu3d.yaw)
+                                   : Menu3dLaserHit{};
   Menu3d_SetCursor(&g_menu3d, laser);
   if (laser.hit && !g_menu3d.gripping) g_menu3d.focus = laser.row;
   if (g_menu3d.visible && have_hand)

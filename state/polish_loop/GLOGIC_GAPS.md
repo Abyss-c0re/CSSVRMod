@@ -21,7 +21,8 @@
 - [x] Laser ray vs world-locked Vision panel (cycle 22). Trigger clicks the aimed row; stick still walks focus.
 - [x] Laser cursor on Vision panel at hit UV (cycle 23).
 - [x] Grip-reposition the world-locked Vision panel (cycle 24). Grab+laser on quad offset-locks; still +Z facing.
-- [ ] Yaw the Vision panel toward the HMD so a dragged panel stays readable.
+- [x] Yaw the Vision panel toward the HMD (cycle 25). Laser plane matches the quad.
+- [ ] Laser + grip from primary hand (not hardcoded right).
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.
