@@ -1,24 +1,24 @@
-# Cycle 16 — 2026-09-18
+# Cycle 17 — 2026-09-18
 
 ## Focus
 
-`renderview-locate-miss-toast` — locate/hook fail only logged; dual never started silently.
+`incomplete-dual-capture-toast` — hook painted both eyes; copies missed; only a log.
 
 ## Did
 
-- Pure `RenderView_ToastDecide`: one-shot on locate/hook miss; never abort VR.
-- `ViewHookTryInstall` fires desktop toast + window title `NO RV`.
-- Hooked / `located` paths stay quiet.
+- Pure `DualCapture_ToastDecide`: toast after 8 incomplete frames; never abort VR.
+- `HookedRenderView` fires desktop toast + title `NO CAP`.
+- Two successful copies stay quiet (label `2CAP` is not a stereo claim).
 
 ## Did not
 
 - HMD walk (user-gated).
-- Claim stereo from offline green.
+- Claim stereo from offline green or from two captures.
 
 ## Tests
 
-`cssvrmod_tests` — 70 passed, 0 failed (479 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 71 passed, 0 failed (489 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`incomplete-dual-capture-toast` — hook live but two captures miss still stays silent except a log.
+`createmove-locate-miss-toast` — analog overlay locate fail is still log-only.

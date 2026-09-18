@@ -38,4 +38,44 @@ inline DualPaintResult DualPaint_Run(const StereoViewIn& in, const DualPaintFn& 
   return r;
 }
 
+// Hook live, both paints ran, but eye copies missed. One-shot after a short hold
+// so the first loading frames do not toast. Never abort VR (stay MONO).
+struct DualCaptureToastIn {
+  int paints = 0;
+  int captures = 0;
+  bool painted_dual = false;
+  int incomplete_frames = 0;
+  bool already_shown = false;
+};
+
+struct DualCaptureToast {
+  bool should_toast = false;
+  bool abort_vr = false;
+  const char* reason = "idle";
+  const char* copy = "";
+  const char* label = "RV · IDLE";
+};
+
+inline int DualCapture_MissHold() { return 8; }
+
+inline const char* DualCapture_MissCopy() {
+  return "Dual paint captured fewer than 2 eyes — staying MONO. Check the RT copy.";
+}
+
+inline DualCaptureToast DualCapture_ToastDecide(const DualCaptureToastIn& in) {
+  DualCaptureToast t;
+  t.abort_vr = false;
+  if (in.painted_dual) {
+    t.reason = "dual_ipd_origin";
+    t.label = "RV · 2CAP";
+    return t;
+  }
+  const bool incomplete = (in.paints == 2 && in.captures < 2);
+  t.reason = incomplete ? "incomplete_dual" : "idle";
+  t.copy = DualCapture_MissCopy();
+  t.label = incomplete ? "RV · NO CAP" : "RV · IDLE";
+  t.should_toast = incomplete && !in.already_shown && in.incomplete_frames >= DualCapture_MissHold();
+  return t;
+}
+
 } // namespace cssvr

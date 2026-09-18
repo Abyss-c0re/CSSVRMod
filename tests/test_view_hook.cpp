@@ -127,3 +127,32 @@ TEST(renderview_locate_miss_toast) {
   ASSERT_TRUE(RenderView_ToastDecide(in).should_toast);
   ASSERT_TRUE(std::strstr(RenderView_MissCopy("no_css"), "client.so") != nullptr);
 }
+
+TEST(dual_capture_miss_toast_after_hold) {
+  DualCaptureToastIn in;
+  in.paints = 2;
+  in.captures = 0;
+  in.incomplete_frames = 1;
+  auto early = DualCapture_ToastDecide(in);
+  ASSERT_FALSE(early.should_toast);
+  ASSERT_FALSE(early.abort_vr);
+  ASSERT_STREQ(early.reason, "incomplete_dual");
+  in.incomplete_frames = DualCapture_MissHold();
+  auto miss = DualCapture_ToastDecide(in);
+  ASSERT_TRUE(miss.should_toast);
+  ASSERT_STREQ(miss.label, "RV · NO CAP");
+  ASSERT_TRUE(std::strstr(miss.copy, "MONO") != nullptr);
+  in.already_shown = true;
+  ASSERT_FALSE(DualCapture_ToastDecide(in).should_toast);
+  in.already_shown = false;
+  in.painted_dual = true;
+  in.captures = 2;
+  auto ok = DualCapture_ToastDecide(in);
+  ASSERT_FALSE(ok.should_toast);
+  ASSERT_STREQ(ok.label, "RV · 2CAP");
+  in.painted_dual = false;
+  in.paints = 1;
+  in.captures = 0;
+  in.incomplete_frames = DualCapture_MissHold();
+  ASSERT_FALSE(DualCapture_ToastDecide(in).should_toast);
+}

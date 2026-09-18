@@ -100,6 +100,10 @@ CViewRender locate/hook miss toasts once (dual never starts silently). Offline 7
 
 ViewHookTryInstall only ran on GL swap. Live CSS is Vulkan, so the hook and the miss toast never fired. First vkQueuePresentKHR now installs RenderView + CreateMove.
 
+## 2026-09-18 cycle 17
+
+Incomplete dual capture (2 paints, <2 copies) toasts once after 8 frames. Offline 71/71. Not HMD-proven.
+
 
 
 

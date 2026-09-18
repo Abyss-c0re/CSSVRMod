@@ -33,6 +33,8 @@ GLuint g_eye[2] = {0, 0};
 int g_eyeW = 0, g_eyeH = 0;
 bool g_have_eyes = false;
 bool g_rv_toast = false;
+bool g_cap_toast = false;
+int g_incomplete_n = 0;
 
 void Logf(const char* fmt, ...) {
   FILE* f = std::fopen("/tmp/cssvrmod.log", "a");
@@ -56,6 +58,23 @@ void NoteLocateToast(const char* reason, bool hooked) {
   Logf("cssvr toast %s %s", t.label, t.copy);
   Toast_FireDesktop(t.copy);
   Chrome_NoteStatus("NO RV");
+}
+
+void NoteCaptureToast(const DualPaintResult& r) {
+  if (r.painted_dual) g_incomplete_n = 0;
+  else if (r.paints == 2 && r.captures < 2) g_incomplete_n++;
+  DualCaptureToastIn in;
+  in.paints = r.paints;
+  in.captures = r.captures;
+  in.painted_dual = r.painted_dual;
+  in.incomplete_frames = g_incomplete_n;
+  in.already_shown = g_cap_toast;
+  const DualCaptureToast t = DualCapture_ToastDecide(in);
+  if (!t.should_toast) return;
+  g_cap_toast = true;
+  Logf("cssvr toast %s paints=%d caps=%d %s", t.label, r.paints, r.captures, t.copy);
+  Toast_FireDesktop(t.copy);
+  Chrome_NoteStatus("NO CAP");
 }
 
 bool ProtectWrite(void* p, bool wr) {
@@ -145,6 +164,7 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
   if (n++ < 4 || (n % 300) == 0)
     Logf("renderview dual paints=%d caps=%d dual=%d look=%s %dx%d reason=%s", r.paints, r.captures,
          r.painted_dual ? 1 : 0, look.reason, w, h, r.reason);
+  NoteCaptureToast(r);
 }
 
 uintptr_t ClientBase() {
