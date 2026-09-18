@@ -120,17 +120,19 @@ TEST(stereo_dual_ipd_ignores_uv_eyescale) {
   ASSERT_NEAR(p.right.origin.y - in.origin.y, -full, 0.001);
 }
 
-TEST(stereo_uv_crop_drops_fake_ipd_when_dual) {
+TEST(stereo_uv_crop_never_fakes_ipd) {
   Calib c;
   c.eyescale = 1.f;
   c.hoffset = 0.2f;
   const auto mono_l = CalibSubmitCrop(c, 0, false);
   const auto mono_r = CalibSubmitCrop(c, 1, false);
-  ASSERT_TRUE(mono_l.u0 > mono_r.u0);
+  ASSERT_NEAR(mono_l.u0, mono_r.u0, 0.0001);
+  ASSERT_NEAR(mono_l.u1, mono_r.u1, 0.0001);
   const auto dual_l = CalibSubmitCrop(c, 0, true);
   const auto dual_r = CalibSubmitCrop(c, 1, true);
   ASSERT_NEAR(dual_l.u0, dual_r.u0, 0.0001);
   ASSERT_NEAR(dual_l.u1, dual_r.u1, 0.0001);
+  ASSERT_NEAR(dual_l.u0, mono_l.u0, 0.0001);
   ASSERT_NEAR(dual_l.pose_x, 0.f, 0.0001);
   ASSERT_NEAR(dual_r.pose_x, 0.f, 0.0001);
   // Shared Vision pan stays; it is not a second IPD plane.

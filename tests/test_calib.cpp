@@ -16,7 +16,7 @@ TEST(calib_clamp_and_defaults) {
   ASSERT_NEAR(c.ipd_m, 0.12f, 0.001);
 }
 
-TEST(calib_eye_apart_follows_eyescale) {
+TEST(calib_eye_uv_never_splits_one_frame) {
   Calib c;
   c.eyescale = 0.f;
   auto l0 = CalibEye(c, 0);
@@ -28,9 +28,9 @@ TEST(calib_eye_apart_follows_eyescale) {
   c.eyescale = 1.f;
   auto l1 = CalibEye(c, 0);
   auto r1 = CalibEye(c, 1);
-  ASSERT_NEAR(l1.pose_x, 0.f, 0.0001); // same-frame: no pose IPD
+  ASSERT_NEAR(l1.pose_x, 0.f, 0.0001);
   ASSERT_NEAR(r1.pose_x, 0.f, 0.0001);
-  ASSERT_TRUE(l1.u0 > r1.u0); // disparity is UV only until dual RenderView
+  ASSERT_NEAR(l1.u0, r1.u0, 0.001); // same framebuffer: no UV IPD plane
 }
 
 TEST(calib_parse_vrmod_names) {

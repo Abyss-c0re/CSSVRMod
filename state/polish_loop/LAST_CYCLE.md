@@ -1,13 +1,13 @@
-# Cycle 52 — 2026-09-18
+# Cycle 53 — 2026-09-18
 
 ## Focus
 
-`dual-pose-ipd-is-second-plane` — world IPD + VIEW pose IPD = two planes.
+`mono-uv-ipd-is-second-plane` — live path is MONO; per-eye UV IPD split one framebuffer.
 
 ## Did
 
-- `StereoView_SubmitPoseX` is always 0. The blit sits on the lenses (cycle 1).
-- Dual IPD stays in the two world origins only. Pose IPD on those rasters is heresy.
+- `CalibEye` no longer shifts L/R UV by eyescale. Same crop both eyes.
+- Shared Vision pan/zoom stay. Dual IPD remains world origins only.
 
 ## Did not
 
@@ -16,7 +16,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 105 passed, 0 failed (844 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 105 passed, 0 failed (846 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

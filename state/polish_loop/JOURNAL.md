@@ -260,6 +260,10 @@ Dual world IPD ignores Vision eyescale. Live 0.13 would crush camera sep to ~8 m
 
 VIEW pose IPD stays 0 after dual paint. IPD is the two world origins; a second VIEW plane is heresy. Offline 105/105. Not HMD-proven.
 
+## 2026-09-18 cycle 53
+
+Mono UV IPD dropped. Same framebuffer + per-eye UV shift is two planes. Shared Vision pan stays. Offline 105/105. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

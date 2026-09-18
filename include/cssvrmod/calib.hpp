@@ -39,17 +39,16 @@ struct EyeBlit {
   float pose_x = 0.f; // VIEW-space metres
 };
 
-// Vision UV crop. Dual world paints own IPD (stereo_view.hpp); UV stereo then drops.
+// Vision UV crop. Shared pan/zoom only. Per-eye UV IPD is a second plane.
 inline EyeBlit CalibEye(const Calib& raw, int eye, bool painted_dual = false) {
   const Calib c = ClampCalib(raw);
-  if (c.swap_eyes) eye = 1 - eye;
+  (void)eye;
+  (void)painted_dual;
   const float halfU = std::max(0.02f, 0.5f / c.scalefactor);
   const float halfV = std::max(0.02f, 0.5f / c.scalefactor);
   const float panU = c.hoffset * 0.22f;
   const float panV = c.voffset * 0.45f;
-  // Mono: eyescale is a UV crop. Dual paint: IPD is origin, not a second UV plane.
-  const float stereo = painted_dual ? 0.f : (0.04f * c.eyescale);
-  float cx = 0.5f + (eye == 0 ? stereo : -stereo);
+  float cx = 0.5f;
   float cy = 0.5f;
   cx = cx + (0.5f - cx) * c.lens_bend;
   cy = cy + (0.5f - cy) * c.lens_bend;

@@ -18,6 +18,7 @@
 - [x] Why `VkCaptureEye` misses: color RTs lacked TRANSFER_SRC; last RT only tracked BeginRenderPass (cycle 21). Dynamic rendering + GENERAL retry added. In-game copy still unproven.
 - [x] Same-frame submit must use **identity VIEW pose** (cycle 1). Pose IPD on a mono frame = two planes + black.
 - [x] Dual-eye blit drops UV IPD (cycle 41). `CalibSubmitCrop(..., painted_dual)` — Vision pan stays; a second UV plane on two world paints is heresy.
+- [x] Mono UV IPD dropped (cycle 53). Same framebuffer + per-eye UV shift is two planes. Shared H/V/scale stay.
 - [x] Dual world IPD ignores Vision eyescale (cycle 51). Live `eye=0.13` must not place cameras 8 mm apart.
 - [x] VIEW pose IPD stays 0 after dual paint (cycle 52). IPD is the two world origins; pose IPD on those rasters is a second plane.
 - [x] Identical L/R pixels stay MONO (cycle 46). Two copies of one RT must not unlock pose IPD.
