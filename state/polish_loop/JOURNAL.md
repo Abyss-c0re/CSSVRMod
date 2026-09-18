@@ -108,6 +108,10 @@ Incomplete dual capture (2 paints, <2 copies) toasts once after 8 frames. Offlin
 
 If copies later succeed, drop the NO CAP window title. Two captures still are not a stereo claim.
 
+## 2026-09-18 cycle 18
+
+CreateMove locate/hook miss toasts once; no per-tick client.so re-read. Offline 72/72. Not HMD-proven.
+
 
 
 

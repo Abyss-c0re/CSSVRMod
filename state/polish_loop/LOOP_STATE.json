@@ -1,10 +1,10 @@
 {
-  "cycle": 17,
+  "cycle": 18,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T10:02:00Z",
-  "last_focus": "incomplete-dual-capture-toast",
-  "next_focus": "createmove-locate-miss-toast",
+  "started_at": "2026-09-18T10:15:00Z",
+  "last_focus": "createmove-locate-miss-toast",
+  "next_focus": "engine-trace-miss-toast",
   "last_commit": "41d7fea",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"

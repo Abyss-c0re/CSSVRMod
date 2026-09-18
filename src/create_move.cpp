@@ -1,5 +1,7 @@
 #include "cssvrmod/create_move.hpp"
+#include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/launch.hpp"
+#include "cssvrmod/toast.hpp"
 #include "cssvrmod/usercmd.hpp"
 
 #include <cstdarg>
@@ -15,6 +17,8 @@ using CreateMoveFn = bool (*)(void*, float, void*);
 CreateMoveFn g_orig = nullptr;
 CreateMoveLoc g_loc;
 bool g_installed = false;
+bool g_attempted = false;
+bool g_cm_toast = false;
 
 void Logf(const char* fmt, ...) {
   FILE* f = std::fopen("/tmp/cssvrmod.log", "a");
@@ -56,22 +60,40 @@ uintptr_t ClientBase() {
   return reinterpret_cast<uintptr_t>(info.dli_fbase);
 }
 
+void NoteCreateMoveToast(const char* reason, bool hooked) {
+  CreateMoveToastIn in;
+  in.locate_reason = reason;
+  in.hooked = hooked;
+  in.already_shown = g_cm_toast;
+  const CreateMoveToast t = CreateMove_ToastDecide(in);
+  if (!t.should_toast) return;
+  g_cm_toast = true;
+  Logf("cssvr toast %s %s", t.label, t.copy);
+  Toast_FireDesktop(t.copy);
+  Chrome_NoteStatus("NO CMD");
+}
+
 } // namespace
 
 bool UserCmd_HookLive() {
   if (g_installed) return true;
+  if (g_attempted) return false;
+  g_attempted = true;
   CssInstall inst = FindCssInstall();
   if (!inst.found) {
     Logf("createmove skip: no css");
+    NoteCreateMoveToast("no_css", false);
     return false;
   }
   if (!LocateCreateMoveFile(inst.client_so.c_str(), &g_loc) || !g_loc.found) {
     Logf("createmove locate fail %s", g_loc.reason);
+    NoteCreateMoveToast(g_loc.reason ? g_loc.reason : "no_rtti", false);
     return false;
   }
   const uintptr_t base = ClientBase();
   if (!base) {
     Logf("createmove no client base");
+    NoteCreateMoveToast("no_client_base", false);
     return false;
   }
   g_orig = reinterpret_cast<CreateMoveFn>(base + g_loc.fn_rva);
@@ -87,7 +109,10 @@ bool UserCmd_HookLive() {
   g_installed = patched > 0;
   Logf("createmove hook fn=0x%llx slot=%d patched=%d", (unsigned long long)g_loc.fn_rva, g_loc.slot,
        patched);
-  if (!patched) g_orig = nullptr;
+  if (!patched) {
+    g_orig = nullptr;
+    NoteCreateMoveToast(g_loc.slot_rva.empty() ? "no_vtable" : "no_patch", false);
+  }
   return g_installed;
 }
 

@@ -135,4 +135,54 @@ inline bool LocateCreateMoveFile(const char* path, CreateMoveLoc* out) {
   return LocateCreateMoveInImage(buf.data(), buf.size(), out);
 }
 
+// Honest toast if CreateMove locate/hook misses — analog overlay never applies.
+struct CreateMoveToastIn {
+  const char* locate_reason = "idle";
+  bool hooked = false;
+  bool already_shown = false;
+};
+
+struct CreateMoveToast {
+  bool should_toast = false;
+  bool abort_vr = false;
+  const char* reason = "idle";
+  const char* copy = "";
+  const char* label = "CM · IDLE";
+};
+
+inline bool CreateMove_IsMissReason(const char* reason) {
+  if (!reason || !reason[0]) return false;
+  if (std::strcmp(reason, "idle") == 0 || std::strcmp(reason, "located") == 0 ||
+      std::strcmp(reason, "hooked") == 0)
+    return false;
+  return true;
+}
+
+inline const char* CreateMove_MissCopy(const char* reason) {
+  if (reason && (std::strcmp(reason, "no_css") == 0 || std::strcmp(reason, "open_fail") == 0 ||
+                 std::strcmp(reason, "read_fail") == 0 || std::strcmp(reason, "bad_size") == 0))
+    return "CSS client.so missing — cannot hook CreateMove (stick stays keyboard).";
+  if (reason && (std::strcmp(reason, "no_rtti") == 0 || std::strcmp(reason, "no_typeinfo") == 0 ||
+                 std::strcmp(reason, "no_vtable") == 0 || std::strcmp(reason, "no_xmm0_rsi") == 0))
+    return "CreateMove not found — analog overlay never applies.";
+  if (reason && (std::strcmp(reason, "no_patch") == 0 || std::strcmp(reason, "no_client_base") == 0))
+    return "CreateMove hook missed — analog overlay never applies.";
+  return "CreateMove locate failed — analog overlay never applies.";
+}
+
+inline CreateMoveToast CreateMove_ToastDecide(const CreateMoveToastIn& in) {
+  CreateMoveToast t;
+  t.abort_vr = false;
+  t.reason = (in.locate_reason && in.locate_reason[0]) ? in.locate_reason : "idle";
+  if (in.hooked) {
+    t.reason = "hooked";
+    t.label = "CM · HOOKED";
+    return t;
+  }
+  t.copy = CreateMove_MissCopy(t.reason);
+  t.label = CreateMove_IsMissReason(t.reason) ? "CM · MISS" : "CM · IDLE";
+  t.should_toast = !in.already_shown && CreateMove_IsMissReason(t.reason);
+  return t;
+}
+
 } // namespace cssvr

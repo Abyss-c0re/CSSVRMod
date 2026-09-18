@@ -64,3 +64,26 @@ TEST(createmove_locate_css) {
   ASSERT_TRUE(loc.slot >= 16 && loc.slot <= 26);
   ASSERT_TRUE(loc.slot_rva.size() >= 1);
 }
+
+TEST(createmove_locate_miss_toast) {
+  CreateMoveToastIn in;
+  in.locate_reason = "no_xmm0_rsi";
+  auto miss = CreateMove_ToastDecide(in);
+  ASSERT_TRUE(miss.should_toast);
+  ASSERT_FALSE(miss.abort_vr);
+  ASSERT_STREQ(miss.label, "CM · MISS");
+  ASSERT_TRUE(std::strstr(miss.copy, "analog") != nullptr);
+  in.already_shown = true;
+  ASSERT_FALSE(CreateMove_ToastDecide(in).should_toast);
+  in.already_shown = false;
+  in.hooked = true;
+  auto ok = CreateMove_ToastDecide(in);
+  ASSERT_FALSE(ok.should_toast);
+  ASSERT_STREQ(ok.reason, "hooked");
+  in.hooked = false;
+  in.locate_reason = "located";
+  ASSERT_FALSE(CreateMove_ToastDecide(in).should_toast);
+  in.locate_reason = "no_patch";
+  ASSERT_TRUE(CreateMove_ToastDecide(in).should_toast);
+  ASSERT_TRUE(std::strstr(CreateMove_MissCopy("no_css"), "client.so") != nullptr);
+}

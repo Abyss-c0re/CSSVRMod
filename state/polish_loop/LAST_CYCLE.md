@@ -1,24 +1,23 @@
-# Cycle 17 — 2026-09-18
+# Cycle 18 — 2026-09-18
 
 ## Focus
 
-`incomplete-dual-capture-toast` — hook painted both eyes; copies missed; only a log.
+`createmove-locate-miss-toast` — analog overlay locate fail was log-only and retried every tick.
 
 ## Did
 
-- Pure `DualCapture_ToastDecide`: toast after 8 incomplete frames; never abort VR.
-- `HookedRenderView` fires desktop toast + title `NO CAP`.
-- Two successful copies stay quiet (label `2CAP` is not a stereo claim).
+- Pure `CreateMove_ToastDecide`: one-shot on locate/hook miss; never abort VR.
+- `UserCmd_HookLive` toasts + title `NO CMD`; `g_attempted` stops per-tick client.so re-reads.
 
 ## Did not
 
 - HMD walk (user-gated).
-- Claim stereo from offline green or from two captures.
+- Claim stereo or live stick smoke from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 71 passed, 0 failed (489 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 72 passed, 0 failed (499 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`createmove-locate-miss-toast` — analog overlay locate fail is still log-only.
+`engine-trace-miss-toast` — TraceRay self-test fail is still log-only.
