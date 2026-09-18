@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T11:07:00Z",
   "last_focus": "menu3d-laser-hit",
   "next_focus": "menu3d-laser-dot",
-  "last_commit": "dba8c08",
+  "last_commit": "94475cf",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
