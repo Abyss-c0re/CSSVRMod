@@ -26,7 +26,7 @@ You are a **careful product polish agent** for **CSSVRMod only** (`/home/voldema
 - **Stop the toast ladder.** Cycles 13–20 already toast no-HMD, locate miss, no cap, no cmd, no trace, no angles. Do not add another `*-toast` theme unless the user is still being lied to.
 - **Do not pick `vk-eye-copy-in-game`.** That needs the user in CSS.
 - **Stop the Vision-panel ladder.** Laser, grip, face-HMD, HAND, reset, HOME, title-hot are in. Do not add another `menu3d-*` chrome cycle.
-- **Do not pick `dual-renderview-ipd-origin`.** Dual paint is HMD-gated. Prefer `settings-win-size` (persist `-w`/`-h` in launch.cfg) or another offline-provable gap.
+- **Do not pick `dual-renderview-ipd-origin`.** Dual paint is HMD-gated. Window size is persistable (`--set width/height`). Prefer a non-menu, non-toast offline gap — do not invent chrome.
 
 ## 2. Implement carefully
 

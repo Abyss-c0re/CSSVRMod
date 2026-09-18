@@ -1,24 +1,23 @@
-# Cycle 31 — 2026-09-18
+# Cycle 32 — 2026-09-18
 
 ## Focus
 
-`launch-seed-handed` — hook only saw `CSSVR_LEFT_HANDED` after XR init, so first Tick was right-only.
+`settings-win-size` — desktop `-w`/`-h` were hardcoded 1920×1080.
 
 ## Did
 
-- `Settings_LeftHandedSeed` / parse launch.cfg text. Env wins.
-- `CSSVR.sh` exports from `cssvr_launch.cfg` before exec. `CSSVR` setenv before spawn.
+- Persist `width`/`height` in launch.cfg (`--set width 1280`). Clamp 640–3840 × 480–2160.
+- Spawn and `--width`/`--height` apply the knobs. Still framed (no force `-noborder`).
 
 ## Did not
 
 - HMD walk (user-gated). Dual-origin remains P0 but in-game.
-- Menu chrome.
-- Claim live left-hand start from offline green.
+- Menu chrome / toasts.
 
 ## Tests
 
-`cssvrmod_tests` — 85 passed, 0 failed (635 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 85 passed, 0 failed (649 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`dual-renderview-ipd-origin` — still HMD-gated. Do not add `menu3d-*`. Prefer a non-menu offline gap or wait for a headset walk.
+`dual-renderview-ipd-origin` — still HMD-gated. Do not add `menu3d-*` or another toast. Prefer a non-menu offline gap or wait.

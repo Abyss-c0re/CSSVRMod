@@ -77,6 +77,16 @@ TEST(launch_default_vk_bordered) {
   }
   ASSERT_TRUE(has_windowed);
   ASSERT_TRUE(has_videomode);
+  o.win_w = 1280;
+  o.win_h = 720;
+  auto sized = PlanSpawn(inst, o);
+  bool has_w = false, has_h = false;
+  for (size_t i = 0; i + 1 < sized.argv.size(); ++i) {
+    if (sized.argv[i] == "-w" && sized.argv[i + 1] == "1280") has_w = true;
+    if (sized.argv[i] == "-h" && sized.argv[i + 1] == "720") has_h = true;
+  }
+  ASSERT_TRUE(has_w);
+  ASSERT_TRUE(has_h);
 }
 
 TEST(launch_detects_curl_gnutls_libdir) {

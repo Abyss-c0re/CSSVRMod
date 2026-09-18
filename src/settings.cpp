@@ -67,7 +67,9 @@ bool Settings_Save(const Settings& s) {
   out << "backend " << BackendName(s.backend) << "\n"
       << "map " << (s.map.empty() ? "-" : s.map) << "\n"
       << "noborder " << (s.noborder ? 1 : 0) << "\n"
-      << "left_handed " << (s.left_handed ? 1 : 0) << "\n";
+      << "left_handed " << (s.left_handed ? 1 : 0) << "\n"
+      << "width " << Settings_ClampWin(s.win_w, 640, 3840) << "\n"
+      << "height " << Settings_ClampWin(s.win_h, 480, 2160) << "\n";
   return true;
 }
 

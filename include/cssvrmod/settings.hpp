@@ -3,6 +3,7 @@
 #include "backend.hpp"
 #include "calib.hpp"
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 
@@ -14,7 +15,15 @@ struct Settings {
   std::string map;
   bool noborder = false;
   bool left_handed = false;
+  int win_w = 1920;
+  int win_h = 1080;
 };
+
+inline int Settings_ClampWin(int v, int lo, int hi) {
+  if (v < lo) return lo;
+  if (v > hi) return hi;
+  return v;
+}
 
 inline bool Settings_ApplyKey(Settings* s, const char* key, const char* val) {
   if (!s || !key || !key[0] || !val) return false;
@@ -32,6 +41,16 @@ inline bool Settings_ApplyKey(Settings* s, const char* key, const char* val) {
   }
   if (std::strcmp(key, "left_handed") == 0 || std::strcmp(key, "lefthanded") == 0) {
     s->left_handed = !(val[0] == '0' && val[1] == 0);
+    return true;
+  }
+  if (std::strcmp(key, "width") == 0 || std::strcmp(key, "win_w") == 0 ||
+      std::strcmp(key, "w") == 0) {
+    s->win_w = Settings_ClampWin(std::atoi(val), 640, 3840);
+    return true;
+  }
+  if (std::strcmp(key, "height") == 0 || std::strcmp(key, "win_h") == 0 ||
+      std::strcmp(key, "h") == 0) {
+    s->win_h = Settings_ClampWin(std::atoi(val), 480, 2160);
     return true;
   }
   char buf[160];
@@ -66,10 +85,13 @@ inline std::string Settings_Format(const Settings& s) {
                 "backend %s\n"
                 "map %s\n"
                 "noborder %d\n"
-                "left_handed %d\n",
+                "left_handed %d\n"
+                "width %d\n"
+                "height %d\n",
                 c.eyescale, c.hoffset, c.voffset, c.scalefactor, c.lens_bend, c.ipd_m,
                 c.swap_eyes ? 1 : 0, BackendName(s.backend), s.map.empty() ? "-" : s.map.c_str(),
-                s.noborder ? 1 : 0, s.left_handed ? 1 : 0);
+                s.noborder ? 1 : 0, s.left_handed ? 1 : 0,
+                Settings_ClampWin(s.win_w, 640, 3840), Settings_ClampWin(s.win_h, 480, 2160));
   return buf;
 }
 

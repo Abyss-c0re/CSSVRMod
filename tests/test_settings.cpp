@@ -22,6 +22,14 @@ TEST(settings_apply_vision_and_launch) {
   ASSERT_TRUE(s.left_handed);
   ASSERT_TRUE(Settings_ApplyKey(&s, "lefthanded", "0"));
   ASSERT_FALSE(s.left_handed);
+  ASSERT_TRUE(Settings_ApplyKey(&s, "width", "1280"));
+  ASSERT_EQ(s.win_w, 1280);
+  ASSERT_TRUE(Settings_ApplyKey(&s, "height", "720"));
+  ASSERT_EQ(s.win_h, 720);
+  ASSERT_TRUE(Settings_ApplyKey(&s, "width", "100"));
+  ASSERT_EQ(s.win_w, 640);
+  ASSERT_TRUE(Settings_ApplyKey(&s, "height", "9999"));
+  ASSERT_EQ(s.win_h, 2160);
   ASSERT_FALSE(Settings_ApplyKey(&s, "cinema", "1"));
   const std::string t = Settings_Format(s);
   ASSERT_TRUE(t.find("eyescale") != std::string::npos);
@@ -30,6 +38,11 @@ TEST(settings_apply_vision_and_launch) {
   s.left_handed = true;
   const std::string t2 = Settings_Format(s);
   ASSERT_TRUE(t2.find("left_handed 1") != std::string::npos);
+  s.win_w = 1280;
+  s.win_h = 720;
+  const std::string t3 = Settings_Format(s);
+  ASSERT_TRUE(t3.find("width 1280") != std::string::npos);
+  ASSERT_TRUE(t3.find("height 720") != std::string::npos);
 }
 
 TEST(settings_seed_left_handed) {
@@ -55,12 +68,16 @@ TEST(settings_roundtrip_tmp) {
   s.backend = Backend::Vk;
   s.map = "de_inferno";
   s.left_handed = true;
+  s.win_w = 1280;
+  s.win_h = 720;
   ASSERT_TRUE(Settings_Save(s));
   Settings b;
   ASSERT_TRUE(Settings_Load(&b));
   ASSERT_NEAR(b.calib.eyescale, 0.18f, 0.01);
   ASSERT_TRUE(b.map == "de_inferno");
   ASSERT_TRUE(b.left_handed);
+  ASSERT_EQ(b.win_w, 1280);
+  ASSERT_EQ(b.win_h, 720);
   unsetenv("CSSVR_CALIB");
   unsetenv("CSSVR_LAUNCH");
 }

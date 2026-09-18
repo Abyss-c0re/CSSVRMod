@@ -23,6 +23,8 @@ static void Usage() {
                "  --gl       OpenGL/togl (CreateDevice still broken on this GPU)\n"
                "  --dx9      original vrmod CreateTexture path (shaderapidx9)\n"
                "  --noborder borderless window (default is decorated)\n"
+               "  --width N  desktop window width (also --set width N)\n"
+               "  --height N desktop window height\n"
                "  --no-hook  spawn CSS without VR hook (debug)\n");
 }
 
@@ -69,7 +71,7 @@ static int Spawn(const cssvr::SpawnPlan& p) {
 int main(int argc, char** argv) {
   bool find_only = false, print_only = false, no_hook = false;
   bool settings_only = false, did_set = false, play = false;
-  bool cli_backend = false, cli_map = false;
+  bool cli_backend = false, cli_map = false, cli_w = false, cli_h = false;
   cssvr::LaunchOpts opts;
   cssvr::Settings set;
   cssvr::Settings_Load(&set);
@@ -109,7 +111,13 @@ int main(int argc, char** argv) {
       opts.backend = cssvr::Backend::Vk;
       cli_backend = true;
     } else if (std::strcmp(argv[i], "--noborder") == 0) opts.noborder = true;
-    else {
+    else if (std::strcmp(argv[i], "--width") == 0 && i + 1 < argc) {
+      opts.win_w = cssvr::Settings_ClampWin(std::atoi(argv[++i]), 640, 3840);
+      cli_w = true;
+    } else if (std::strcmp(argv[i], "--height") == 0 && i + 1 < argc) {
+      opts.win_h = cssvr::Settings_ClampWin(std::atoi(argv[++i]), 480, 2160);
+      cli_h = true;
+    } else {
       std::fprintf(stderr, "cssvr: unknown arg %s\n", argv[i]);
       Usage();
       return 1;
@@ -119,6 +127,8 @@ int main(int argc, char** argv) {
   if (!cli_backend) opts.backend = set.backend;
   if (!cli_map && !set.map.empty() && set.map != "-") opts.map = set.map;
   if (set.noborder) opts.noborder = true;
+  if (!cli_w) opts.win_w = cssvr::Settings_ClampWin(set.win_w, 640, 3840);
+  if (!cli_h) opts.win_h = cssvr::Settings_ClampWin(set.win_h, 480, 2160);
   if (did_set) cssvr::Settings_Save(set);
   if (settings_only || (did_set && !play && !find_only && !print_only)) {
     std::fputs(cssvr::Settings_Format(set).c_str(), stdout);
