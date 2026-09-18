@@ -132,6 +132,10 @@ Color RTs gain TRANSFER_SRC; last RT also tracks BeginRendering; GENERAL layout 
 
 Dropped GENERAL retry after an 8 ms fence timeout (in-flight cmd buffer). Next is 3D-menu laser hit, not an unattended in-game copy proof.
 
+## 2026-09-18 cycle 22
+
+Laser ray vs Vision panel: hover + trigger clicks the aimed row. Offline 77/77. Not HMD-proven.
+
 
 
 

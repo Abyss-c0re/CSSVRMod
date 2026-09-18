@@ -18,6 +18,7 @@
 
 - [x] World-locked 3D Vision panel (HL2VR/Cube class) — menu button toggle, stick rows (cycle 3).
 - [x] 3D panel row labels + values (cycle 12). Glyphs, not engine VGUI.
+- [x] Laser ray vs world-locked Vision panel (cycle 22). Trigger clicks the aimed row; stick still walks focus.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.

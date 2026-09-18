@@ -1,6 +1,7 @@
 #pragma once
 // World-locked 3D settings panel (HL2VR / Cube class) — not a 2D square on the lens.
 #include "calib.hpp"
+#include "vec3.hpp"
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
@@ -27,6 +28,40 @@ inline int Menu3d_HitRow(float u, float v) {
   const int row = (int)((v - 0.18f) / ((0.92f - 0.18f) / (float)kMenuRows));
   if (row < 0 || row >= kMenuRows) return -1;
   return row;
+}
+
+struct Menu3dLaserHit {
+  bool hit = false;
+  float u = 0.f, v = 0.f, t = 0.f;
+  int row = -1;
+};
+
+// STAGE metres. Identity quad at (0, kMenuY, kMenuZ) faces +Z (OpenXR quad).
+inline Vec3 Menu3d_QuatRotate(float qx, float qy, float qz, float qw, const Vec3& v) {
+  const Vec3 q{qx, qy, qz};
+  const Vec3 t = Cross(q, v) * 2.f;
+  return v + t * qw + Cross(q, t);
+}
+
+inline Vec3 Menu3d_AimFromQuat(float qx, float qy, float qz, float qw) {
+  return Menu3d_QuatRotate(qx, qy, qz, qw, {0.f, 0.f, -1.f});
+}
+
+inline Menu3dLaserHit Menu3d_RayHit(const Vec3& origin, const Vec3& dir) {
+  Menu3dLaserHit h;
+  const Vec3 C{0.f, kMenuY, kMenuZ};
+  const Vec3 N{0.f, 0.f, 1.f};
+  const float denom = dir.Dot(N);
+  if (std::fabs(denom) < 1e-6f) return h;
+  const float t = (C - origin).Dot(N) / denom;
+  if (t < 0.02f || t > 8.f) return h;
+  const Vec3 dlt = origin + dir * t - C;
+  h.t = t;
+  h.u = 0.5f + dlt.x / kMenuW;
+  h.v = 0.5f - dlt.y / kMenuH;
+  h.row = Menu3d_HitRow(h.u, h.v);
+  h.hit = h.row >= 0;
+  return h;
 }
 
 inline bool Menu3d_ApplyClick(Menu3d* m, int row, int dir) {

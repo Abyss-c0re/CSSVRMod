@@ -14,6 +14,24 @@ TEST(menu3d_hit_and_click) {
   ASSERT_TRUE(!m.visible);
 }
 
+TEST(menu3d_laser_hits_panel) {
+  const Vec3 o{0.f, kMenuY, 0.f};
+  const auto mid = Menu3d_RayHit(o, {0.f, 0.f, -1.f});
+  ASSERT_TRUE(mid.hit);
+  ASSERT_NEAR(mid.u, 0.5f, 0.02);
+  ASSERT_NEAR(mid.v, 0.5f, 0.02);
+  ASSERT_TRUE(mid.row >= 1 && mid.row <= 3);
+  const auto left = Menu3d_RayHit({-0.2f, kMenuY, 0.f}, {0.f, 0.f, -1.f});
+  ASSERT_TRUE(left.hit);
+  ASSERT_TRUE(left.u < 0.5f);
+  const auto high = Menu3d_RayHit({0.f, kMenuY + kMenuH * 0.6f, 0.f}, {0.f, 0.f, -1.f});
+  ASSERT_FALSE(high.hit);
+  const auto behind = Menu3d_RayHit({0.f, kMenuY, -2.f}, {0.f, 0.f, -1.f});
+  ASSERT_FALSE(behind.hit);
+  const Vec3 aim = Menu3d_AimFromQuat(0.f, 0.f, 0.f, 1.f);
+  ASSERT_NEAR(aim.z, -1.f, 0.001);
+}
+
 TEST(menu3d_raster_not_empty) {
   unsigned char pix[64 * 48 * 4];
   Menu3d m;

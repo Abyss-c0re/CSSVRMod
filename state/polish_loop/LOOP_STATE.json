@@ -1,10 +1,10 @@
 {
-  "cycle": 21,
+  "cycle": 22,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T10:54:00Z",
-  "last_focus": "vk-last-rt-why-miss",
-  "next_focus": "menu3d-laser-hit",
+  "started_at": "2026-09-18T11:07:00Z",
+  "last_focus": "menu3d-laser-hit",
+  "next_focus": "menu3d-laser-dot",
   "last_commit": "dba8c08",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"

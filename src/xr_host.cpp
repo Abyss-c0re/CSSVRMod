@@ -721,12 +721,23 @@ bool XrHostPollInput(XrSample* out) {
   out->a_click = bval(g_abxy, 1);
   pose(0, &out->left);
   pose(1, &out->right);
+  Menu3dLaserHit laser{};
+  if (g_menu3d.visible && g_aim[1] && g_fs.predictedDisplayTime && g_stage) {
+    XrSpaceLocation loc{XR_TYPE_SPACE_LOCATION};
+    xrLocateSpace(g_aim[1], g_stage, g_fs.predictedDisplayTime, &loc);
+    if (loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT) {
+      const Vec3 o{loc.pose.position.x, loc.pose.position.y, loc.pose.position.z};
+      const Vec3 d = Menu3d_AimFromQuat(loc.pose.orientation.x, loc.pose.orientation.y,
+                                        loc.pose.orientation.z, loc.pose.orientation.w);
+      laser = Menu3d_RayHit(o, d);
+      if (laser.hit) g_menu3d.focus = laser.row;
+    }
+  }
   if (out->menu && !g_prev_menu_btn) g_menu3d.visible = !g_menu3d.visible;
   g_prev_menu_btn = out->menu;
   const bool trig = out->trigger_r > 0.55f;
   if (g_menu3d.visible && trig && !g_prev_trig) {
-    // Aim at the STAGE panel: crude forward hit on the 3D menu plane (HL2VR class).
-    const int row = g_menu3d.focus;
+    const int row = laser.hit ? laser.row : g_menu3d.focus;
     const int dir = (out->stick_rx > 0.4f) ? 1 : (out->stick_rx < -0.4f) ? -1 : 1;
     if (Menu3d_ApplyClick(&g_menu3d, row, dir)) CalibSave(g_menu3d.calib);
   }
