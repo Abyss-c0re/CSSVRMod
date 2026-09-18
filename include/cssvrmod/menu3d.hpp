@@ -24,6 +24,9 @@ struct Menu3d {
   bool cursor = false;
   float cu = 0.5f;
   float cv = 0.5f;
+  Vec3 pos{0.f, kMenuY, kMenuZ};
+  bool gripping = false;
+  Vec3 grip_off{};
 };
 
 inline int Menu3d_HitRow(float u, float v) {
@@ -76,15 +79,15 @@ inline Vec3 Menu3d_AimFromQuat(float qx, float qy, float qz, float qw) {
   return Menu3d_QuatRotate(qx, qy, qz, qw, {0.f, 0.f, -1.f});
 }
 
-inline Menu3dLaserHit Menu3d_RayHit(const Vec3& origin, const Vec3& dir) {
+inline Menu3dLaserHit Menu3d_RayHit(const Vec3& origin, const Vec3& dir,
+                                    const Vec3& center = Vec3{0.f, kMenuY, kMenuZ}) {
   Menu3dLaserHit h;
-  const Vec3 C{0.f, kMenuY, kMenuZ};
   const Vec3 N{0.f, 0.f, 1.f};
   const float denom = dir.Dot(N);
   if (std::fabs(denom) < 1e-6f) return h;
-  const float t = (C - origin).Dot(N) / denom;
+  const float t = (center - origin).Dot(N) / denom;
   if (t < 0.02f || t > 8.f) return h;
-  const Vec3 dlt = origin + dir * t - C;
+  const Vec3 dlt = origin + dir * t - center;
   h.t = t;
   h.u = 0.5f + dlt.x / kMenuW;
   h.v = 0.5f - dlt.y / kMenuH;
@@ -92,6 +95,30 @@ inline Menu3dLaserHit Menu3d_RayHit(const Vec3& origin, const Vec3& dir) {
   h.row = Menu3d_HitRow(h.u, h.v);
   h.hit = h.row >= 0;
   return h;
+}
+
+inline void Menu3d_ClampPos(Vec3* p) {
+  if (!p) return;
+  p->x = Clamp(p->x, -3.f, 3.f);
+  p->y = Clamp(p->y, 0.35f, 2.6f);
+  p->z = Clamp(p->z, -5.f, -0.3f);
+}
+
+// World-locked default. Grab while the laser is on the quad starts a drag (offset = panel − hand).
+inline bool Menu3d_GripTick(Menu3d* m, bool grab, const Vec3& hand, bool on_quad) {
+  if (!m) return false;
+  if (!grab) {
+    m->gripping = false;
+    return false;
+  }
+  if (!m->gripping) {
+    if (!on_quad) return false;
+    m->gripping = true;
+    m->grip_off = m->pos - hand;
+  }
+  m->pos = hand + m->grip_off;
+  Menu3d_ClampPos(&m->pos);
+  return true;
 }
 
 inline bool Menu3d_ApplyClick(Menu3d* m, int row, int dir) {

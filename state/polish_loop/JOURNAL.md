@@ -140,6 +140,10 @@ Laser ray vs Vision panel: hover + trigger clicks the aimed row. Offline 77/77. 
 
 Laser cursor at Vision-panel hit UV (cyan crosshair). Offline 78/78. Not HMD-proven.
 
+## 2026-09-18 cycle 24
+
+Grip-drag the world-locked Vision panel (offset-lock while grab+laser on quad). Offline 79/79. Not HMD-proven.
+
 
 
 

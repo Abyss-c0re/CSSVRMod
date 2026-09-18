@@ -75,6 +75,41 @@ TEST(menu3d_laser_cursor_at_uv) {
   ASSERT_FALSE(m.cursor);
 }
 
+TEST(menu3d_grip_moves_panel) {
+  Menu3d m;
+  ASSERT_NEAR(m.pos.y, kMenuY, 0.001);
+  ASSERT_NEAR(m.pos.z, kMenuZ, 0.001);
+  const Vec3 hand0{0.f, kMenuY, 0.f};
+  const auto mid = Menu3d_RayHit(hand0, {0.f, 0.f, -1.f}, m.pos);
+  ASSERT_TRUE(mid.on_quad);
+  ASSERT_TRUE(Menu3d_GripTick(&m, true, hand0, mid.on_quad));
+  ASSERT_TRUE(m.gripping);
+  const Vec3 hand1{0.2f, kMenuY + 0.1f, 0.1f};
+  ASSERT_TRUE(Menu3d_GripTick(&m, true, hand1, true));
+  ASSERT_NEAR(m.pos.x, 0.2f, 0.001);
+  ASSERT_NEAR(m.pos.y, kMenuY + 0.1f, 0.001);
+  ASSERT_NEAR(m.pos.z, kMenuZ + 0.1f, 0.001);
+  ASSERT_FALSE(Menu3d_GripTick(&m, false, hand1, true));
+  ASSERT_FALSE(m.gripping);
+  ASSERT_NEAR(m.pos.x, 0.2f, 0.001);
+
+  Menu3d idle;
+  ASSERT_FALSE(Menu3d_GripTick(&idle, true, {0.f, 0.f, 0.f}, false));
+  ASSERT_FALSE(idle.gripping);
+  ASSERT_NEAR(idle.pos.z, kMenuZ, 0.001);
+
+  Menu3d far;
+  far.pos = {2.f, kMenuY, kMenuZ};
+  ASSERT_FALSE(Menu3d_RayHit({0.f, kMenuY, 0.f}, {0.f, 0.f, -1.f}, far.pos).on_quad);
+  ASSERT_TRUE(Menu3d_RayHit({2.f, kMenuY, 0.f}, {0.f, 0.f, -1.f}, far.pos).on_quad);
+
+  Menu3d c;
+  ASSERT_TRUE(Menu3d_GripTick(&c, true, {0.f, kMenuY, 0.f}, true));
+  Menu3d_GripTick(&c, true, {0.f, 10.f, 5.f}, true);
+  ASSERT_TRUE(c.pos.y <= 2.61f);
+  ASSERT_TRUE(c.pos.z <= -0.29f);
+}
+
 TEST(menu3d_raster_not_empty) {
   unsigned char pix[64 * 48 * 4];
   Menu3d m;

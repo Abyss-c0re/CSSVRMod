@@ -1,24 +1,24 @@
-# Cycle 23 — 2026-09-18
+# Cycle 24 — 2026-09-18
 
 ## Focus
 
-`menu3d-laser-dot` — no cursor on the Vision panel at the laser UV.
+`menu3d-grip-move` — world-locked Vision panel could not be repositioned.
 
 ## Did
 
-- UV→pixel + cyan crosshair rastered on the world-locked quad when the STAGE ray hits it.
-- Submit re-locates the right-hand aim so the VK (submit-then-poll) path is not a frame late.
+- Panel origin is STAGE-movable. Right-hand grab while the laser is on the quad offset-locks the panel to the hand.
+- Laser / trigger / stick ignore the panel while gripping. Quad submit uses `Menu3d.pos`.
 
 ## Did not
 
 - HMD walk (user-gated).
-- Claim live laser UX from offline green.
-- Grip-reposition the panel (next).
+- Yaw the quad toward the HMD (next).
+- Claim live grip UX from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 78 passed, 0 failed (556 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 79 passed, 0 failed (576 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`menu3d-grip-move` — hold grip to drag the world-locked Vision panel in STAGE.
+`menu3d-face-hmd` — yaw the world-locked panel toward the headset so a dragged panel stays readable.

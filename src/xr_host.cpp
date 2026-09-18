@@ -474,17 +474,22 @@ void BlitToSwapchain(unsigned int src, int srcW, int srcH, int eye, bool vflip) 
   xrReleaseSwapchainImage(g_sc[eye], &rel);
 }
 
-Menu3dLaserHit LocateMenuLaser() {
-  Menu3dLaserHit laser{};
-  if (!g_menu3d.visible || !g_aim[1] || !g_fs.predictedDisplayTime || !g_stage || !xrLocateSpace)
-    return laser;
+bool LocateAimHand(Vec3* o, Vec3* d) {
+  if (!o || !d || !g_aim[1] || !g_fs.predictedDisplayTime || !g_stage || !xrLocateSpace)
+    return false;
   XrSpaceLocation loc{XR_TYPE_SPACE_LOCATION};
-  if (xrLocateSpace(g_aim[1], g_stage, g_fs.predictedDisplayTime, &loc) != XR_SUCCESS) return laser;
-  if (!(loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT)) return laser;
-  const Vec3 o{loc.pose.position.x, loc.pose.position.y, loc.pose.position.z};
-  const Vec3 d = Menu3d_AimFromQuat(loc.pose.orientation.x, loc.pose.orientation.y,
-                                    loc.pose.orientation.z, loc.pose.orientation.w);
-  return Menu3d_RayHit(o, d);
+  if (xrLocateSpace(g_aim[1], g_stage, g_fs.predictedDisplayTime, &loc) != XR_SUCCESS) return false;
+  if (!(loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT)) return false;
+  *o = {loc.pose.position.x, loc.pose.position.y, loc.pose.position.z};
+  *d = Menu3d_AimFromQuat(loc.pose.orientation.x, loc.pose.orientation.y, loc.pose.orientation.z,
+                          loc.pose.orientation.w);
+  return true;
+}
+
+Menu3dLaserHit LocateMenuLaser() {
+  Vec3 o, d;
+  if (!g_menu3d.visible || !LocateAimHand(&o, &d)) return {};
+  return Menu3d_RayHit(o, d, g_menu3d.pos);
 }
 
 bool UploadMenuSwapchain() {
@@ -644,8 +649,9 @@ bool XrHostSubmitEyes(unsigned int gl_l, unsigned int gl_r, int src_w, int src_h
     quad.subImage.imageRect.offset = {0, 0};
     quad.subImage.imageRect.extent = {(int32_t)g_menuW, (int32_t)g_menuH};
     quad.pose.orientation.w = 1.f;
-    quad.pose.position.y = kMenuY;
-    quad.pose.position.z = kMenuZ;
+    quad.pose.position.x = g_menu3d.pos.x;
+    quad.pose.position.y = g_menu3d.pos.y;
+    quad.pose.position.z = g_menu3d.pos.z;
     quad.size.width = kMenuW;
     quad.size.height = kMenuH;
     layers[1] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
@@ -735,18 +741,23 @@ bool XrHostPollInput(XrSample* out) {
   out->a_click = bval(g_abxy, 1);
   pose(0, &out->left);
   pose(1, &out->right);
-  const Menu3dLaserHit laser = LocateMenuLaser();
+  Vec3 hand{}, dir{};
+  const bool have_hand = LocateAimHand(&hand, &dir);
+  const Menu3dLaserHit laser =
+      (have_hand && g_menu3d.visible) ? Menu3d_RayHit(hand, dir, g_menu3d.pos) : Menu3dLaserHit{};
   Menu3d_SetCursor(&g_menu3d, laser);
-  if (laser.hit) g_menu3d.focus = laser.row;
+  if (laser.hit && !g_menu3d.gripping) g_menu3d.focus = laser.row;
+  if (g_menu3d.visible && have_hand)
+    Menu3d_GripTick(&g_menu3d, out->grab_r > 0.55f, hand, laser.on_quad);
   if (out->menu && !g_prev_menu_btn) g_menu3d.visible = !g_menu3d.visible;
   g_prev_menu_btn = out->menu;
   const bool trig = out->trigger_r > 0.55f;
-  if (g_menu3d.visible && trig && !g_prev_trig) {
+  if (g_menu3d.visible && trig && !g_prev_trig && !g_menu3d.gripping) {
     const int row = laser.hit ? laser.row : g_menu3d.focus;
     const int dir = (out->stick_rx > 0.4f) ? 1 : (out->stick_rx < -0.4f) ? -1 : 1;
     if (Menu3d_ApplyClick(&g_menu3d, row, dir)) CalibSave(g_menu3d.calib);
   }
-  if (g_menu3d.visible && std::fabs(out->stick_ry) > 0.55f && !trig) {
+  if (g_menu3d.visible && std::fabs(out->stick_ry) > 0.55f && !trig && !g_menu3d.gripping) {
     int n = g_menu3d.focus + (out->stick_ry < 0.f ? 1 : -1);
     if (n < 0) n = 0;
     if (n >= kMenuRows) n = kMenuRows - 1;

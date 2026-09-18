@@ -20,7 +20,8 @@
 - [x] 3D panel row labels + values (cycle 12). Glyphs, not engine VGUI.
 - [x] Laser ray vs world-locked Vision panel (cycle 22). Trigger clicks the aimed row; stick still walks focus.
 - [x] Laser cursor on Vision panel at hit UV (cycle 23).
-- [ ] Grip-reposition the world-locked Vision panel (Cube: world-locked default, grip moves).
+- [x] Grip-reposition the world-locked Vision panel (cycle 24). Grab+laser on quad offset-locks; still +Z facing.
+- [ ] Yaw the Vision panel toward the HMD so a dragged panel stays readable.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.
