@@ -1,11 +1,11 @@
 {
-  "cycle": 5,
+  "cycle": 6,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T07:14:00Z",
-  "last_focus": "vulkan-eye-capture",
-  "next_focus": "hmd-drives-viewangles",
-  "last_commit": "ec1344a",
+  "started_at": "2026-09-18T07:27:00Z",
+  "last_focus": "hmd-drives-viewangles",
+  "next_focus": "engine-setviewangles-selftest",
+  "last_commit": "",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }

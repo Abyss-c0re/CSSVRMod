@@ -34,6 +34,7 @@ add_executable(cssvrmod_tests
   tests/test_menu3d.cpp
   tests/test_view_hook.cpp
   tests/test_vk_eye.cpp
+  tests/test_look.cpp
 )
 target_include_directories(cssvrmod_tests PRIVATE
   ${CSSVR_ROOT}/include

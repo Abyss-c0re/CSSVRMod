@@ -19,7 +19,7 @@ Same framebuffer submitted twice is **not** stereo. gVRMod forbids submitting on
 | Law | gVRMod | CSSVRMod now |
 |-----|--------|----------------|
 | Dual OUT submit | yes | VK per-eye copy after each paint; gated on two captures |
-| HMD drives look | yes | no — mouse/game view |
+| HMD drives look | yes | CViewSetup angles from HMD; engine SetViewAngles open |
 | Controls from XR | yes | stub poll + SDL inject, not live-proven |
 | Wall / hand collision | last-free hull | C++ laws exist, **not wired to live traces** |
 | Vision cal | scale→V→H→eye | cfg file only, no standalone UI |

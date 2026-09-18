@@ -28,5 +28,10 @@ Dropped swap-image fallback on the VK eye copy. Acquired swap is PRESENT_SRC; tr
 
 Vulkan per-eye capture: last color RT / acquired swap image after each paint. Two distinct CPU frames required. Present still never waits. Offline 41/41. Not HMD-proven stereo.
 
+## 2026-09-18 cycle 6
+
+HMD writes `CViewSetup` angles for both paints (shared orientation). VIEW-in-STAGE locate, not stick/controller look. Engine `SetViewAngles` still open. Offline 45/45. Not HMD-proven.
+
+
 
 

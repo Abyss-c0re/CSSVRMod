@@ -2,6 +2,7 @@
 #include "cssvrmod/calib.hpp"
 #include "cssvrmod/dual_paint.hpp"
 #include "cssvrmod/launch.hpp"
+#include "cssvrmod/look.hpp"
 #include "cssvrmod/vk_eye.hpp"
 #include "xr_host.hpp"
 
@@ -97,6 +98,11 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
     g_orig(self, view, clear, draw);
     return;
   }
+  const auto look = Look_Decide(XrHostLastHmd(), nullptr, false, angles);
+  if (look.applied) {
+    angles = look.angles;
+    ViewSetup_WriteAngles(view, kBlob, g_loc.fields, angles);
+  }
   g_in = true;
   StereoViewIn in;
   in.origin = origin;
@@ -118,8 +124,8 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
   g_in = false;
   static int n = 0;
   if (n++ < 4 || (n % 300) == 0)
-    Logf("renderview dual paints=%d caps=%d dual=%d %dx%d reason=%s", r.paints, r.captures,
-         r.painted_dual ? 1 : 0, w, h, r.reason);
+    Logf("renderview dual paints=%d caps=%d dual=%d look=%s %dx%d reason=%s", r.paints, r.captures,
+         r.painted_dual ? 1 : 0, look.reason, w, h, r.reason);
 }
 
 uintptr_t ClientBase() {

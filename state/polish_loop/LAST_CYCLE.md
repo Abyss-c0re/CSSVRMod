@@ -1,26 +1,25 @@
-# Cycle 5 — 2026-09-18
+# Cycle 6 — 2026-09-18
 
 ## Focus
 
-`vulkan-eye-capture` — live CSS is `-vulkan`; GL `CopyEye` cannot see that present.
+`hmd-drives-viewangles` — look around is VR.
 
 ## Did
 
-- `vk_eye.hpp`: two distinct CPU frames required; same buffer is not ready.
-- After each `RenderView`, copy last color RT (BeginRenderPass ≥640) or acquired swap image.
-- Fence wait is on the **render** thread between eyes (8 ms). Present path still never `vkQueueWaitIdle`.
-- Dual mailbox → `XrHostSubmitEyePixels`. Pose IPD still gated on two successful copies.
-- GL copy is fallback only.
+- `look.hpp`: HMD overrides game view; invalid HMD keeps game; snap-on-fire still beats HMD.
+- `CViewSetup` angles (+0x4c) written for both eye paints (shared orientation).
+- Cache HMD from `xrLocateSpace(VIEW in STAGE)` — not controller yaw.
+- No guessed `SetViewAngles` vtable.
 
 ## Did not
 
-- Claim stereo or HMD from offline green.
-- Prove the RT layout (`COLOR_ATTACHMENT`) in a running CSS session.
+- Drive `IVEngineClient` viewangles (movement/bullets still game view).
+- Claim stereo or HMD smoke from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 41 passed, 0 failed (327 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 45 passed, 0 failed (342 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`hmd-drives-viewangles` — look around is VR. In-game dual-paint walk still open.
+`engine-setviewangles-selftest` — write look into the engine only after a GetViewAngles self-test.

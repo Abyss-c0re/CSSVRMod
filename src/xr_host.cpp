@@ -519,6 +519,24 @@ void XrHostShutdown() {
   g_info.reason = "shutdown";
 }
 
+static Pose g_hmd_cache{};
+
+static void CacheHmdFromViewSpace() {
+  if (!xrLocateSpace || !g_view || !g_stage || !g_fs.predictedDisplayTime) return;
+  XrSpaceLocation loc{XR_TYPE_SPACE_LOCATION};
+  if (xrLocateSpace(g_view, g_stage, g_fs.predictedDisplayTime, &loc) != XR_SUCCESS) return;
+  if (!(loc.locationFlags & XR_SPACE_LOCATION_ORIENTATION_VALID_BIT)) return;
+  Pose p;
+  p.ang = QuatToAng(loc.pose.orientation.x, loc.pose.orientation.y, loc.pose.orientation.z,
+                    loc.pose.orientation.w);
+  if (loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT)
+    p.pos = XrPosToSource(loc.pose.position.x, loc.pose.position.y, loc.pose.position.z);
+  p.valid = true;
+  g_hmd_cache = p;
+}
+
+Pose XrHostLastHmd() { return g_hmd_cache; }
+
 bool XrHostBeginFrame() {
   PollEvents();
   if (!g_running || !xrWaitFrame) return false;
@@ -528,6 +546,7 @@ bool XrHostBeginFrame() {
   XrFrameBeginInfo bi{XR_TYPE_FRAME_BEGIN_INFO};
   if (xrBeginFrame(g_sess, &bi) != XR_SUCCESS) return false;
   g_begun = true;
+  CacheHmdFromViewSpace();
   return g_fs.shouldRender;
 }
 
@@ -690,18 +709,24 @@ bool XrHostPollInput(XrSample* out) {
     g_menu3d.focus = n;
   }
   g_prev_trig = trig;
-  // HMD ≈ average of eyes via view space: use right-hand yaw if no view space.
-  if (out->right.valid) {
-    out->hmd = out->right;
-    out->hmd.pos.z += 8.f; // crude head above right hand if only controllers
+  CacheHmdFromViewSpace();
+  if (g_hmd_cache.valid) {
+    out->hmd = g_hmd_cache;
+  } else {
+    // No VIEW locate yet — controller midpoint is not a look pose.
+    if (out->right.valid) {
+      out->hmd = out->right;
+      out->hmd.pos.z += 8.f;
+    }
+    if (out->left.valid && out->right.valid) {
+      out->hmd.pos = (out->left.pos + out->right.pos) * 0.5f;
+      out->hmd.pos.z += 12.f;
+      out->hmd.ang.y = out->right.ang.y;
+      out->hmd.valid = true;
+    }
+    if (out->hmd.valid) g_hmd_cache = out->hmd;
   }
-  if (out->left.valid && out->right.valid) {
-    out->hmd.pos = (out->left.pos + out->right.pos) * 0.5f;
-    out->hmd.pos.z += 12.f;
-    out->hmd.ang.y = out->right.ang.y;
-    out->hmd.valid = true;
-  }
-  return out->left.valid || out->right.valid || out->trigger_r > 0.f;
+  return out->left.valid || out->right.valid || out->trigger_r > 0.f || out->hmd.valid;
 }
 
 const XrHostInfo& XrHostStatus() { return g_info; }

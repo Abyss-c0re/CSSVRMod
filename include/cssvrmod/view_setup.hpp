@@ -61,4 +61,8 @@ inline bool ViewSetup_WriteOrigin(void* blob, size_t n, const ViewSetupFields& f
   return ViewSetup_WriteVec(blob, n, f.origin_off, o);
 }
 
+inline bool ViewSetup_WriteAngles(void* blob, size_t n, const ViewSetupFields& f, const Ang3& a) {
+  return ViewSetup_WriteVec(blob, n, f.angles_off, Vec3{a.p, a.y, a.r});
+}
+
 } // namespace cssvr

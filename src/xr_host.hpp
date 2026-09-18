@@ -1,5 +1,6 @@
 #pragma once
 // Slim OpenXR host for the CSS hook. Game paints; we submit. No GMod Lua.
+#include "cssvrmod/vec3.hpp"
 #include <cstdint>
 
 namespace cssvr {
@@ -29,6 +30,7 @@ bool XrHostSubmitEyePixels(const unsigned char* left, const unsigned char* right
                            bool bgra, bool painted_dual);
 void XrHostEndFrame();
 bool XrHostPollInput(struct XrSample* out);
+Pose XrHostLastHmd();
 const XrHostInfo& XrHostStatus();
 
 } // namespace cssvr
