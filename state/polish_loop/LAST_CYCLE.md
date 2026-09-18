@@ -1,20 +1,27 @@
-# Cycle 3 — 2026-09-18
+# Cycle 4 — 2026-09-18
 
 ## Focus
 
-HL2VR (Steam 658920) gap: quality image + **3D world menu**, not a potato 2D square.
+`hook-cviewrender-dual-paint` — locate CSS `CViewRender::RenderView` and paint left then right.
 
 ## Did
 
-- `docs/HL2VR_GAPS.md` — dual-eye VR res, 3D menus, 2D plane is their *fallback*.
-- Default CSS window **1920×1080** (HL2VR mirror class; 720p upsample was potato).
-- World-locked `menu3d` quad in STAGE (1.05×0.60 m). Menu button toggle; stick selects; trigger applies Vision knobs.
+- Locator self-test: string `CViewRender::RenderView` → prologue → `movss [r13+0x40]` origin.
+- CSS 64-bit `CViewSetup`: origin +0x40, angles +0x4c, fov +0x38 (from the copy in RenderView).
+- Vtable slots (writable PT_LOAD) swapped only when they still point at that function.
+- `DualPaint_Run`: `painted_dual` only after two paints **and** two framebuffer captures.
+- Submit pose IPD stays 0 unless two distinct eye textures exist (heresy gate).
+- Offline locator ran against live `client.so` on this machine.
 
 ## Did not
 
-- Live `CViewRender` dual paint (still next).
-- Claim HL2VR-complete stereo.
+- Claim stereo or HMD from offline green.
+- Prove the vtable patch in a running CSS session.
+
+## Tests
+
+`cssvrmod_tests` — 38 passed, 0 failed (313 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`hook-cviewrender-dual-paint`
+`hmd-drives-viewangles` — look around is VR. In-game dual-paint walk is still open.

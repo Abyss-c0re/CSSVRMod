@@ -531,13 +531,19 @@ bool XrHostBeginFrame() {
   return g_fs.shouldRender;
 }
 
-bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vflip) {
+static bool g_note_dual = false;
+
+void XrHostNoteDualPaint(bool painted_dual) { g_note_dual = painted_dual; }
+
+bool XrHostSubmitEyes(unsigned int gl_l, unsigned int gl_r, int src_w, int src_h, bool vflip,
+                      bool painted_dual) {
   if (!g_begun || !g_fs.shouldRender) return false;
   if (!g_sc[0] || !g_sc[1]) return false;
-  BlitToSwapchain(gl_tex, src_w, src_h, 0, vflip);
-  BlitToSwapchain(gl_tex, src_w, src_h, 1, vflip);
+  const bool dual = painted_dual && g_note_dual && gl_l && gl_r && gl_l != gl_r;
+  BlitToSwapchain(gl_l, src_w, src_h, 0, vflip);
+  BlitToSwapchain(dual ? gl_r : gl_l, src_w, src_h, 1, vflip);
 
-  // One CSS present. Pose IPD stays 0 until CViewRender paints both IPD origins.
+  // Pose IPD only when two distinct world paints were captured.
   XrView located[2] = {{XR_TYPE_VIEW}, {XR_TYPE_VIEW}};
   uint32_t nloc = 0;
   if (xrLocateViews && g_view) {
@@ -551,12 +557,11 @@ bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vfli
   XrFovf fallback{-0.85f, 0.85f, 0.85f, -0.85f};
 
   const Calib cal = CalibLive();
-  const bool painted_dual = false;
   XrCompositionLayerProjectionView pv[2]{};
   for (int e = 0; e < 2; ++e) {
     pv[e].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
     pv[e].pose.orientation.w = 1.f;
-    pv[e].pose.position.x = StereoView_SubmitPoseX(cal, e, painted_dual);
+    pv[e].pose.position.x = StereoView_SubmitPoseX(cal, e, dual);
     pv[e].fov = (nloc >= 2) ? located[e].fov : fallback;
     pv[e].subImage.swapchain = g_sc[e];
     pv[e].subImage.imageRect.offset = {0, 0};
@@ -595,9 +600,13 @@ bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vfli
   static int ends = 0;
   ends++;
   if (ends <= 3 || (ends % 300) == 0)
-    Log("cssvr xr endframe #%d rc=%d stereo-offset %ux%u eye=%.2f h=%.2f v=%.2f sc=%.2f", ends,
-        (int)rc, g_scW, g_scH, cal.eyescale, cal.hoffset, cal.voffset, cal.scalefactor);
+    Log("cssvr xr endframe #%d rc=%d dual=%d %ux%u eye=%.2f h=%.2f v=%.2f sc=%.2f", ends, (int)rc,
+        dual ? 1 : 0, g_scW, g_scH, cal.eyescale, cal.hoffset, cal.voffset, cal.scalefactor);
   return rc == XR_SUCCESS;
+}
+
+bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vflip) {
+  return XrHostSubmitEyes(gl_tex, gl_tex, src_w, src_h, vflip, false);
 }
 
 void XrHostEndFrame() {

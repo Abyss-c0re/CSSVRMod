@@ -3,6 +3,7 @@
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/tick.hpp"
+#include "cssvrmod/view_hook.hpp"
 #include "cssvrmod/weapons.hpp"
 #include "xr_host.hpp"
 
@@ -288,6 +289,7 @@ void Once() {
   g_want_xr = EnvOn("CSSVR_XR", false);
   Logf("dump_dir=%s xr=%d", g_dump_dir.c_str(), g_want_xr ? 1 : 0);
   ProbeLiveEngine(g_eng);
+  ViewHookTryInstall();
   g_wep = FindWeapon("weapon_knife");
   if (g_want_xr) {
     g_xr_ok = XrHostInit();
@@ -336,11 +338,16 @@ void HookOnSwap() {
     g_status = tout.status;
   }
   if (g_xr_ok) {
-    if (g_cap)
+    unsigned el = 0, er = 0;
+    int ew = 0, eh = 0;
+    if (ViewHookTakeEyes(&el, &er, &ew, &eh))
+      XrHostSubmitEyes(el, er, ew, eh, true, true);
+    else if (g_cap)
       XrHostSubmitBackbuffer(g_cap, g_capW, g_capH, true);
     else
       XrHostEndFrame();
   }
+  ViewHookOnSwap();
   g_now += 0.011f;
 }
 

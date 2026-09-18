@@ -12,3 +12,8 @@ Encoded the gmod dual-origin law (`stereo_view.hpp`): same angles, origin ± hea
 
 Compared Steam HL2VR (658920): dual-eye VR res, 3D world menus; 2D plane is their comfort fallback. Raised default CSS window to 1920×1080. Added STAGE-space 3D Vision panel (menu toggle). Dual paint still open.
 
+## 2026-09-18 cycle 4
+
+Hooked `CViewRender::RenderView` via string-xref locator + vtable swap (no guessed index). Dual paint sets `painted_dual` only after two captures. Offline 38/38. Not HMD-proven stereo.
+
+

@@ -32,6 +32,7 @@ add_executable(cssvrmod_tests
   tests/test_calib.cpp
   tests/test_stereo_view.cpp
   tests/test_menu3d.cpp
+  tests/test_view_hook.cpp
 )
 target_include_directories(cssvrmod_tests PRIVATE
   ${CSSVR_ROOT}/include
@@ -75,6 +76,7 @@ if(CSSVR_BUILD_HOOK AND NOT WIN32)
       src/hook_vk.cpp
       src/togl_adapter.cpp
       src/xr_host.cpp
+      src/view_hook.cpp
     )
     target_include_directories(cssvrmod_hook PRIVATE
       ${CSSVR_ROOT}/include

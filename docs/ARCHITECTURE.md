@@ -40,7 +40,7 @@ skips submit.
 
 ## Honest limits (do not claim HMD smoke from offline green)
 
-- Submit is **mono capture → both eyes, identity VIEW pose, UV Vision crop**. Dual-origin law is in `stereo_view.hpp`; live `CViewRender` two-paint is still P0.
+- Submit is **identity VIEW pose** unless `CViewRender` painted both IPD origins and both were captured. Locator + vtable hook is in `view_hook.hpp` / `src/view_hook.cpp`. Offline green ≠ HMD stereo.
 - World traces in-game need `IEngineTrace` wired (P2). Offline tests inject a `TraceFn`.
 - `ClientCmd` digital move/fire is P0; analog `CUserCmd` is P2.
 - Offline `cssvrmod_tests` ≠ headset-proven.
@@ -50,6 +50,6 @@ skips submit.
 
 ## P1 / P2
 
-1. Hook `CViewRender` / stereo views (true IPD).
+1. Prove live dual `CViewRender` in-game (hook is cycle 4; HMD walk open).
 2. `IEngineTrace` melee + wall in live CSS.
 3. Hand worldmodels + knife swing synced to CSS knife anim.
