@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T13:57:12Z",
   "last_focus": "maps-basename-not-substring",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "pending",
+  "last_commit": "cdc89a4",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
