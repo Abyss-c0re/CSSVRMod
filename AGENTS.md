@@ -16,4 +16,8 @@ cmake --build build --target cssvrmod_tests CSSVR cssvrmod_hook -j"$(nproc)"
 
 ## Cube launcher
 
-Product start is CubeUI (gVRMod) → New Game → **CSSVRMod** → Start Game. That execs `scripts/CSSVR.sh` / `install/CSSVR`. Do not add a second desktop entry.
+Product start is CubeUI (gVRMod) → New Game → **CSSVRMod** → Start Game. That execs `scripts/CSSVR.sh` / `install/CSSVR`.
+
+## 13-minute polish loop
+
+Durable brief: `state/polish_loop/AGENT_PROMPT.md`. Cadence: one theme vs gVRMod Cube standard, tests, meaningful commit. Never claim stereo from a mono present.

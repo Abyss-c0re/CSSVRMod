@@ -28,10 +28,9 @@ TEST(calib_eye_apart_follows_eyescale) {
   c.eyescale = 1.f;
   auto l1 = CalibEye(c, 0);
   auto r1 = CalibEye(c, 1);
-  ASSERT_TRUE(l1.pose_x < 0.f);
-  ASSERT_TRUE(r1.pose_x > 0.f);
-  ASSERT_TRUE(r1.pose_x - l1.pose_x > 0.05f); // ~full 64 mm
-  ASSERT_TRUE(l1.u0 > r1.u0);                 // left crop shifted right
+  ASSERT_NEAR(l1.pose_x, 0.f, 0.0001); // same-frame: no pose IPD
+  ASSERT_NEAR(r1.pose_x, 0.f, 0.0001);
+  ASSERT_TRUE(l1.u0 > r1.u0); // disparity is UV only until dual RenderView
 }
 
 TEST(calib_parse_vrmod_names) {

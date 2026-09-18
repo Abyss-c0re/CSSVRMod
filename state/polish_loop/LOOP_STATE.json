@@ -1,0 +1,11 @@
+{
+  "cycle": 1,
+  "interval_min": 13,
+  "repo": "CSSVRMod",
+  "started_at": "2026-09-18T06:20:00Z",
+  "last_focus": "identity-view-pose-same-frame",
+  "next_focus": "dual-renderview-ipd-origin",
+  "last_commit": "",
+  "consecutive_no_commit": 0,
+  "heresy": "same-frame pose IPD = two planes"
+}

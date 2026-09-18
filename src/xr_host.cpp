@@ -480,9 +480,9 @@ bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vfli
   BlitToSwapchain(gl_tex, src_w, src_h, 0, vflip);
   BlitToSwapchain(gl_tex, src_w, src_h, 1, vflip);
 
-  // Map the same CSS frame onto each eye (projection + HMD FOV). Slight VIEW-space
-  // IPD only — same angles, same frame, gmod synthetic stereo. Full world-space
-  // eye poses on this 2D present is what made two squares float apart.
+  // Same CSS frame, mapped onto each lens. Identity VIEW pose — any pose IPD
+  // on this mono present is two floating planes with black around them.
+  // True stereo is a second world paint (next polish-loop focus).
   XrView located[2] = {{XR_TYPE_VIEW}, {XR_TYPE_VIEW}};
   uint32_t nloc = 0;
   if (xrLocateViews && g_view) {
@@ -498,10 +498,9 @@ bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vfli
   const Calib cal = CalibLive();
   XrCompositionLayerProjectionView pv[2]{};
   for (int e = 0; e < 2; ++e) {
-    const EyeBlit crop = CalibEye(cal, e);
     pv[e].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
     pv[e].pose.orientation.w = 1.f;
-    pv[e].pose.position.x = crop.pose_x;
+    pv[e].pose.position.x = 0.f;
     pv[e].fov = (nloc >= 2) ? located[e].fov : fallback;
     pv[e].subImage.swapchain = g_sc[e];
     pv[e].subImage.imageRect.offset = {0, 0};

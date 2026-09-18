@@ -60,7 +60,9 @@ inline EyeBlit CalibEye(const Calib& raw, int eye) {
   b.v1 = CalibClamp(cy + halfV - panV, 0.f, 1.f);
   if (b.u1 < b.u0 + 0.04f) b.u1 = CalibClamp(b.u0 + 0.04f, 0.f, 1.f);
   if (b.v1 < b.v0 + 0.04f) b.v1 = CalibClamp(b.v0 + 0.04f, 0.f, 1.f);
-  b.pose_x = (eye == 0 ? -1.f : 1.f) * (c.ipd_m * 0.5f * c.eyescale);
+  // Same-frame law: IPD in projection pose makes two floating planes + black
+  // frames. pose_x stays 0 until a real second RenderView exists.
+  b.pose_x = 0.f;
   return b;
 }
 

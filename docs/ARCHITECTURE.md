@@ -39,7 +39,7 @@ and projected onto each eye FOV (not a cinema quad, not full world-space IPD).
 
 ## Honest limits (do not claim HMD smoke from offline green)
 
-- Submit is **mono capture → both eyes, slight IPD offset** (gmod synthetic) until dual `RenderView` exists (P1).
+- Submit is **mono capture → both eyes, identity VIEW pose, UV Vision crop**. Pose IPD on that frame was two planes + black (heresy). Dual `RenderView` is still P0.
 - World traces in-game need `IEngineTrace` wired (P2). Offline tests inject a `TraceFn`.
 - `ClientCmd` digital move/fire is P0; analog `CUserCmd` is P2.
 - Offline `cssvrmod_tests` ≠ headset-proven.
