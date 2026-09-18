@@ -124,6 +124,10 @@ ViewAngles self-test miss toasts once; engine yaw stay-off is auditable. Offline
 
 Honesty toasts are enough. Next focus is why Vulkan last-RT eye copy misses — not another toast.
 
+## 2026-09-18 cycle 21
+
+Color RTs gain TRANSFER_SRC; last RT also tracks BeginRendering; GENERAL layout retry. Offline 76/76. Not a live dual-copy claim.
+
 
 
 

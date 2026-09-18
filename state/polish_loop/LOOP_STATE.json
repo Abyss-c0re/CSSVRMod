@@ -1,10 +1,10 @@
 {
-  "cycle": 20,
+  "cycle": 21,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T10:41:00Z",
-  "last_focus": "angles-selftest-miss-toast",
-  "next_focus": "vk-last-rt-why-miss",
+  "started_at": "2026-09-18T10:54:00Z",
+  "last_focus": "vk-last-rt-why-miss",
+  "next_focus": "vk-eye-copy-in-game",
   "last_commit": "3a2a582",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"

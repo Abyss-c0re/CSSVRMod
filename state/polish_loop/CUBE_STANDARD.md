@@ -18,7 +18,7 @@ Same framebuffer submitted twice is **not** stereo. gVRMod forbids submitting on
 
 | Law | gVRMod | CSSVRMod now |
 |-----|--------|----------------|
-| Dual OUT submit | yes | VK per-eye copy; locate miss + incomplete capture toast |
+| Dual OUT submit | yes | VK per-eye copy; TRANSFER_SRC + BeginRendering last-RT |
 | HMD drives look | yes | CViewSetup + SetViewAngles after self-test; miss toasts |
 | Controls from XR | yes | CreateMove overlay; locate miss toasts; not HMD-proven |
 | Wall / hand collision | last-free hull | TraceRay self-test + miss toast; not HMD-proven |

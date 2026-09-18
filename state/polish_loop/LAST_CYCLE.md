@@ -1,23 +1,24 @@
-# Cycle 20 — 2026-09-18
+# Cycle 21 — 2026-09-18
 
 ## Focus
 
-`angles-selftest-miss-toast` — Get/SetViewAngles self-test fail was silent; engine yaw stayed game.
+`vk-last-rt-why-miss` — `VkCaptureEye` stayed `no_rt` / `copy_fail` on live `-vulkan`.
 
 ## Did
 
-- Pure `EngineAngles_ToastDecide`: one-shot on missing engine or failed roundtrip; never abort VR.
-- `ProbeLiveEngine` toasts. `EngineSetViewAngles` still refuses unless `angles_ok`.
+- Color attachments get `TRANSFER_SRC` (copy was illegal without it).
+- Track last RT from `vkCmdBeginRendering` as well as BeginRenderPass.
+- Copy retries `GENERAL` if the recorded layout wait-times-out. Miss reason is logged.
 
 ## Did not
 
 - HMD walk (user-gated).
-- Claim live HMD look from offline green.
+- Claim stereo or a live dual copy from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 74 passed, 0 failed (521 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 76 passed, 0 failed (531 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`screen-selftest-miss-toast` — GetScreenSize / ClientCmd gate fail is still silent.
+`vk-eye-copy-in-game` — prove two RT copies after this hook (user/HMD). Until then stay MONO.
