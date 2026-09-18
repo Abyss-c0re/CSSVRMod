@@ -63,6 +63,7 @@ GetWinIdFn g_get_id = nullptr;
 XChangePropFn g_xchange = nullptr;
 void* g_last_win = nullptr;
 int g_creates = 0;
+bool g_late_attach = false;
 int g_last_w = 0;
 int g_last_h = 0;
 int g_last_persist_ms = 0;
@@ -237,8 +238,14 @@ void SDL_DestroyWindow(void* window) {
   if (window == g_last_win) g_last_win = nullptr;
 }
 
+extern "C" int CssvrLateAttach();
+
 int SDL_PollEvent(void* event) {
   EnsureSdl();
+  if (cssvr::SdlHook_ShouldLateAttach(g_late_attach, g_creates)) {
+    g_late_attach = true;
+    CssvrLateAttach();
+  }
   const int r = g_poll ? g_poll(event) : 0;
   int w = 0, h = 0;
   const uint32_t want = (g_last_win && g_get_id) ? g_get_id(g_last_win) : 0;

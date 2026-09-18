@@ -1,26 +1,26 @@
-# Cycle 78 — 2026-09-19
+# Cycle 81 — 2026-09-19
 
 ## Focus
 
-`cbuf-steal-safe` — do not 12-byte inline-hook CSS `Cbuf_AddText` (RIP-relative lea).
+`sdl-late-attach-present` — SDL2-mapped hook must late-attach present + ICvar (not LD_PRELOAD).
 
 ## Did
 
-- Recovered cycle 77 idle. Tip was `cd799b7` (Cbuf hook from a parallel cycle). Live CSS still pid `2221372` (19:20, ~5h). No hook in maps.
-- Slot 106 thunk is `mov rdi,rsi; jmp 0x4ce720`. That target starts `push rbp; lea rcx,[rip+disp]; mov rbp,rsp; push r14`. Stealing 12 bytes splits the push and relocates the lea — every Cbuf_AddText would crash.
-- `EngineCmd_CbufStealOk` allowlists relocatable insns only. `HookCbufAddText` refuses the live CSS prologue. Copied rebuilt hook into CSS `bin/linux64`.
-- Dual paint / RT copy stay HMD-gated. Did not invent print/help/menu/toast/cfg chrome. Did not restart CSS.
+- Recovered cycle 80 idle. Live CSS is pid `2370093` (started 00:45). **Hook is in maps** via `bin/linux64/libSDL2-2.0.so.0` → `libcssvrmod_hook.so`. Window persist 1280×720. shaderapivk + dxvk + libvulkan mapped.
+- 11+ min, no `vk: device`, no `cmd wrap`, no `icvar register`. DXVK `dlopen`s libvulkan; hook exports are not global. Plugin `CssvrLateAttach` never runs on the client.
+- `SDL_PollEvent` one-shots `CssvrLateAttach` after the first window (present GOT patch + ProbeLiveEngine / ICvar). Copied rebuilt hook into CSS `bin/linux64`.
+- Dual paint stays HMD-gated. Did not invent print/help/menu/toast/cfg chrome.
 
 ## Did not
 
 - HMD walk. Stereo unproven.
 - Queue `dual-renderview-ipd-origin`.
-- A relocating Cbuf trampoline (typed `cssvr_start` still Unknown until then).
+- A libvulkan.so.1 shim (next if GOT patch misses after restart).
 
 ## Tests
 
-`cssvrmod_tests` — 121 passed, 0 failed (962 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 124 passed, 0 failed (973 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`idle-no-shell-ladder` — close with no commit unless a real offline bug appears. Restart CSS from the menu (not mid-map) so autoexec/`addons/*.vdf` can load. Dual paint stays HMD-gated.
+`idle-no-shell-ladder` — restart CSS from the menu so the new hook can late-attach. Dual paint stays HMD-gated.

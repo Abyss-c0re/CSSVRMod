@@ -103,6 +103,14 @@ TEST(launch_detects_curl_gnutls_libdir) {
   unsetenv("CSSVR_LIBDIR");
 }
 
+TEST(sdl_hook_late_attach_after_first_window) {
+  ASSERT_FALSE(SdlHook_ShouldLateAttach(false, 0));
+  ASSERT_TRUE(SdlHook_ShouldLateAttach(false, 1));
+  ASSERT_TRUE(SdlHook_ShouldLateAttach(false, 3));
+  ASSERT_FALSE(SdlHook_ShouldLateAttach(true, 1));
+  ASSERT_FALSE(SdlHook_ShouldLateAttach(true, 0));
+}
+
 TEST(sdl_event_win_size) {
   unsigned char ev[56] = {};
   const uint32_t type = kSdlWindowEvent;

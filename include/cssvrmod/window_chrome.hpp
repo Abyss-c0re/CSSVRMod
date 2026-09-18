@@ -54,4 +54,10 @@ inline bool SdlEventWinSizeFor(const void* ev, int ev_bytes, uint32_t want_id, i
   return got == want_id;
 }
 
+/// Hook arrived as SDL2 NEEDED, not LD_PRELOAD. Present/ICvar stay dead until
+/// one late attach after the first real window (shaderapivk is mapped by then).
+inline bool SdlHook_ShouldLateAttach(bool done, int creates) {
+  return !done && creates >= 1;
+}
+
 } // namespace cssvr

@@ -348,6 +348,18 @@ Idle hunt. Same Steam CSS `2221372`; no hook in maps. LaunchOptions still Cloud-
 
 Cbuf 12-byte steal refuses CSS RIP-relative lea prologue. Slot 106 jmp target would crash every console line. Offline 121/121. Not HMD-proven. Restart CSS from the menu.
 
+## 2026-09-19 cycle 79
+
+Idle hunt. CSS restarted as `2358263` (00:20) but predates `80fce66` SDL2 shim (00:30). No hook in maps. `ldd` with `bin/linux64` first binds shim→hook. No code. Not HMD-proven. Next: restart CSS from the menu again.
+
+## 2026-09-19 cycle 80
+
+Idle hunt. Same Steam CSS `2358263`; still predates shim; no hook in maps. No code. Not HMD-proven. Next: restart CSS from the menu again.
+
+## 2026-09-19 cycle 81
+
+SDL2 shim mapped the hook in live CSS `2370093`. Present/ICvar stayed dead (not LD_PRELOAD). PollEvent one-shots CssvrLateAttach after the first window. Offline 124/124. Not HMD-proven. Restart CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
