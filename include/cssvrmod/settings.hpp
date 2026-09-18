@@ -166,4 +166,12 @@ inline std::string FormatLaunchPath(const char* path, bool exists) {
   return buf;
 }
 
+/// --help env block. Resize persist + CSSVR_LAUNCH must be documented.
+inline std::string FormatHelpEnv() {
+  return "env:\n"
+         "  CSSVR_LAUNCH       launch.cfg path (resize writes width/height here)\n"
+         "                     default ~/.config/gvrmod/cssvr_launch.cfg\n"
+         "  CSSVR_LEFT_HANDED  1=left primary; unset reads launch.cfg\n";
+}
+
 } // namespace cssvr

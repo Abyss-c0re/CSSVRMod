@@ -23,9 +23,11 @@ static void Usage() {
                "  --gl       OpenGL/togl (CreateDevice still broken on this GPU)\n"
                "  --dx9      original vrmod CreateTexture path (shaderapidx9)\n"
                "  --noborder borderless window (default is decorated)\n"
-               "  --width N  desktop window width (also --set width N)\n"
-               "  --height N desktop window height\n"
-               "  --no-hook  spawn CSS without VR hook (debug)\n");
+               "  --width N  desktop window width (--set width N; resize persists)\n"
+               "  --height N desktop window height (resize persists to launch.cfg)\n"
+               "  --no-hook  spawn CSS without VR hook (debug)\n"
+               "%s",
+               cssvr::FormatHelpEnv().c_str());
 }
 
 static void PrintLaunchPath() {

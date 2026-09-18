@@ -196,6 +196,10 @@ Only persist the last CSS window. Destroy/SetWindowSize on a splash or popup mus
 
 `--print` / `--settings` now show launch.cfg path (ok/missing). Offline 90/90. Not HMD-proven.
 
+## 2026-09-18 cycle 37
+
+`--help` documents CSSVR_LAUNCH and that resize persists width/height. Offline 91/91. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

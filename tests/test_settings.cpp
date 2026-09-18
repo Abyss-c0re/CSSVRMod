@@ -56,6 +56,15 @@ TEST(settings_seed_left_handed) {
   ASSERT_TRUE(Settings_LeftHandedSeed("0", true) == nullptr);
 }
 
+TEST(settings_help_launch_env) {
+  const std::string e = FormatHelpEnv();
+  ASSERT_TRUE(e.find("CSSVR_LAUNCH") != std::string::npos);
+  ASSERT_TRUE(e.find("cssvr_launch.cfg") != std::string::npos);
+  ASSERT_TRUE(e.find("width") != std::string::npos);
+  ASSERT_TRUE(e.find("resize") != std::string::npos);
+  ASSERT_TRUE(e.find("CSSVR_LEFT_HANDED") != std::string::npos);
+}
+
 TEST(settings_format_launch_path) {
   ASSERT_STREQ(FormatLaunchPath(nullptr, false).c_str(), "launch.cfg -");
   ASSERT_STREQ(FormatLaunchPath("", true).c_str(), "launch.cfg -");
