@@ -224,6 +224,10 @@ Dual-eye blit now uses `CalibSubmitCrop(..., painted_dual)` so UV IPD drops afte
 
 ProbeLiveEngine opens engine.so/client.so via Module_SoHandle. Dropped dlopen(nullptr) — launcher is not engine. Offline 95/95. Not HMD-proven.
 
+## 2026-09-18 cycle 44
+
+Retry RenderView/CreateMove until client.so is mapped. First present can be splash; no_client_base is not a toast. Offline 96/96. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

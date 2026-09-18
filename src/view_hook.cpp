@@ -27,6 +27,8 @@ using RenderViewFn = void (*)(void*, void*, int, int);
 
 RenderViewLoc g_loc;
 RenderViewFn g_orig = nullptr;
+bool g_rv_permanent = false;
+int g_rv_tries = 0;
 EngineIf g_eng;
 bool g_in = false;
 bool g_did_frame = false;
@@ -177,23 +179,29 @@ uintptr_t ClientBase(const char* full_path) { return Module_ClientBase(full_path
 } // namespace
 
 void ViewHookTryInstall() {
-  if (g_orig) return;
-  Logf("renderview install try");
+  if (g_orig || g_rv_permanent) return;
+  g_rv_tries++;
+  if (g_rv_tries <= 3 || (g_rv_tries % 300) == 0)
+    Logf("renderview install try n=%d", g_rv_tries);
   CssInstall inst = FindCssInstall();
   if (!inst.found) {
     Logf("renderview locate skip: no css");
     NoteLocateToast("no_css", false);
+    g_rv_permanent = true;
     return;
   }
-  if (!LocateRenderViewFile(inst.client_so.c_str(), &g_loc) || !g_loc.found) {
-    Logf("renderview locate fail %s", g_loc.reason);
-    NoteLocateToast(g_loc.reason ? g_loc.reason : "no_xref", false);
-    return;
+  if (!g_loc.found) {
+    if (!LocateRenderViewFile(inst.client_so.c_str(), &g_loc) || !g_loc.found) {
+      Logf("renderview locate fail %s", g_loc.reason);
+      NoteLocateToast(g_loc.reason ? g_loc.reason : "no_xref", false);
+      g_rv_permanent = true;
+      return;
+    }
   }
   const uintptr_t base = ClientBase(inst.client_so.c_str());
   if (!base) {
-    Logf("renderview no client base (fn_rva=0x%llx)", (unsigned long long)g_loc.fn_rva);
-    NoteLocateToast("no_client_base", false);
+    if (g_rv_tries <= 3 || (g_rv_tries % 300) == 0)
+      Logf("renderview no client base (fn_rva=0x%llx) — retry", (unsigned long long)g_loc.fn_rva);
     return;
   }
   g_orig = reinterpret_cast<RenderViewFn>(base + g_loc.fn_rva);
@@ -212,6 +220,7 @@ void ViewHookTryInstall() {
   if (!patched) {
     g_orig = nullptr;
     NoteLocateToast(g_loc.slot_rva.empty() ? "fn_no_vtable" : "no_patch", false);
+    g_rv_permanent = true;
   }
   ProbeLiveEngine(g_eng);
   Logf("engine angles_ok=%d get=%d set=%d %s", g_eng.angles_ok ? 1 : 0, g_eng.get_angles_idx,

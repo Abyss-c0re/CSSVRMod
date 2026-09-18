@@ -1,11 +1,11 @@
 {
-  "cycle": 43,
+  "cycle": 44,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T12:39:22Z",
-  "last_focus": "engine-so-noload-path",
+  "started_at": "2026-09-18T12:53:08Z",
+  "last_focus": "hook-retry-until-client-mapped",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "551b6cb",
+  "last_commit": "pending",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }

@@ -1,14 +1,14 @@
-# Cycle 43 — 2026-09-18
+# Cycle 44 — 2026-09-18
 
 ## Focus
 
-`engine-so-noload-path` — ProbeLiveEngine used short-name NOLOAD then `dlopen(nullptr)`.
+`hook-retry-until-client-mapped` — first VK present can run before client.so is mapped.
 
 ## Did
 
-- `Module_SoHandle` / `Module_SoPlan` for any path-loaded Source .so. Never the main exe.
-- ProbeLiveEngine opens `engine.so` + `client.so` via install path + maps.
-- Look / trace factories no longer come from the launcher.
+- `HookInstall_Transient("no_client_base")` — retry, do not toast (splash is not a miss).
+- Locate client.so once; retry ClientBase + patch on later presents.
+- CreateMove same. WrapPresent / GL swap no longer one-shot.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 95 passed, 0 failed (752 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 96 passed, 0 failed (760 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

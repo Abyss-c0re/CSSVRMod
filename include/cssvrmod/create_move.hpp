@@ -155,6 +155,7 @@ inline bool CreateMove_IsMissReason(const char* reason) {
   if (std::strcmp(reason, "idle") == 0 || std::strcmp(reason, "located") == 0 ||
       std::strcmp(reason, "hooked") == 0)
     return false;
+  if (HookInstall_Transient(reason)) return false;
   return true;
 }
 

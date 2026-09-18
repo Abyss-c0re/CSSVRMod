@@ -1,3 +1,4 @@
+#include "cssvrmod/create_move.hpp"
 #include "cssvrmod/dual_paint.hpp"
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/module_base.hpp"
@@ -104,6 +105,21 @@ TEST(locate_renderview_fixture_and_css) {
     ASSERT_EQ(live.fields.angles_off, 0x4c);
     ASSERT_TRUE(live.slot_rva.size() >= 1);
   }
+}
+
+TEST(hook_install_retries_until_client_mapped) {
+  ASSERT_TRUE(HookInstall_Transient("no_client_base"));
+  ASSERT_FALSE(HookInstall_Transient("no_xref"));
+  ASSERT_TRUE(HookInstall_ShouldRetry("no_client_base", false));
+  ASSERT_TRUE(HookInstall_ShouldRetry("idle", false));
+  ASSERT_FALSE(HookInstall_ShouldRetry("no_xref", false));
+  ASSERT_FALSE(HookInstall_ShouldRetry("no_client_base", true));
+  RenderViewToastIn in;
+  in.locate_reason = "no_client_base";
+  ASSERT_FALSE(RenderView_ToastDecide(in).should_toast);
+  CreateMoveToastIn cm;
+  cm.locate_reason = "no_client_base";
+  ASSERT_FALSE(CreateMove_ToastDecide(cm).should_toast);
 }
 
 TEST(renderview_locate_miss_toast) {

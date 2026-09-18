@@ -695,12 +695,8 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
     }
   }
   if (!real) return VK_ERROR_UNKNOWN;
-  static bool vk_hooks = false;
-  if (!vk_hooks) {
-    vk_hooks = true;
-    ViewHookTryInstall();
-    UserCmd_HookLive();
-  }
+  ViewHookTryInstall();
+  UserCmd_HookLive();
   const VkResult pr = real(queue, info);
   // After present: never wait. Harvest a finished GPU copy, kick the next if XR is hungry.
   VkEyePair dual{};

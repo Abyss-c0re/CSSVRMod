@@ -71,22 +71,25 @@ void NoteCreateMoveToast(const char* reason, bool hooked) {
 bool UserCmd_HookLive() {
   if (g_installed) return true;
   if (g_attempted) return false;
-  g_attempted = true;
   CssInstall inst = FindCssInstall();
   if (!inst.found) {
     Logf("createmove skip: no css");
     NoteCreateMoveToast("no_css", false);
+    g_attempted = true;
     return false;
   }
-  if (!LocateCreateMoveFile(inst.client_so.c_str(), &g_loc) || !g_loc.found) {
-    Logf("createmove locate fail %s", g_loc.reason);
-    NoteCreateMoveToast(g_loc.reason ? g_loc.reason : "no_rtti", false);
-    return false;
+  if (!g_loc.found) {
+    if (!LocateCreateMoveFile(inst.client_so.c_str(), &g_loc) || !g_loc.found) {
+      Logf("createmove locate fail %s", g_loc.reason);
+      NoteCreateMoveToast(g_loc.reason ? g_loc.reason : "no_rtti", false);
+      g_attempted = true;
+      return false;
+    }
   }
   const uintptr_t base = ClientBase(inst.client_so.c_str());
   if (!base) {
-    Logf("createmove no client base");
-    NoteCreateMoveToast("no_client_base", false);
+    static int n = 0;
+    if (n++ < 3 || (n % 300) == 0) Logf("createmove no client base — retry");
     return false;
   }
   g_orig = reinterpret_cast<CreateMoveFn>(base + g_loc.fn_rva);
@@ -105,6 +108,7 @@ bool UserCmd_HookLive() {
   if (!patched) {
     g_orig = nullptr;
     NoteCreateMoveToast(g_loc.slot_rva.empty() ? "no_vtable" : "no_patch", false);
+    g_attempted = true;
   }
   return g_installed;
 }

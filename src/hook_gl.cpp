@@ -351,6 +351,8 @@ void HookOnSwap() {
   g_swaps++;
   CaptureBackbuffer(); // dump before engine probe — Once() can block
   Once();
+  ViewHookTryInstall();
+  UserCmd_HookLive();
   XrSample xr{};
   const bool got = g_xr_ok && XrHostPollInput(&xr);
   if (g_xr_ok) XrHostBeginFrame();

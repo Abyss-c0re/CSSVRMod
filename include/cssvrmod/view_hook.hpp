@@ -224,11 +224,23 @@ struct RenderViewToast {
   const char* label = "RV · IDLE";
 };
 
+/// First present can run before client.so is mapped. Retry; do not toast yet.
+inline bool HookInstall_Transient(const char* reason) {
+  return reason && std::strcmp(reason, "no_client_base") == 0;
+}
+
+inline bool HookInstall_ShouldRetry(const char* reason, bool hooked) {
+  if (hooked) return false;
+  if (!reason || !reason[0] || std::strcmp(reason, "idle") == 0) return true;
+  return HookInstall_Transient(reason);
+}
+
 inline bool RenderView_IsMissReason(const char* reason) {
   if (!reason || !reason[0]) return false;
   if (std::strcmp(reason, "idle") == 0 || std::strcmp(reason, "located") == 0 ||
       std::strcmp(reason, "hooked") == 0)
     return false;
+  if (HookInstall_Transient(reason)) return false;
   return true;
 }
 
