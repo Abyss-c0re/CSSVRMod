@@ -20,6 +20,10 @@ Hooked `CViewRender::RenderView` via string-xref locator + vtable swap (no guess
 
 Live path is Vulkan. `CopyEye` is GL and will miss. Next focus is VK per-eye capture, not viewangles yet.
 
+## 2026-09-18 cycle 5 follow
+
+Dropped swap-image fallback on the VK eye copy. Acquired swap is PRESENT_SRC; treating it as COLOR_ATTACHMENT can hang. Only the last BeginRenderPass RT is copied.
+
 ## 2026-09-18 cycle 5
 
 Vulkan per-eye capture: last color RT / acquired swap image after each paint. Two distinct CPU frames required. Present still never waits. Offline 41/41. Not HMD-proven stereo.

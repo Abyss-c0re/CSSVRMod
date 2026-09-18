@@ -529,17 +529,9 @@ bool CaptureEyeImpl(int eye) {
   {
     std::lock_guard<std::mutex> lk(g_mu);
     rt = g_last_rt;
-    if ((!rt.img || rt.w < 8) && g_cur_sc) {
-      auto sit = g_scs.find(g_cur_sc);
-      if (sit != g_scs.end() && g_cur_idx < sit->second.images.size()) {
-        rt.img = sit->second.images[g_cur_idx];
-        rt.w = sit->second.w;
-        rt.h = sit->second.h;
-        rt.fmt = sit->second.format;
-        rt.dev = sit->second.device;
-      }
-    }
-    if (!rt.img || !rt.dev) return false;
+    // Do not fall back to the acquired swap image: that is PRESENT_SRC, not
+    // COLOR_ATTACHMENT. A wrong layout here can hang the GPU.
+    if (!rt.img || !rt.dev || rt.w < 8) return false;
     auto dit = g_devs.find(rt.dev);
     if (dit == g_devs.end()) return false;
     ds = &dit->second;
