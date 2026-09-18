@@ -47,3 +47,36 @@ TEST(melee_decide_gates) {
   ASSERT_FALSE(cd.hit);
   ASSERT_STREQ(cd.reason, "cooldown");
 }
+
+TEST(melee_sweep_and_vel_delta) {
+  auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    if (end.x > 20.f && start.x < 20.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.fraction = 0.4f;
+      t.hit_pos = {20, start.y, start.z};
+      t.hit_normal = {-1, 0, 0};
+    }
+    return t;
+  };
+  MeleeSample s;
+  s.pos = {0, 0, 40};
+  s.dir = {1, 0, 0};
+  s.reach = 30.f;
+  ASSERT_TRUE(MeleeSweepHit(s, world));
+  s.pos = {40, 0, 40}; // start past the wall
+  ASSERT_FALSE(MeleeSweepHit(s, world));
+
+  Pose p;
+  p.pos = {0, 0, 0};
+  p.vel = {};
+  HandVelState st;
+  auto v0 = HandVelOrDelta(p, 0.f, &st);
+  ASSERT_NEAR(v0.Length(), 0.f, 0.001);
+  p.pos = {8, 0, 0};
+  auto v1 = HandVelOrDelta(p, 0.1f, &st);
+  ASSERT_NEAR(v1.x, 80.f, 0.1);
+}

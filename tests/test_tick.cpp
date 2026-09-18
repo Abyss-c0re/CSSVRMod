@@ -33,6 +33,36 @@ TEST(tick_fire_ak_and_knife_melee) {
   ASSERT_STREQ(knife.status, "melee_hit");
 }
 
+TEST(tick_knife_sweep_uses_trace) {
+  auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    if (end.y > 10.f) {
+      t.hit = true;
+      t.fraction = 0.3f;
+      t.hit_world = true;
+      t.hit_pos = {start.x, 10.f, start.z};
+      t.hit_normal = {0, -1, 0};
+    }
+    return t;
+  };
+  TickIn in;
+  in.xr.right.valid = true;
+  in.xr.right.pos = {0, 0, 40};
+  in.xr.right.ang = {0, 90, 0}; // +Y
+  in.xr.right.vel = {80, 0, 0};
+  in.xr.trigger_l = 0.9f;
+  in.wep = FindWeapon("weapon_knife");
+  in.trace = world;
+  in.now = 1.f;
+  WallState L, R;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_TRUE(o.melee.hit);
+  ASSERT_STREQ(o.status, "melee_hit");
+}
+
 TEST(tick_wall_blocks_hand) {
   auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
     TraceHit t;

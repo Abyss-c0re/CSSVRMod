@@ -1,6 +1,7 @@
 #pragma once
 // Port of addon/vrmod-x64/lua/vrmod/combat/sh_combat.lua
 // Velocity-gated hull melee. CSS knife uses sharp / CSS knife base.
+#include "collision.hpp"
 #include "vec3.hpp"
 #include <cstring>
 
@@ -123,6 +124,41 @@ struct MeleeDecision {
   const char* reason = "idle";
   bool path_ok = true;
 };
+
+struct HandVelState {
+  Vec3 last;
+  float t = -1.f;
+  bool have = false;
+};
+
+/// Prefer XR linear vel. Else finite difference. First sample is zero.
+inline Vec3 HandVelOrDelta(const Pose& hand, float now, HandVelState* st) {
+  if (hand.vel.LengthSqr() > 1e-4f) return hand.vel;
+  if (!st) return {};
+  if (!st->have) {
+    st->last = hand.pos;
+    st->t = now;
+    st->have = true;
+    return {};
+  }
+  const float dt = now - st->t;
+  Vec3 v{};
+  if (dt > 1e-4f && dt < 0.25f) v = (hand.pos - st->last) * (1.f / dt);
+  st->last = hand.pos;
+  st->t = now;
+  return v;
+}
+
+/// Hull sweep along the swing. Start-solid (hand in wall) is not a melee hit.
+inline bool MeleeSweepHit(const MeleeSample& s, const TraceFn& trace) {
+  if (!trace) return false;
+  const Vec3 dir = s.dir.LengthSqr() > 1e-8f ? s.dir.Normalized() : Vec3{1, 0, 0};
+  const float reach = s.reach > 0.f ? s.reach : kDefaultReach;
+  const Aabb hull = SymmetricHull(s.radius > 0.f ? s.radius : kDefaultRadius);
+  const TraceHit t = trace(s.pos, s.pos + dir * reach, hull.mins, hull.maxs);
+  if (t.start_solid || t.all_solid) return false;
+  return t.hit && t.fraction < 0.995f;
+}
 
 inline bool MeleeVelocityGates(const MeleeSample& s, const MeleeConfig& c) {
   const float speed = s.vel.Length();

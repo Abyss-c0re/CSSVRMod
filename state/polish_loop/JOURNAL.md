@@ -60,6 +60,11 @@ Apply XR overlay *after* the original CreateMove (orig was wiping analog). Vulka
 
 Ray_t was missing `m_pWorldAxisTransform` (2013, offset 64) — engine would treat is_ray as a pointer and crash. Added null axis. Tick+trace now also runs on the Vulkan worker, not only GL swap.
 
+## 2026-09-18 cycle 10
+
+Melee hull sweep + pose-delta velocity. Tick hits only if the swing ray reports a world hit. Offline 58/58. Not HMD-proven melee.
+
+
 
 
 

@@ -18,10 +18,11 @@ struct TickIn {
   MeleeConfig melee;
   float wall_pad = 0.75f;
   float hand_radius = kDefaultRadius;
-  bool world_melee_hit = false; // engine hull result (or mock)
+  bool world_melee_hit = false; // mock when no trace
   Ang3 current_view;
   float mouse_sens = 0.022f;
-  TraceFn trace; // empty → skip wall
+  TraceFn trace; // empty → skip wall / melee sweep
+  HandVelState* right_vel = nullptr;
 };
 
 struct TickOut {
@@ -87,14 +88,16 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
     const Pose& hand = o.right_resolved.valid ? o.right_resolved : in.xr.right;
     ms.pos = hand.pos;
     ms.dir = Forward(hand.ang);
-    ms.vel = hand.vel;
+    ms.vel = HandVelOrDelta(hand, in.now, in.right_vel);
     ms.hand = Hand::Right;
     ms.impact = knife ? in.wep->melee_impact : ImpactType::Fist;
     ms.use_weapon = knife;
     ms.is_melee_weapon = knife;
     if (knife) ms.weapon_base_damage = in.wep->damage;
     ms.reach = knife ? 24.f : kDefaultReach;
-    o.melee = MeleeDecide(ms, in.world_melee_hit, in.melee, in.now, next_melee);
+    bool world_hit = in.world_melee_hit;
+    if (in.trace) world_hit = MeleeSweepHit(ms, in.trace);
+    o.melee = MeleeDecide(ms, world_hit, in.melee, in.now, next_melee);
   }
 
   if (o.melee.hit) o.status = "melee_hit";

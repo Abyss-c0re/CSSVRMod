@@ -242,6 +242,7 @@ void* XrWorker(void*) {
       XrSample xr{};
       if (XrHostPollInput(&xr)) {
         static WallState leftWall, rightWall;
+        static HandVelState rightVel;
         static float nextMelee = 0.f;
         static float now = 0.f;
         static const WeaponInfo* wep = FindWeapon("weapon_knife");
@@ -252,6 +253,7 @@ void* XrWorker(void*) {
         tin.dt = 0.011f;
         tin.current_view = xr.hmd.ang;
         tin.trace = EngineMakeTraceFn(g_eng);
+        tin.right_vel = &rightVel;
         TickOut tout = Tick(tin, leftWall, rightWall, &nextMelee);
         now += 0.011f;
         UserCmdOverlay cmd = tout.cmd;

@@ -34,6 +34,7 @@ int g_dumps = 0;
 bool g_want_xr = false;
 std::string g_dump_dir;
 WallState g_leftWall, g_rightWall;
+HandVelState g_rightVel;
 float g_nextMelee = 0.f;
 float g_now = 0.f;
 EngineIf g_eng;
@@ -336,6 +337,7 @@ void HookOnSwap() {
     tin.melee = g_mcfg;
     tin.current_view = xr.hmd.ang;
     tin.trace = EngineMakeTraceFn(g_eng);
+    tin.right_vel = &g_rightVel;
     TickOut tout = Tick(tin, g_leftWall, g_rightWall, &g_nextMelee);
     UserCmd_NoteOverlay(tout.cmd);
     ApplyClientCmd(tout.cmd, g_prevCmd);

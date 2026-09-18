@@ -21,7 +21,8 @@
 
 - [x] `IEngineTrace::TraceRay` self-test + Tick last-free hull (cycle 9). No write if fraction insane.
 - [ ] Live wall collision proven in-game (HMD).
-- [ ] Melee / knife from hand velocity in live CSS.
+- [x] Melee hull sweep + pose-delta vel in Tick (cycle 10). Start-solid is not a hit.
+- [ ] Live melee proven in-game (HMD). No guessed CSS damage dispatch.
 
 ## Honest limits (do not delete)
 
