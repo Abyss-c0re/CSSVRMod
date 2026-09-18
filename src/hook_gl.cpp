@@ -330,7 +330,7 @@ void HookOnSwap() {
   if (got) {
     TickIn tin;
     tin.xr = xr;
-    tin.wep = g_wep;
+    tin.wep = nullptr; // no live weapon query yet — fist only on melee_intent
     tin.now = g_now;
     tin.dt = 0.011f;
     tin.input = g_icfg;

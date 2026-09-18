@@ -64,6 +64,10 @@ Ray_t was missing `m_pWorldAxisTransform` (2013, offset 64) — engine would tre
 
 Melee hull sweep + pose-delta velocity. Tick hits only if the swing ray reports a world hit. Offline 58/58. Not HMD-proven melee.
 
+## 2026-09-18 cycle 10 follow
+
+Stopped forcing `weapon_knife` every tick. Without a live weapon query that ran a knife hull while holding a gun. Fist sweep only on melee_intent.
+
 
 
 

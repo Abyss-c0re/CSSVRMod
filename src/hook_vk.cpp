@@ -245,10 +245,9 @@ void* XrWorker(void*) {
         static HandVelState rightVel;
         static float nextMelee = 0.f;
         static float now = 0.f;
-        static const WeaponInfo* wep = FindWeapon("weapon_knife");
         TickIn tin;
         tin.xr = xr;
-        tin.wep = wep;
+        tin.wep = nullptr; // no live weapon query yet — fist only on melee_intent
         tin.now = now;
         tin.dt = 0.011f;
         tin.current_view = xr.hmd.ang;
