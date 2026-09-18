@@ -1,44 +1,48 @@
 # CSSVRMod
 
-<p align="center"><strong>A VR mod for Counter-Strike: Source</strong><br/>
-OpenXR · texture hook · C++ combat laws (from gVRMod Lua)</p>
+A VR mod for **Counter-Strike: Source** (Linux 64-bit). OpenXR headset, Source in a framed window, combat laws ported from [gVRMod](https://github.com/Abyss-c0re/gVRMod).
 
-**Repo name is `CSSVRMod` (that letter case).** Sibling of [gVRMod](https://github.com/Abyss-c0re/gVRMod). Start it from the **Cube** launcher (New Game → category **CSSVRMod**) or `scripts/CSSVR.sh`.
+## Start
 
-- **Texture hook** — Vulkan `vkQueuePresentKHR` (working 64-bit CSS path). OpenGL/togl is the gVRMod Linux priority; DX9 is the original vrmod `CreateTexture` path.
-- **OpenXR** — one CSS present on the lenses (identity VIEW pose until dual `RenderView`) + shared controller paths
-- **Cube** — gVRMod `CubeUI` Start Game on the CSSVRMod category execs this launcher
-- **Combat** — melee, hand-bullet, wall, gun-aim — ported from `vrmod-x64` Lua to **pure C++**
+From **Cube** (gVRMod launcher): New Game → CSSVRMod → pick a map → Start Game.
 
-## Quick start
+Or from this tree:
 
 ```bash
 cmake -S . -B build
 cmake --build build -j"$(nproc)"
-./build/cssvrmod_tests
-
-# locate CSS (Steam app 240)
-./scripts/CSSVR.sh --find
-
-# play (or pick CSSVRMod in CubeUI)
 ./scripts/CSSVR.sh --map de_dust2
-
-# desktop settings host (Vision knobs + backend/map)
-./install/CSSVR --settings
-./install/CSSVR --set eyescale 0.20
 ```
 
-Video calibration: `~/.config/gvrmod/cssvr_calib.cfg` (same knobs as vrmod Vision). Reloads live. `CSSVR --set` writes that file.
+Needs a Steam install of CSS (app 240) and an OpenXR runtime (WiVRn, Monado, SteamVR). `./scripts/CSSVR.sh --find` prints the game path.
 
-Headset + CSS walk is **manual**. Offline green is not an HMD claim.
+## Settings
+
+Vision knobs (same idea as vrmod’s scale / H / V / eye) live in `~/.config/gvrmod/cssvr_calib.cfg` and reload while the game is running. The in-headset panel is the Vision slab (menu button). Desktop:
+
+```bash
+./install/CSSVR --settings
+./install/CSSVR --set eyescale 0.20
+./install/CSSVR --set width 1920
+./install/CSSVR --set height 1080
+```
+
+`./install/CSSVR --help` lists env vars (`CSSVR_LAUNCH`, `CSSVR_LEFT_HANDED`, …).
+
+## What’s in here
+
+- **Present hook** — Vulkan `vkQueuePresentKHR` is the live 64-bit CSS path. OpenGL/togl is still the long-term gVRMod-style target; DX9 is the old vrmod `CreateTexture` path.
+- **OpenXR** — session + headset submit. Dual-eye world paint is hooked; until both eyes actually copy, you get one image on the lenses, not a cinema quad and not two offset planes.
+- **Combat** — melee, hand-bullet, wall sweep, gun-aim in C++ (from the gVRMod Lua laws).
+- **Window** — decorated by default. `--noborder` is opt-in.
 
 ## Layout
 
 ```
-include/cssvrmod/   laws
-src/                catalog, launch, hook, XR
-tests/              offline gate
-scripts/CSSVR.sh    host (Cube calls this)
+include/cssvrmod/   combat + stereo + settings
+src/                launcher, hooks, OpenXR
+tests/              offline suite
+scripts/CSSVR.sh    host script
 docs/ARCHITECTURE.md
 ```
 

@@ -1,6 +1,6 @@
 # CSSVRMod polish loop — agent brief (every 13 min)
 
-You are a **careful product polish agent** for **CSSVRMod only** (`/home/voldemar/Dev/GMod/CSSVRMod`, repo name exact case). Goal: a **real VRMOD** — stereo eyes, HMD look, controls, collisions — matching **gVRMod Cube standard**. The user named the current submit **heresy** (2D plane + misaligned other plane, no stereo, black frames). **Do not ship another cinema/offset-plane.** Self-recover. Validate. Meaningful commit when safe.
+You are a **careful product polish agent** for **CSSVRMod only** (`/home/voldemar/Dev/GMod/CSSVRMod`). Goal: a **real VRMOD** — stereo eyes, HMD look, controls, collisions — matching **gVRMod Cube standard**. The user named the current submit **heresy** (2D plane + misaligned other plane, no stereo, black frames). **Do not ship another cinema/offset-plane.** Self-recover. Validate. Meaningful commit when safe.
 
 ## 0. Self-recover (always first)
 

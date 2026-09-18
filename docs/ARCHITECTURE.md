@@ -1,6 +1,6 @@
 # CSSVRMod architecture
 
-CSS has no GMod Lua. Combat laws from `addon/vrmod-x64` are **C++** here. Texture share + OpenXR follow gVRMod / Cube compositor split. **Start from CubeUI** (New Game → category `CSSVRMod`). This repo is **CSSVRMod** (exact case).
+CSS has no GMod Lua. Combat laws from `addon/vrmod-x64` are **C++** here. Texture share + OpenXR follow gVRMod / Cube compositor split. Start from Cube (New Game → CSSVRMod) or `scripts/CSSVR.sh`.
 
 ```
 Priority: OpenGL/togl (gVRMod Linux)     Also: DX9 CreateTexture (original module)

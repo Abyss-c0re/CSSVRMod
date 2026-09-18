@@ -1,6 +1,6 @@
 # Agent notes — CSSVRMod
 
-Repo name is **`CSSVRMod`** (that letter case). Sibling of `Abyss-c0re/gVRMod`.
+Sibling of `Abyss-c0re/gVRMod`. Product start is Cube or `scripts/CSSVR.sh`.
 
 ## Version control
 
