@@ -296,6 +296,14 @@ In-process hook finds CSS from `/proc/self/exe` and cwd, not only HOME Steam pat
 
 Steam Cloud wiped App 240 LaunchOptions. `--install` now writes `autoexec.cfg` `plugin_load` (durable) and re-upserts LaunchOptions. Offline 116/116. Not HMD-proven.
 
+## 2026-09-18 cycle 66
+
+Idle hunt. Live Steam CSS `2221372` still predates autoexec; no hook in maps. LaunchOptions/plugin/VDF on disk. No code. Not HMD-proven. Next: restart CSS from the menu.
+
+## 2026-09-18 cycle 67
+
+Hook no longer NEEDs `libopenxr_loader`. Steam PV cannot resolve that .so (runtime is under overrides/openxr). Delay-load + `/run/host/usr/lib` search. Offline 117/117. Not HMD-proven. Restart CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

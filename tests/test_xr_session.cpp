@@ -1,9 +1,29 @@
 #include "cssvrmod/banner.hpp"
 #include "cssvrmod/toast.hpp"
+#include "cssvrmod/xr_loader.hpp"
 #include "cssvrmod/xr_session.hpp"
 #include "test_framework.h"
 
 using namespace cssvr;
+
+TEST(xr_loader_searches_soname_then_pv_host) {
+  int n = 0;
+  const char* const* c = XrLoader_Candidates(&n);
+  ASSERT_TRUE(n >= 4);
+  ASSERT_TRUE(c != nullptr);
+  ASSERT_STREQ(c[0], "libopenxr_loader.so.1");
+  ASSERT_STREQ(c[1], "libopenxr_loader.so");
+  ASSERT_TRUE(XrLoader_HasPvHostCandidate());
+  bool pv = false, usr = false;
+  for (int i = 0; i < n; ++i) {
+    if (XrLoader_IsPvHostPath(c[i])) pv = true;
+    if (c[i] && std::strstr(c[i], "/usr/lib") && std::strstr(c[i], "libopenxr_loader")) usr = true;
+  }
+  ASSERT_TRUE(pv);
+  ASSERT_TRUE(usr);
+  ASSERT_FALSE(XrLoader_IsPvHostPath(c[0]));
+  ASSERT_FALSE(XrLoader_IsPvHostPath(nullptr));
+}
 
 TEST(xr_session_ok_only_when_running) {
   ASSERT_EQ((int)XrSession_FromState(kXrStateUnknown, false, false), (int)XrSessionPhase::none);

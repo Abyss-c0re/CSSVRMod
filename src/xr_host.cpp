@@ -6,6 +6,7 @@
 #include "cssvrmod/settings.hpp"
 #include "cssvrmod/stereo_view.hpp"
 #include "cssvrmod/toast.hpp"
+#include "cssvrmod/xr_loader.hpp"
 #include "cssvrmod/xr_session.hpp"
 #include "openxr_paths.hpp"
 
@@ -136,8 +137,9 @@ bool LoadFn(XrInstance inst, const char* name, PFN_xrVoidFunction* out) {
 
 bool LoadLoader() {
   if (g_loader) return true;
-  g_loader = dlopen("libopenxr_loader.so.1", RTLD_NOW | RTLD_LOCAL);
-  if (!g_loader) g_loader = dlopen("libopenxr_loader.so", RTLD_NOW | RTLD_LOCAL);
+  int n = 0;
+  const char* const* cand = XrLoader_Candidates(&n);
+  for (int i = 0; i < n && !g_loader; ++i) g_loader = dlopen(cand[i], RTLD_NOW | RTLD_LOCAL);
   if (!g_loader) {
     g_info.reason = "no_loader";
     return false;

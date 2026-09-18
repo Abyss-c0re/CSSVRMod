@@ -74,12 +74,12 @@ add_custom_command(TARGET CSSVR POST_BUILD
 
 option(CSSVR_BUILD_HOOK "Build libcssvrmod_hook.so" ON)
 if(CSSVR_BUILD_HOOK AND NOT WIN32)
-  find_library(OPENXR_LIB openxr_loader)
   find_library(GL_LIB GL)
   find_library(GLX_LIB GLX)
   find_package(X11)
   find_path(OPENXR_INCLUDE_DIR openxr/openxr.h)
-  if(OPENXR_LIB AND GL_LIB AND GLX_LIB AND X11_FOUND)
+  # Headers only — do not NEEDED libopenxr_loader (Steam PV cannot resolve it).
+  if(OPENXR_INCLUDE_DIR AND GL_LIB AND GLX_LIB AND X11_FOUND)
     add_library(cssvrmod_hook SHARED
       src/hook_ctor.cpp
       src/hook_gl.cpp
@@ -99,7 +99,6 @@ if(CSSVR_BUILD_HOOK AND NOT WIN32)
     )
     target_link_libraries(cssvrmod_hook PRIVATE
       cssvrmod_core
-      ${OPENXR_LIB}
       ${GL_LIB}
       ${GLX_LIB}
       ${X11_LIBRARIES}

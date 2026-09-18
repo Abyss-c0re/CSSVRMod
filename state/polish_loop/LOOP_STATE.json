@@ -1,11 +1,11 @@
 {
-  "cycle": 64,
+  "cycle": 67,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T18:05:00Z",
-  "last_focus": "autoexec-plugin-load",
+  "started_at": "2026-09-18T18:54:44Z",
+  "last_focus": "hook-delay-openxr",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "91457ca",
+  "last_commit": "pending",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
