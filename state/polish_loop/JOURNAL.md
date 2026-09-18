@@ -104,6 +104,10 @@ ViewHookTryInstall only ran on GL swap. Live CSS is Vulkan, so the hook and the 
 
 Incomplete dual capture (2 paints, <2 copies) toasts once after 8 frames. Offline 71/71. Not HMD-proven.
 
+## 2026-09-18 cycle 17 follow
+
+If copies later succeed, drop the NO CAP window title. Two captures still are not a stereo claim.
+
 
 
 

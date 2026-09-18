@@ -61,8 +61,12 @@ void NoteLocateToast(const char* reason, bool hooked) {
 }
 
 void NoteCaptureToast(const DualPaintResult& r) {
-  if (r.painted_dual) g_incomplete_n = 0;
-  else if (r.paints == 2 && r.captures < 2) g_incomplete_n++;
+  if (r.painted_dual) {
+    g_incomplete_n = 0;
+    if (g_cap_toast) Chrome_NoteStatus("CSS");
+    return;
+  }
+  if (r.paints == 2 && r.captures < 2) g_incomplete_n++;
   DualCaptureToastIn in;
   in.paints = r.paints;
   in.captures = r.captures;
