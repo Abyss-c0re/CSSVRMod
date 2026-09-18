@@ -25,6 +25,36 @@ inline int Settings_ClampWin(int v, int lo, int hi) {
   return v;
 }
 
+/// Reject minimize / garbage. High side may still clamp (4000 → 3840).
+inline bool Settings_WinSizePlausible(int w, int h) {
+  return w >= 640 && h >= 480 && w <= 4096 && h <= 2304;
+}
+
+/// True if clamped size differs. Does not write the file.
+inline bool Settings_NoteWinSize(Settings* s, int w, int h) {
+  if (!s || !Settings_WinSizePlausible(w, h)) return false;
+  const int nw = Settings_ClampWin(w, 640, 3840);
+  const int nh = Settings_ClampWin(h, 480, 2160);
+  if (nw == s->win_w && nh == s->win_h) return false;
+  s->win_w = nw;
+  s->win_h = nh;
+  return true;
+}
+
+/// Debounce gate for the window hook. `force` skips the timer (destroy / unload).
+inline bool Settings_ResizePersistReady(int last_w, int last_h, int w, int h, int last_ms,
+                                        int now_ms, int debounce_ms, bool force, int* out_w,
+                                        int* out_h) {
+  if (!Settings_WinSizePlausible(w, h)) return false;
+  const int nw = Settings_ClampWin(w, 640, 3840);
+  const int nh = Settings_ClampWin(h, 480, 2160);
+  if (out_w) *out_w = nw;
+  if (out_h) *out_h = nh;
+  if (nw == last_w && nh == last_h) return false;
+  if (!force && debounce_ms > 0 && now_ms - last_ms < debounce_ms) return false;
+  return true;
+}
+
 inline bool Settings_ApplyKey(Settings* s, const char* key, const char* val) {
   if (!s || !key || !key[0] || !val) return false;
   if (std::strcmp(key, "backend") == 0) {
@@ -125,6 +155,7 @@ inline bool Settings_LeftHandedFromLaunchText(const char* text) {
 
 const char* LaunchPrefsPath();
 bool Settings_Load(Settings* s);
+bool Settings_SaveLaunch(const Settings& s); // launch.cfg only — resize must not rewrite Vision
 bool Settings_Save(const Settings& s);
 
 } // namespace cssvr

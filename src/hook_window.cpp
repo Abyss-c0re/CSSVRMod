@@ -1,5 +1,6 @@
 // Force a decorated X11/SDL window. Source + DXVK often create BORDERLESS
 // even when -noborder is omitted; Motif hints then hide the title bar.
+#include "cssvrmod/settings.hpp"
 #include "cssvrmod/window_chrome.hpp"
 
 #include <X11/Xatom.h>
@@ -10,6 +11,7 @@
 #include <dlfcn.h>
 #include <cstdlib>
 #include <cstdint>
+#include <time.h>
 
 namespace {
 
@@ -34,20 +36,34 @@ using CreateWinFn = void* (*)(const char*, int, int, int, int, uint32_t);
 using SetBorderFn = void (*)(void*, int);
 using SetFsFn = int (*)(void*, uint32_t);
 using SetReszFn = void (*)(void*, int);
+using SetSizeFn = void (*)(void*, int, int);
+using GetSizeFn = void (*)(void*, int*, int*);
+using DestroyFn = void (*)(void*);
+using PollEventFn = int (*)(void*);
 using XChangePropFn = int (*)(Display*, Window, Atom, Atom, int, int, const unsigned char*, int);
 
 extern "C" void* SDL_CreateWindow(const char*, int, int, int, int, uint32_t);
 extern "C" void SDL_SetWindowBordered(void*, int);
 extern "C" int SDL_SetWindowFullscreen(void*, uint32_t);
+extern "C" void SDL_SetWindowSize(void*, int, int);
+extern "C" void SDL_DestroyWindow(void*);
+extern "C" int SDL_PollEvent(void*);
 extern "C" int XChangeProperty(Display*, Window, Atom, Atom, int, int, const unsigned char*, int);
 
 CreateWinFn g_create = nullptr;
 SetBorderFn g_set_border = nullptr;
 SetFsFn g_set_fs = nullptr;
 SetReszFn g_set_resz = nullptr;
+SetSizeFn g_set_size = nullptr;
+GetSizeFn g_get_size = nullptr;
+DestroyFn g_destroy = nullptr;
+PollEventFn g_poll = nullptr;
 XChangePropFn g_xchange = nullptr;
 void* g_last_win = nullptr;
 int g_creates = 0;
+int g_last_w = 0;
+int g_last_h = 0;
+int g_last_persist_ms = 0;
 using SetTitleFn = void (*)(void*, const char*);
 SetTitleFn g_set_title = nullptr;
 char g_last_label[32] = {};
@@ -87,6 +103,24 @@ void EnsureSdl() {
   if (!g_set_resz)
     g_set_resz = (SetReszFn)(sdl ? dlsym(sdl, "SDL_SetWindowResizable")
                                  : dlsym(RTLD_NEXT, "SDL_SetWindowResizable"));
+  if (!g_set_size) {
+    g_set_size = (SetSizeFn)SymIn(sdl, "SDL_SetWindowSize", (void*)SDL_SetWindowSize);
+    if (!g_set_size) g_set_size = (SetSizeFn)dlsym(RTLD_NEXT, "SDL_SetWindowSize");
+    if (g_set_size == (SetSizeFn)SDL_SetWindowSize) g_set_size = nullptr;
+  }
+  if (!g_get_size)
+    g_get_size = (GetSizeFn)(sdl ? dlsym(sdl, "SDL_GetWindowSize")
+                                 : dlsym(RTLD_NEXT, "SDL_GetWindowSize"));
+  if (!g_destroy) {
+    g_destroy = (DestroyFn)SymIn(sdl, "SDL_DestroyWindow", (void*)SDL_DestroyWindow);
+    if (!g_destroy) g_destroy = (DestroyFn)dlsym(RTLD_NEXT, "SDL_DestroyWindow");
+    if (g_destroy == (DestroyFn)SDL_DestroyWindow) g_destroy = nullptr;
+  }
+  if (!g_poll) {
+    g_poll = (PollEventFn)SymIn(sdl, "SDL_PollEvent", (void*)SDL_PollEvent);
+    if (!g_poll) g_poll = (PollEventFn)dlsym(RTLD_NEXT, "SDL_PollEvent");
+    if (g_poll == (PollEventFn)SDL_PollEvent) g_poll = nullptr;
+  }
 }
 
 void EnsureX11() {
@@ -104,6 +138,31 @@ void ForceDecorated(void* win) {
   if (g_set_fs) g_set_fs(win, 0);
   if (g_set_border) g_set_border(win, 1);
   if (g_set_resz) g_set_resz(win, 1);
+}
+
+int NowMs() {
+  timespec ts {};
+  if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0) return 0;
+  return (int)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+}
+
+void PersistWinSize(int w, int h, bool force) {
+  int nw = 0, nh = 0;
+  if (!cssvr::Settings_ResizePersistReady(g_last_w, g_last_h, w, h, g_last_persist_ms, NowMs(),
+                                          400, force, &nw, &nh))
+    return;
+  cssvr::Settings s;
+  if (!cssvr::Settings_Load(&s)) return;
+  if (!cssvr::Settings_NoteWinSize(&s, nw, nh)) {
+    g_last_w = nw;
+    g_last_h = nh;
+    return;
+  }
+  if (!cssvr::Settings_SaveLaunch(s)) return;
+  g_last_w = s.win_w;
+  g_last_h = s.win_h;
+  g_last_persist_ms = NowMs();
+  Log("persist size %dx%d", g_last_w, g_last_h);
 }
 
 } // namespace
@@ -143,10 +202,39 @@ void* SDL_CreateWindow(const char* title, int x, int y, int w, int h, uint32_t f
   void* win = g_create(title, x, y, w, h, flags);
   g_last_win = win;
   g_creates++;
+  if (cssvr::Settings_WinSizePlausible(w, h)) {
+    g_last_w = cssvr::Settings_ClampWin(w, 640, 3840);
+    g_last_h = cssvr::Settings_ClampWin(h, 480, 2160);
+  }
   Log("SDL_CreateWindow #%d '%s' %dx%d flags 0x%x->0x%x win=%p", g_creates,
       title ? title : "", w, h, raw, flags, win);
   ForceDecorated(win);
   return win;
+}
+
+void SDL_SetWindowSize(void* window, int w, int h) {
+  EnsureSdl();
+  if (g_set_size) g_set_size(window, w, h);
+  PersistWinSize(w, h, false);
+}
+
+void SDL_DestroyWindow(void* window) {
+  EnsureSdl();
+  if (window && g_get_size) {
+    int w = 0, h = 0;
+    g_get_size(window, &w, &h);
+    PersistWinSize(w, h, true);
+  }
+  if (g_destroy) g_destroy(window);
+  if (window == g_last_win) g_last_win = nullptr;
+}
+
+int SDL_PollEvent(void* event) {
+  EnsureSdl();
+  const int r = g_poll ? g_poll(event) : 0;
+  int w = 0, h = 0;
+  if (r == 1 && event && cssvr::SdlEventWinSize(event, 56, &w, &h)) PersistWinSize(w, h, false);
+  return r;
 }
 
 void SDL_SetWindowBordered(void* window, int bordered) {
@@ -210,4 +298,13 @@ int XChangeProperty(Display* dpy, Window w, Atom property, Atom type, int format
 
 __attribute__((constructor)) static void win_ctor() {
   Log("chrome hook ready force_decorated=%d", AllowNoborder() ? 0 : 1);
+}
+
+__attribute__((destructor)) static void win_dtor() {
+  if (!g_last_win) return;
+  EnsureSdl();
+  if (!g_get_size) return;
+  int w = 0, h = 0;
+  g_get_size(g_last_win, &w, &h);
+  PersistWinSize(w, h, true);
 }

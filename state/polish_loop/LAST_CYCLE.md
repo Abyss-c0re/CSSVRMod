@@ -1,13 +1,14 @@
-# Cycle 34 — 2026-09-18
+# Cycle 35 — 2026-09-18
 
 ## Focus
 
-`print-spawn-chrome` — `--print` hid framed vs `-noborder`.
+`persist-resize` — a user-resized framed window was forgotten next launch.
 
 ## Did
 
-- `--print` writes `cssvr: spawn chrome framed` or `cssvr: spawn chrome -noborder`.
-- Argv is exec truth; CSS-missing falls back to planned/persisted noborder.
+- SDL resize / SetWindowSize / destroy writes clamped `width`/`height` to launch.cfg.
+- Minimize/garbage (below 640×480) is ignored. Debounce 400 ms; destroy forces a last write.
+- Launch-only save — resize must not rewrite Vision calib.
 
 ## Did not
 
@@ -16,8 +17,8 @@
 
 ## Tests
 
-`cssvrmod_tests` — 87 passed, 0 failed (670 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 89 passed, 0 failed (700 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`persist-resize` — remember a user-resized framed window in launch.cfg. Never queue `dual-renderview-ipd-origin`.
+`print-launch-path` — `--print` should show which launch.cfg size came from. Never queue `dual-renderview-ipd-origin`.

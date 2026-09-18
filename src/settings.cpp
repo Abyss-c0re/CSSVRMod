@@ -55,8 +55,7 @@ bool Settings_Load(Settings* s) {
   return true;
 }
 
-bool Settings_Save(const Settings& s) {
-  if (!CalibSave(s.calib)) return false;
+bool Settings_SaveLaunch(const Settings& s) {
   const char* path = LaunchPrefsPath();
   if (!path || !path[0]) return false;
   std::string p(path);
@@ -71,6 +70,11 @@ bool Settings_Save(const Settings& s) {
       << "width " << Settings_ClampWin(s.win_w, 640, 3840) << "\n"
       << "height " << Settings_ClampWin(s.win_h, 480, 2160) << "\n";
   return true;
+}
+
+bool Settings_Save(const Settings& s) {
+  if (!CalibSave(s.calib)) return false;
+  return Settings_SaveLaunch(s);
 }
 
 } // namespace cssvr

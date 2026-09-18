@@ -96,6 +96,25 @@ TEST(launch_detects_curl_gnutls_libdir) {
   unsetenv("CSSVR_LIBDIR");
 }
 
+TEST(sdl_event_win_size) {
+  unsigned char ev[56] = {};
+  const uint32_t type = kSdlWindowEvent;
+  std::memcpy(ev, &type, 4);
+  ev[12] = kSdlWindowEventResized;
+  int32_t dw = 1280, dh = 720;
+  std::memcpy(ev + 16, &dw, 4);
+  std::memcpy(ev + 20, &dh, 4);
+  int w = 0, h = 0;
+  ASSERT_TRUE(SdlEventWinSize(ev, 56, &w, &h));
+  ASSERT_EQ(w, 1280);
+  ASSERT_EQ(h, 720);
+  ev[12] = kSdlWindowEventSizeChanged;
+  ASSERT_TRUE(SdlEventWinSize(ev, 56, &w, &h));
+  ev[12] = 1; // shown
+  ASSERT_FALSE(SdlEventWinSize(ev, 56, &w, &h));
+  ASSERT_FALSE(SdlEventWinSize(ev, 8, &w, &h));
+}
+
 TEST(sdl_window_flags_force_decorated) {
   using namespace cssvr;
   const uint32_t raw = kSdlWindowFullscreen | kSdlWindowBorderless | kSdlWindowFullscreenDesktopBit;

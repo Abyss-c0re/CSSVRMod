@@ -56,6 +56,31 @@ TEST(settings_seed_left_handed) {
   ASSERT_TRUE(Settings_LeftHandedSeed("0", true) == nullptr);
 }
 
+TEST(settings_note_win_size_and_debounce) {
+  Settings s;
+  s.win_w = 1920;
+  s.win_h = 1080;
+  ASSERT_TRUE(Settings_NoteWinSize(&s, 1280, 720));
+  ASSERT_EQ(s.win_w, 1280);
+  ASSERT_EQ(s.win_h, 720);
+  ASSERT_FALSE(Settings_NoteWinSize(&s, 1280, 720));
+  ASSERT_FALSE(Settings_NoteWinSize(&s, 1, 1)); // minimize / garbage
+  ASSERT_EQ(s.win_w, 1280);
+  ASSERT_TRUE(Settings_WinSizePlausible(1280, 720));
+  ASSERT_FALSE(Settings_WinSizePlausible(200, 200));
+  ASSERT_TRUE(Settings_NoteWinSize(&s, 4000, 2200)); // clamp high
+  ASSERT_EQ(s.win_w, 3840);
+  ASSERT_EQ(s.win_h, 2160);
+  int w = 0, h = 0;
+  ASSERT_TRUE(Settings_ResizePersistReady(1920, 1080, 1280, 720, 0, 500, 400, false, &w, &h));
+  ASSERT_EQ(w, 1280);
+  ASSERT_EQ(h, 720);
+  ASSERT_FALSE(Settings_ResizePersistReady(1920, 1080, 1280, 720, 0, 100, 400, false, &w, &h));
+  ASSERT_TRUE(Settings_ResizePersistReady(1920, 1080, 1280, 720, 0, 100, 400, true, &w, &h));
+  ASSERT_FALSE(Settings_ResizePersistReady(1280, 720, 1280, 720, 0, 1000, 400, true, &w, &h));
+  ASSERT_FALSE(Settings_ResizePersistReady(1920, 1080, 32, 32, 0, 1000, 400, true, &w, &h));
+}
+
 TEST(settings_roundtrip_tmp) {
   char dir[] = "/tmp/cssvr_setXXXXXX";
   ASSERT_TRUE(mkdtemp(dir) != nullptr);
@@ -78,6 +103,13 @@ TEST(settings_roundtrip_tmp) {
   ASSERT_TRUE(b.left_handed);
   ASSERT_EQ(b.win_w, 1280);
   ASSERT_EQ(b.win_h, 720);
+  ASSERT_TRUE(Settings_NoteWinSize(&b, 1600, 900));
+  ASSERT_TRUE(Settings_SaveLaunch(b));
+  Settings c;
+  ASSERT_TRUE(Settings_Load(&c));
+  ASSERT_EQ(c.win_w, 1600);
+  ASSERT_EQ(c.win_h, 900);
+  ASSERT_TRUE(c.left_handed);
   unsetenv("CSSVR_CALIB");
   unsetenv("CSSVR_LAUNCH");
 }

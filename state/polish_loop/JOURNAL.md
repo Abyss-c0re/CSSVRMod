@@ -184,6 +184,10 @@ Persist desktop window width/height in launch.cfg; spawn uses them. Offline 85/8
 
 `--print` now says framed vs `-noborder` (argv or planned opts). Offline 87/87. Not HMD-proven.
 
+## 2026-09-18 cycle 35
+
+User-resized framed window persists to launch.cfg (debounce, ignore minimize). Offline 89/89. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.
