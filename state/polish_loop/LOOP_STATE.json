@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T18:54:44Z",
   "last_focus": "hook-delay-openxr",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "pending",
+  "last_commit": "abcc1d3",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
