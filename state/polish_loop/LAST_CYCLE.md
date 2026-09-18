@@ -1,23 +1,24 @@
-# Cycle 48 — 2026-09-18
+# Cycle 49 — 2026-09-18
 
 ## Focus
 
-`maps-basename-not-substring` — `client.so` needle matched `steamclient.so`.
+`xr-session-ok-only-when-running` — log lied `xr submit fail #N session_ok` on warmup and after STOPPING.
 
 ## Did
 
-- Maps path match requires `/client.so` (basename), not a substring.
-- steamclient.so first in maps no longer steals the CSS module base.
-- Same rule for engine.so.
+- `session_ok` only after `xrBeginSession`. CreateSession is `session_created`.
+- STOPPING / LOSS_PENDING / EXITING / instance-loss update the reason. LOSS toasts no-HMD once.
+- `shouldRender=false` is a skip, not a fail. Warmup / stop do not increment `xr_fail`.
+- Shutdown does not re-arm the no-HMD toast (one-shot per process).
 
 ## Did not
 
-- HMD walk (user-gated). Dual paint still unproven in-game.
+- HMD walk (user-gated). Dual paint still unproven in-game. No renderview/createmove in `/tmp/cssvrmod.log` (CSS not relaunched).
 - Menu / toast / print / help / cfg chrome. No force `-noborder`.
 
 ## Tests
 
-`cssvrmod_tests` — 99 passed, 0 failed (778 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 104 passed, 0 failed (832 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

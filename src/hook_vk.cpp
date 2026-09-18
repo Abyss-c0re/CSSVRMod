@@ -10,6 +10,7 @@
 #include "cssvrmod/usercmd.hpp"
 #include "cssvrmod/view_hook.hpp"
 #include "cssvrmod/vk_eye.hpp"
+#include "cssvrmod/xr_session.hpp"
 #include "cssvrmod/weapons.hpp"
 #include <vulkan/vulkan.h>
 
@@ -282,7 +283,7 @@ void* XrWorker(void*) {
         }
         g_prev_cmd = cmd;
       }
-    } else {
+    } else if (XrSubmit_CountFail(XrHostStatus().reason, false, XrHostLastFrameSkipped())) {
       g_xr_fail++;
       if (g_xr_fail == 1 || (g_xr_fail % 120) == 0)
         Log("xr submit fail #%d %s", g_xr_fail, XrHostStatus().reason);

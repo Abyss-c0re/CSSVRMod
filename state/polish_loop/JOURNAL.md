@@ -244,6 +244,10 @@ Vulkan-live CopyEye no longer counts a GL blit as a world capture. GL_NO_ERROR o
 
 Maps basename match: client.so must not bind steamclient.so. Offline 99/99. Not HMD-proven.
 
+## 2026-09-18 cycle 49
+
+`session_ok` only after BeginSession. Warmup skip and STOPPING/LOSS no longer log as a failed healthy session. Offline 104/104. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

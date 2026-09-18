@@ -2,6 +2,7 @@
 // Desktop present stamp. Fail + honest MONO. Never paint on a live dual-eye submit.
 #include "menu3d.hpp"
 #include "toast.hpp"
+#include "xr_session.hpp"
 #include <algorithm>
 #include <cstring>
 
@@ -25,7 +26,7 @@ inline BannerPlan Banner_Decide(const char* xr_reason, bool painted_dual) {
     p.should_stamp = true;
     p.stamp_xr = true;
     p.text = "NO XR";
-  } else if (!painted_dual && std::strcmp(p.reason, "session_ok") == 0) {
+  } else if (!painted_dual && XrSession_ShowsMono(p.reason)) {
     p.should_stamp = true;
     p.stamp_xr = false;
     p.text = "MONO";

@@ -5,6 +5,7 @@
 #include "cssvrmod/settings.hpp"
 #include "cssvrmod/stereo_view.hpp"
 #include "cssvrmod/toast.hpp"
+#include "cssvrmod/xr_session.hpp"
 #include "openxr_paths.hpp"
 
 #include <cmath>
@@ -94,6 +95,7 @@ bool g_prev_trig = false;
 XrSessionState g_state = XR_SESSION_STATE_UNKNOWN;
 bool g_running = false;
 bool g_begun = false;
+bool g_last_skip = false;
 XrFrameState g_fs{};
 XrHostInfo g_info{};
 
@@ -212,12 +214,27 @@ void PollEvents() {
       if (g_state == XR_SESSION_STATE_READY && xrBeginSession) {
         XrSessionBeginInfo bi{XR_TYPE_SESSION_BEGIN_INFO};
         bi.primaryViewConfigurationType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
-        if (xrBeginSession(g_sess, &bi) == XR_SUCCESS) g_running = true;
+        if (xrBeginSession(g_sess, &bi) == XR_SUCCESS) {
+          g_running = true;
+          g_info.reason = XrSession_Reason(XrSessionPhase::running);
+        } else {
+          g_info.reason = XrSession_Reason(XrSessionPhase::ready);
+        }
       }
       if (g_state == XR_SESSION_STATE_STOPPING && xrEndSession) {
         xrEndSession(g_sess);
         g_running = false;
+        g_info.reason = XrSession_Reason(XrSessionPhase::stopping);
       }
+      if (g_state == XR_SESSION_STATE_LOSS_PENDING || g_state == XR_SESSION_STATE_EXITING) {
+        g_running = false;
+        g_info.reason = XrSession_Reason(XrSessionPhase::lost);
+        HonestToastIfNeeded(g_info.reason);
+      }
+    } else if (ev.type == XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING) {
+      g_running = false;
+      g_info.reason = XrSession_Reason(XrSessionPhase::lost);
+      HonestToastIfNeeded(g_info.reason);
     }
     ev = XrEventDataBuffer{XR_TYPE_EVENT_DATA_BUFFER};
   }
@@ -368,7 +385,7 @@ bool CreateSess() {
   }
   g_info.swapchain = true;
   g_info.session = true;
-  g_info.reason = "session_ok";
+  g_info.reason = XrSession_Reason(XrSessionPhase::created);
   return true;
 }
 
@@ -567,6 +584,7 @@ bool XrHostInit() {
     return false;
   }
   SetupInput();
+  PollEvents(); // READY may already be queued — do not claim session_ok until BeginSession
   {
     const Calib c = CalibLive();
     Log("cssvr xr init %s stereo-offset %ux%u calib=%s eye=%.2f", g_info.reason, g_info.width,
@@ -591,7 +609,7 @@ void XrHostShutdown() {
   g_sess = XR_NULL_HANDLE;
   g_info = XrHostInfo{};
   g_info.reason = "shutdown";
-  g_toast_shown = false;
+  if (XrSession_ResetToastOnShutdown()) g_toast_shown = false;
 }
 
 static Pose g_hmd_cache{};
@@ -617,9 +635,15 @@ Pose XrHostLastHmd() {
   return g_hmd_cache;
 }
 
+bool XrHostLastFrameSkipped() { return g_last_skip; }
+
 bool XrHostBeginFrame() {
+  g_last_skip = false;
   PollEvents();
-  if (!g_running || !xrWaitFrame) return false;
+  if (!g_running || !xrWaitFrame) {
+    if (g_info.session) g_info.reason = XrSession_BeginMiss(true, g_running, g_info.reason);
+    return false;
+  }
   g_fs = XrFrameState{XR_TYPE_FRAME_STATE};
   XrFrameWaitInfo wi{XR_TYPE_FRAME_WAIT_INFO};
   if (xrWaitFrame(g_sess, &wi, &g_fs) != XR_SUCCESS) return false;
@@ -627,7 +651,11 @@ bool XrHostBeginFrame() {
   if (xrBeginFrame(g_sess, &bi) != XR_SUCCESS) return false;
   g_begun = true;
   CacheHmdFromViewSpace();
-  return g_fs.shouldRender;
+  if (!g_fs.shouldRender) {
+    g_last_skip = true;
+    return false;
+  }
+  return true;
 }
 
 static bool g_note_dual = false;

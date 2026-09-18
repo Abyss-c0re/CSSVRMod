@@ -43,6 +43,7 @@ add_executable(cssvrmod_tests
   tests/test_settings.cpp
   tests/test_toast.cpp
   tests/test_banner.cpp
+  tests/test_xr_session.cpp
 )
 target_include_directories(cssvrmod_tests PRIVATE
   ${CSSVR_ROOT}/include
