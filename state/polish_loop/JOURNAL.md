@@ -8,3 +8,7 @@ User dismissed a 2D/offset-plane submit as heresy. Cycle 1 removes VIEW-space po
 
 Encoded the gmod dual-origin law (`stereo_view.hpp`): same angles, origin ± head-right × halfIPD. Pose IPD still gated on a real second paint. Live `CViewRender` hook is next. Offline 33/33. Not stereo until two world paints.
 
+## 2026-09-18 cycle 3
+
+Compared Steam HL2VR (658920): dual-eye VR res, 3D world menus; 2D plane is their comfort fallback. Raised default CSS window to 1920×1080. Added STAGE-space 3D Vision panel (menu toggle). Dual paint still open.
+

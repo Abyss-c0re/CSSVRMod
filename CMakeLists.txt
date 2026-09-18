@@ -31,6 +31,7 @@ add_executable(cssvrmod_tests
   tests/test_tick.cpp
   tests/test_calib.cpp
   tests/test_stereo_view.cpp
+  tests/test_menu3d.cpp
 )
 target_include_directories(cssvrmod_tests PRIVATE
   ${CSSVR_ROOT}/include

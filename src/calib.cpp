@@ -80,6 +80,31 @@ bool CalibWriteDefault(const char* path) {
   return true;
 }
 
+bool CalibSave(const Calib& raw) {
+  const Calib c = ClampCalib(raw);
+  const char* path = CalibPath();
+  if (!path || !path[0]) return false;
+  std::string p(path);
+  auto slash = p.find_last_of('/');
+  if (slash != std::string::npos) MkDirP(p.substr(0, slash));
+  std::ofstream out(p);
+  if (!out) return false;
+  out << "eyescale " << c.eyescale << "\n"
+      << "horizontaloffset " << c.hoffset << "\n"
+      << "verticaloffset " << c.voffset << "\n"
+      << "scalefactor " << c.scalefactor << "\n"
+      << "lens_bend " << c.lens_bend << "\n"
+      << "ipd_m " << c.ipd_m << "\n"
+      << "swap_eyes " << (c.swap_eyes ? 1 : 0) << "\n";
+  CalibSetLive(c);
+  return true;
+}
+
+void CalibSetLive(const Calib& c) {
+  g_live = ClampCalib(c);
+  g_inited = true;
+}
+
 const Calib& CalibLive() {
   if (++g_stat_skip >= 30 || !g_inited) {
     g_stat_skip = 0;

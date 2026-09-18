@@ -107,5 +107,7 @@ inline bool ParseCalibText(const char* text, Calib* out) {
 const Calib& CalibLive();
 const char* CalibPath();
 bool CalibWriteDefault(const char* path);
+bool CalibSave(const Calib& c);
+void CalibSetLive(const Calib& c);
 
 } // namespace cssvr

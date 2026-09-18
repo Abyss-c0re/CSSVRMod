@@ -9,7 +9,8 @@
 
 ## P1 — product shell
 
-- [ ] Standalone settings (Vision knobs + map + backend) — Cube is start, not the CSS settings surface.
+- [x] World-locked 3D Vision panel (HL2VR/Cube class) — menu button toggle, stick rows (cycle 3).
+- [ ] Standalone desktop settings host (still Cube + this 3D panel).
 - [ ] Live XR input → movement / look / fire proven in-game (not only offline InputMap).
 
 ## P2 — world law

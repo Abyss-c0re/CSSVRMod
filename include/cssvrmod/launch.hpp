@@ -33,8 +33,8 @@ struct SpawnPlan {
 struct LaunchOpts {
   std::string hook_so; // libcssvrmod_hook.so
   std::string map;     // empty → menu
-  int win_w = 1280;
-  int win_h = 720;
+  int win_w = 1920; // HL2VR mirror class — 720p upscaled to HMD is potato
+  int win_h = 1080;
   bool windowed = true;
   bool noborder = false; // bordered window — user-visible desktop monitor
   bool novid = true;

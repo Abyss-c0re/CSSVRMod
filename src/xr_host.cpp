@@ -1,9 +1,11 @@
 #include "xr_host.hpp"
 #include "cssvrmod/calib.hpp"
 #include "cssvrmod/input.hpp"
+#include "cssvrmod/menu3d.hpp"
 #include "cssvrmod/stereo_view.hpp"
 #include "openxr_paths.hpp"
 
+#include <cmath>
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
@@ -79,6 +81,12 @@ struct ScImg {
   XrSwapchainImageOpenGLKHR img[8]{};
 };
 ScImg g_img[2];
+XrSwapchain g_menu_sc = XR_NULL_HANDLE;
+uint32_t g_menuW = 1024, g_menuH = 576;
+ScImg g_menu_img;
+Menu3d g_menu3d{};
+bool g_prev_menu_btn = false;
+bool g_prev_trig = false;
 XrSessionState g_state = XR_SESSION_STATE_UNKNOWN;
 bool g_running = false;
 bool g_begun = false;
@@ -318,6 +326,32 @@ bool CreateSess() {
     xrEnumerateSwapchainImages(g_sc[eye], g_img[eye].n, &g_img[eye].n,
                                reinterpret_cast<XrSwapchainImageBaseHeader*>(g_img[eye].img));
   }
+  // World-locked 3D settings panel (HL2VR/Cube) — not a 2D square on the lens.
+  {
+    XrSwapchainCreateInfo sci{XR_TYPE_SWAPCHAIN_CREATE_INFO};
+    sci.usageFlags = XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT | XR_SWAPCHAIN_USAGE_SAMPLED_BIT;
+    sci.format = GL_SRGB8_ALPHA8;
+    sci.sampleCount = 1;
+    sci.width = g_menuW;
+    sci.height = g_menuH;
+    sci.faceCount = 1;
+    sci.arraySize = 1;
+    sci.mipCount = 1;
+    if (xrCreateSwapchain(g_sess, &sci, &g_menu_sc) != XR_SUCCESS) {
+      sci.format = GL_RGBA8;
+      if (xrCreateSwapchain(g_sess, &sci, &g_menu_sc) != XR_SUCCESS) g_menu_sc = XR_NULL_HANDLE;
+    }
+    if (g_menu_sc) {
+      xrEnumerateSwapchainImages(g_menu_sc, 0, &g_menu_img.n, nullptr);
+      if (g_menu_img.n > 8) g_menu_img.n = 8;
+      for (uint32_t i = 0; i < g_menu_img.n; ++i)
+        g_menu_img.img[i].type = XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR;
+      xrEnumerateSwapchainImages(g_menu_sc, g_menu_img.n, &g_menu_img.n,
+                                 reinterpret_cast<XrSwapchainImageBaseHeader*>(g_menu_img.img));
+      g_menu3d.calib = CalibLive();
+      Log("cssvr xr menu3d %ux%u", g_menuW, g_menuH);
+    }
+  }
   g_info.swapchain = true;
   g_info.session = true;
   g_info.reason = "session_ok";
@@ -428,6 +462,28 @@ void BlitToSwapchain(unsigned int src, int srcW, int srcH, int eye, bool vflip) 
   xrReleaseSwapchainImage(g_sc[eye], &rel);
 }
 
+bool UploadMenuSwapchain() {
+  if (!g_menu_sc) return false;
+  uint32_t idx = 0;
+  XrSwapchainImageAcquireInfo ac{XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO};
+  if (xrAcquireSwapchainImage(g_menu_sc, &ac, &idx) != XR_SUCCESS) return false;
+  XrSwapchainImageWaitInfo wi{XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO};
+  wi.timeout = XR_INFINITE_DURATION;
+  xrWaitSwapchainImage(g_menu_sc, &wi);
+  GLuint dst = (idx < g_menu_img.n) ? g_menu_img.img[idx].image : 0;
+  if (dst) {
+    static unsigned char pix[1024 * 576 * 4];
+    Menu3d_Raster(pix, (int)g_menuW, (int)g_menuH, g_menu3d);
+    glBindTexture(GL_TEXTURE_2D, dst);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLint)g_menuW, (GLint)g_menuH, GL_RGBA,
+                    GL_UNSIGNED_BYTE, pix);
+  }
+  XrSwapchainImageReleaseInfo rel{XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO};
+  xrReleaseSwapchainImage(g_menu_sc, &rel);
+  return dst != 0;
+}
+
 } // namespace
 
 bool XrHostInit() {
@@ -510,12 +566,29 @@ bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vfli
   proj.space = g_view ? g_view : g_stage;
   proj.viewCount = 2;
   proj.views = pv;
-  const XrCompositionLayerBaseHeader* layers[] = {
-      reinterpret_cast<const XrCompositionLayerBaseHeader*>(&proj)};
+
+  XrCompositionLayerQuad quad{XR_TYPE_COMPOSITION_LAYER_QUAD};
+  const XrCompositionLayerBaseHeader* layers[2];
+  uint32_t nlay = 1;
+  layers[0] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&proj);
+  if (g_menu3d.visible && g_menu_sc && UploadMenuSwapchain()) {
+    quad.space = g_stage ? g_stage : g_view;
+    quad.eyeVisibility = XR_EYE_VISIBILITY_BOTH;
+    quad.subImage.swapchain = g_menu_sc;
+    quad.subImage.imageRect.offset = {0, 0};
+    quad.subImage.imageRect.extent = {(int32_t)g_menuW, (int32_t)g_menuH};
+    quad.pose.orientation.w = 1.f;
+    quad.pose.position.y = kMenuY;
+    quad.pose.position.z = kMenuZ;
+    quad.size.width = kMenuW;
+    quad.size.height = kMenuH;
+    layers[1] = reinterpret_cast<const XrCompositionLayerBaseHeader*>(&quad);
+    nlay = 2;
+  }
   XrFrameEndInfo ei{XR_TYPE_FRAME_END_INFO};
   ei.displayTime = g_fs.predictedDisplayTime;
   ei.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
-  ei.layerCount = 1;
+  ei.layerCount = nlay;
   ei.layers = layers;
   const XrResult rc = xrEndFrame(g_sess, &ei);
   g_begun = false;
@@ -592,6 +665,22 @@ bool XrHostPollInput(XrSample* out) {
   out->a_click = bval(g_abxy, 1);
   pose(0, &out->left);
   pose(1, &out->right);
+  if (out->menu && !g_prev_menu_btn) g_menu3d.visible = !g_menu3d.visible;
+  g_prev_menu_btn = out->menu;
+  const bool trig = out->trigger_r > 0.55f;
+  if (g_menu3d.visible && trig && !g_prev_trig) {
+    // Aim at the STAGE panel: crude forward hit on the 3D menu plane (HL2VR class).
+    const int row = g_menu3d.focus;
+    const int dir = (out->stick_rx > 0.4f) ? 1 : (out->stick_rx < -0.4f) ? -1 : 1;
+    if (Menu3d_ApplyClick(&g_menu3d, row, dir)) CalibSave(g_menu3d.calib);
+  }
+  if (g_menu3d.visible && std::fabs(out->stick_ry) > 0.55f && !trig) {
+    int n = g_menu3d.focus + (out->stick_ry < 0.f ? 1 : -1);
+    if (n < 0) n = 0;
+    if (n >= kMenuRows) n = kMenuRows - 1;
+    g_menu3d.focus = n;
+  }
+  g_prev_trig = trig;
   // HMD ≈ average of eyes via view space: use right-hand yaw if no view space.
   if (out->right.valid) {
     out->hmd = out->right;
