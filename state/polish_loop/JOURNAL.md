@@ -128,6 +128,10 @@ Honesty toasts are enough. Next focus is why Vulkan last-RT eye copy misses — 
 
 Color RTs gain TRANSFER_SRC; last RT also tracks BeginRendering; GENERAL layout retry. Offline 76/76. Not a live dual-copy claim.
 
+## 2026-09-18 cycle 21 follow
+
+Dropped GENERAL retry after an 8 ms fence timeout (in-flight cmd buffer). Next is 3D-menu laser hit, not an unattended in-game copy proof.
+
 
 
 
