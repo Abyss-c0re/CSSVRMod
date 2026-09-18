@@ -72,6 +72,10 @@ Stopped forcing `weapon_knife` every tick. Without a live weapon query that ran 
 
 Standalone settings host: `CSSVR --settings` / `--set`. Vision + backend/map persist. Offline 60/60. Not HMD-proven.
 
+## 2026-09-18 cycle 11 follow
+
+`--settings` prints live knobs (verified). Next focus is **not** an unattended HMD walk — that is user-gated. Loop will do readable 3D menu labels.
+
 
 
 
