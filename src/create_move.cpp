@@ -36,13 +36,14 @@ bool ProtectWrite(void* p, bool wr) {
 }
 
 bool HookedCreateMove(void* self, float dt, void* cmd) {
+  // Original fills the cmd from mouse/keys. Overlay after, or it is wiped.
+  const bool rc = g_orig ? g_orig(self, dt, cmd) : true;
   UserCmdOverlay ov;
   if (cmd && UserCmd_PeekOverlay(&ov)) {
     UserCmdFields f;
     if (UserCmd_Detect(cmd, 64, &f)) UserCmd_Apply(cmd, 64, f, ov);
   }
-  if (!g_orig) return true;
-  return g_orig(self, dt, cmd);
+  return rc;
 }
 
 uintptr_t ClientBase() {

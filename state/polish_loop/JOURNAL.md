@@ -48,6 +48,10 @@ Angles probe is process-wide one-shot. hook_gl + view_hook + hook_vk each had th
 
 Analog XR → `CUserCmd` via `IClientMode::CreateMove` (RTTI + xmm0/rsi self-test, slot 22). Overlay from InputMap. Offline 50/50. Not in-game proven.
 
+## 2026-09-18 cycle 8 follow
+
+Apply XR overlay *after* the original CreateMove (orig was wiping analog). Vulkan path no longer also sends +forward when the hook is live. Overlay mailbox mutexed.
+
 
 
 

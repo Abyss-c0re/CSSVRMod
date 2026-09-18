@@ -251,11 +251,13 @@ void* XrWorker(void*) {
           };
           edge(kInAttack, "+attack", "-attack");
           edge(kInJump, "+jump", "-jump");
-          edge(kInForward, "+forward", "-forward");
-          edge(kInBack, "+back", "-back");
-          edge(kInMoveLeft, "+moveleft", "-moveleft");
-          edge(kInMoveRight, "+moveright", "-moveright");
           edge(kInReload, "+reload", "-reload");
+          if (!UserCmd_HookLive()) {
+            edge(kInForward, "+forward", "-forward");
+            edge(kInBack, "+back", "-back");
+            edge(kInMoveLeft, "+moveleft", "-moveleft");
+            edge(kInMoveRight, "+moveright", "-moveright");
+          }
         }
         g_prev_cmd = cmd;
       }
