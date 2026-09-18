@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T12:25:00Z",
   "last_focus": "menu3d-reset-pose",
   "next_focus": "menu3d-home-hint",
-  "last_commit": "PENDING",
+  "last_commit": "fcb295c",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
