@@ -1,5 +1,6 @@
 #include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/settings.hpp"
+#include "cssvrmod/source_if.hpp"
 #include <atomic>
 #include <cstdio>
 
@@ -33,6 +34,8 @@ void CssvrShowMenu(int on) {
 
 int CssvrLateAttach() {
   cssvr::VkLateAttachPresent();
+  cssvr::EngineIf eng;
+  cssvr::ProbeLiveEngine(eng);
   Log("late attach");
   return 1;
 }

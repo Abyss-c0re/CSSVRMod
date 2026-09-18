@@ -3,6 +3,7 @@
 #include "collision.hpp"
 #include "vec3.hpp"
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <string>
 
@@ -95,6 +96,24 @@ inline bool EngineCmd_WrapComplete(bool have_unrestricted, bool slot106_present,
                                    bool slot106_in_engine) {
   if (have_unrestricted) return true;
   return slot106_present && !slot106_in_engine;
+}
+
+/// ClientCmd_Unrestricted is `mov rdi,rsi; jmp rel32` to Cbuf_AddText.
+/// Typed console calls Cbuf_AddText, not the IVEngineClient wrapper.
+inline void* EngineCmd_DecodeCbuf(const unsigned char* p) {
+  if (!p) return nullptr;
+  // 48 89 f7 e9 xx xx xx xx
+  if (p[0] == 0x48 && p[1] == 0x89 && p[2] == 0xf7 && p[3] == 0xe9) {
+    int32_t rel = 0;
+    std::memcpy(&rel, p + 4, 4);
+    return (void*)(p + 8 + rel);
+  }
+  if (p[0] == 0xe9) {
+    int32_t rel = 0;
+    std::memcpy(&rel, p + 1, 4);
+    return (void*)(p + 5 + rel);
+  }
+  return nullptr;
 }
 
 bool EngineCmd_WrapReady();

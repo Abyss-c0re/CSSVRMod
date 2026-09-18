@@ -52,6 +52,45 @@ void PatchCmdSlot(ClientCmdFn* slot, ClientCmdFn wrap, ClientCmdFn* orig) {
   ProtectSlot(slot, false);
 }
 
+using CbufFn = void (*)(const char*);
+CbufFn g_cbuf_orig = nullptr;
+unsigned char g_cbuf_saved[12]{};
+void* g_cbuf = nullptr;
+
+extern "C" void CssvrCbufHook(const char* text) {
+  if (g_cmd_filter && text && g_cmd_filter(text)) return;
+  if (g_cbuf_orig) g_cbuf_orig(text);
+}
+
+bool HookCbufAddText(void* cbuf) {
+  if (!cbuf || g_cbuf_orig) return g_cbuf_orig != nullptr;
+  if (!SlotInEngine(reinterpret_cast<ClientCmdFn>(cbuf))) return false;
+  auto* p = static_cast<unsigned char*>(cbuf);
+  void* tramp = mmap(nullptr, 4096, PROT_READ | PROT_WRITE | PROT_EXEC,
+                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+  if (tramp == MAP_FAILED) return false;
+  std::memcpy(g_cbuf_saved, p, 12);
+  std::memcpy(tramp, p, 12);
+  auto* t = static_cast<unsigned char*>(tramp) + 12;
+  t[0] = 0x48;
+  t[1] = 0xb8;
+  uintptr_t back = (uintptr_t)p + 12;
+  std::memcpy(t + 2, &back, 8);
+  t[10] = 0xff;
+  t[11] = 0xe0;
+  g_cbuf_orig = reinterpret_cast<CbufFn>(tramp);
+  g_cbuf = cbuf;
+  ProtectSlot(p, true);
+  p[0] = 0x48;
+  p[1] = 0xb8;
+  uintptr_t to = (uintptr_t)&CssvrCbufHook;
+  std::memcpy(p + 2, &to, 8);
+  p[10] = 0xff;
+  p[11] = 0xe0;
+  ProtectSlot(p, false);
+  return true;
+}
+
 void InstallCmdWrap(void* engine) {
   if (g_cmd_wrapped || !engine) return;
   auto** vt = *reinterpret_cast<ClientCmdFn**>(engine);
@@ -60,13 +99,18 @@ void InstallCmdWrap(void* engine) {
   ClientCmdFn slot106 = vt[cssvr::kEngineClientCmdUnrestrictedSlot];
   PatchCmdSlot(&vt[cssvr::kEngineClientCmdUnrestrictedSlot], &WrappedClientCmdUnrestricted,
                &g_orig_unrestricted);
+  void* cbuf = nullptr;
+  if (slot106)
+    cbuf = cssvr::EngineCmd_DecodeCbuf(reinterpret_cast<const unsigned char*>(slot106));
+  bool cbuf_ok = cbuf && HookCbufAddText(cbuf);
   if (!cssvr::EngineCmd_WrapComplete(g_orig_unrestricted != nullptr, slot106 != nullptr,
-                                     SlotInEngine(slot106)))
+                                     SlotInEngine(slot106)) &&
+      !cbuf_ok)
     return;
   g_cmd_wrapped = true;
   if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
-    std::fprintf(f, "cssvr cmd wrap slot7=%d slot106=%d\n", g_real_cmd ? 1 : 0,
-                 g_orig_unrestricted ? 1 : 0);
+    std::fprintf(f, "cssvr cmd wrap slot7=%d slot106=%d cbuf=%d\n", g_real_cmd ? 1 : 0,
+                 g_orig_unrestricted ? 1 : 0, cbuf_ok ? 1 : 0);
     std::fclose(f);
   }
 }

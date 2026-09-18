@@ -3,9 +3,16 @@
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/menu3d.hpp"
 #include "cssvrmod/plugin_hook.hpp"
+#include "cssvrmod/source_if.hpp"
 #include "test_framework.h"
 
 using namespace cssvr;
+
+TEST(console_decode_cbuf_jmp) {
+  unsigned char buf[16] = {0x48, 0x89, 0xf7, 0xe9, 0x10, 0x00, 0x00, 0x00};
+  void* t = EngineCmd_DecodeCbuf(buf);
+  ASSERT_TRUE(t == (void*)(buf + 8 + 0x10));
+}
 
 TEST(console_parse_start_stop_menu) {
   CssvrConsole c;
