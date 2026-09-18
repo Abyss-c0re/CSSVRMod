@@ -76,6 +76,11 @@ Standalone settings host: `CSSVR --settings` / `--set`. Vision + backend/map per
 
 `--settings` prints live knobs (verified). Next focus is **not** an unattended HMD walk — that is user-gated. Loop will do readable 3D menu labels.
 
+## 2026-09-18 cycle 12
+
+3D Vision panel now rasters EYE/SCALE/H/V/DONE plus values. Offline 61/61. Not HMD-proven.
+
+
 
 
 

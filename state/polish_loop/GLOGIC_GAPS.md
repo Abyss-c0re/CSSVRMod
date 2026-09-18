@@ -13,7 +13,7 @@
 ## P1 — product shell
 
 - [x] World-locked 3D Vision panel (HL2VR/Cube class) — menu button toggle, stick rows (cycle 3).
-- [ ] 3D panel still color bars — needs readable row labels (eyescale / scale / H / V).
+- [x] 3D panel row labels + values (cycle 12). Glyphs, not engine VGUI.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [ ] Optional GTK/Qt window (CLI host is enough to persist knobs).
 - [x] `CUserCmd` overlay + CreateMove hook (RTTI/xmm0 self-test, cycle 8). Analog stick writes forwardmove.
