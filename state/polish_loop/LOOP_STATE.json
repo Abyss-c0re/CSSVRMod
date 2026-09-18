@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T10:28:00Z",
   "last_focus": "engine-trace-miss-toast",
   "next_focus": "angles-selftest-miss-toast",
-  "last_commit": "0c4b8d6",
+  "last_commit": "c7fabb4",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
