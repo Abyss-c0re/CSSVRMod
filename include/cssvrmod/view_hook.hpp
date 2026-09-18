@@ -209,6 +209,57 @@ void ViewHookOnSwap();
 bool ViewHookTakeEyes(unsigned* l, unsigned* r, int* w, int* h);
 bool ViewHookHaveEyes();
 
+// Honest toast if locate/hook misses — dual paint never starts (stay MONO).
+struct RenderViewToastIn {
+  const char* locate_reason = "idle";
+  bool hooked = false;
+  bool already_shown = false;
+};
+
+struct RenderViewToast {
+  bool should_toast = false;
+  bool abort_vr = false;
+  const char* reason = "idle";
+  const char* copy = "";
+  const char* label = "RV · IDLE";
+};
+
+inline bool RenderView_IsMissReason(const char* reason) {
+  if (!reason || !reason[0]) return false;
+  if (std::strcmp(reason, "idle") == 0 || std::strcmp(reason, "located") == 0 ||
+      std::strcmp(reason, "hooked") == 0)
+    return false;
+  return true;
+}
+
+inline const char* RenderView_MissCopy(const char* reason) {
+  if (reason && (std::strcmp(reason, "no_css") == 0 || std::strcmp(reason, "open_fail") == 0 ||
+                 std::strcmp(reason, "read_fail") == 0 || std::strcmp(reason, "bad_size") == 0))
+    return "CSS client.so missing — cannot hook CViewRender (staying MONO).";
+  if (reason && (std::strcmp(reason, "no_string") == 0 || std::strcmp(reason, "no_xref") == 0 ||
+                 std::strcmp(reason, "no_prologue") == 0 || std::strcmp(reason, "no_origin_load") == 0))
+    return "CViewRender::RenderView not found — dual paint never starts (MONO).";
+  if (reason && (std::strcmp(reason, "fn_no_vtable") == 0 || std::strcmp(reason, "no_patch") == 0 ||
+                 std::strcmp(reason, "no_client_base") == 0))
+    return "RenderView hook missed — dual paint never starts (MONO).";
+  return "CViewRender locate failed — dual paint never starts (MONO).";
+}
+
+inline RenderViewToast RenderView_ToastDecide(const RenderViewToastIn& in) {
+  RenderViewToast t;
+  t.abort_vr = false;
+  t.reason = (in.locate_reason && in.locate_reason[0]) ? in.locate_reason : "idle";
+  if (in.hooked) {
+    t.reason = "hooked";
+    t.label = "RV · HOOKED";
+    return t;
+  }
+  t.copy = RenderView_MissCopy(t.reason);
+  t.label = RenderView_IsMissReason(t.reason) ? "RV · MISS" : "RV · IDLE";
+  t.should_toast = !in.already_shown && RenderView_IsMissReason(t.reason);
+  return t;
+}
+
 inline bool LocateRenderViewFile(const char* path, RenderViewLoc* out) {
   if (!path || !out) return false;
   *out = RenderViewLoc{};

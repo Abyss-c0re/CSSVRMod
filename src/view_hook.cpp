@@ -1,9 +1,11 @@
 #include "cssvrmod/view_hook.hpp"
 #include "cssvrmod/calib.hpp"
 #include "cssvrmod/dual_paint.hpp"
+#include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/look.hpp"
 #include "cssvrmod/source_if.hpp"
+#include "cssvrmod/toast.hpp"
 #include "cssvrmod/vk_eye.hpp"
 #include "xr_host.hpp"
 
@@ -30,6 +32,7 @@ bool g_did_frame = false;
 GLuint g_eye[2] = {0, 0};
 int g_eyeW = 0, g_eyeH = 0;
 bool g_have_eyes = false;
+bool g_rv_toast = false;
 
 void Logf(const char* fmt, ...) {
   FILE* f = std::fopen("/tmp/cssvrmod.log", "a");
@@ -40,6 +43,19 @@ void Logf(const char* fmt, ...) {
   va_end(ap);
   std::fputc('\n', f);
   std::fclose(f);
+}
+
+void NoteLocateToast(const char* reason, bool hooked) {
+  RenderViewToastIn in;
+  in.locate_reason = reason;
+  in.hooked = hooked;
+  in.already_shown = g_rv_toast;
+  const RenderViewToast t = RenderView_ToastDecide(in);
+  if (!t.should_toast) return;
+  g_rv_toast = true;
+  Logf("cssvr toast %s %s", t.label, t.copy);
+  Toast_FireDesktop(t.copy);
+  Chrome_NoteStatus("NO RV");
 }
 
 bool ProtectWrite(void* p, bool wr) {
@@ -148,15 +164,18 @@ void ViewHookTryInstall() {
   CssInstall inst = FindCssInstall();
   if (!inst.found) {
     Logf("renderview locate skip: no css");
+    NoteLocateToast("no_css", false);
     return;
   }
   if (!LocateRenderViewFile(inst.client_so.c_str(), &g_loc) || !g_loc.found) {
     Logf("renderview locate fail %s", g_loc.reason);
+    NoteLocateToast(g_loc.reason ? g_loc.reason : "no_xref", false);
     return;
   }
   const uintptr_t base = ClientBase();
   if (!base) {
     Logf("renderview no client base (fn_rva=0x%llx)", (unsigned long long)g_loc.fn_rva);
+    NoteLocateToast("no_client_base", false);
     return;
   }
   g_orig = reinterpret_cast<RenderViewFn>(base + g_loc.fn_rva);
@@ -172,7 +191,10 @@ void ViewHookTryInstall() {
   Logf("renderview hook fn=0x%llx slots=%d patched=%d origin=+0x%x",
        (unsigned long long)g_loc.fn_rva, (int)g_loc.slot_rva.size(), patched,
        g_loc.fields.origin_off);
-  if (!patched) g_orig = nullptr;
+  if (!patched) {
+    g_orig = nullptr;
+    NoteLocateToast(g_loc.slot_rva.empty() ? "fn_no_vtable" : "no_patch", false);
+  }
   ProbeLiveEngine(g_eng);
   Logf("engine angles_ok=%d get=%d set=%d %s", g_eng.angles_ok ? 1 : 0, g_eng.get_angles_idx,
        g_eng.set_angles_idx, g_eng.reason);

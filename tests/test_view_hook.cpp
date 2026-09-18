@@ -104,3 +104,26 @@ TEST(locate_renderview_fixture_and_css) {
     ASSERT_TRUE(live.slot_rva.size() >= 1);
   }
 }
+
+TEST(renderview_locate_miss_toast) {
+  RenderViewToastIn in;
+  in.locate_reason = "no_xref";
+  auto miss = RenderView_ToastDecide(in);
+  ASSERT_TRUE(miss.should_toast);
+  ASSERT_FALSE(miss.abort_vr);
+  ASSERT_STREQ(miss.label, "RV · MISS");
+  ASSERT_TRUE(std::strstr(miss.copy, "MONO") != nullptr);
+  in.already_shown = true;
+  ASSERT_FALSE(RenderView_ToastDecide(in).should_toast);
+  in.already_shown = false;
+  in.hooked = true;
+  auto ok = RenderView_ToastDecide(in);
+  ASSERT_FALSE(ok.should_toast);
+  ASSERT_STREQ(ok.reason, "hooked");
+  in.hooked = false;
+  in.locate_reason = "located";
+  ASSERT_FALSE(RenderView_ToastDecide(in).should_toast);
+  in.locate_reason = "no_patch";
+  ASSERT_TRUE(RenderView_ToastDecide(in).should_toast);
+  ASSERT_TRUE(std::strstr(RenderView_MissCopy("no_css"), "client.so") != nullptr);
+}

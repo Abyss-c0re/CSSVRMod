@@ -92,6 +92,10 @@ Fail-only NO HMD / NO XR banner on the captured CSS present + window title. Dual
 
 Desktop MONO label while session_ok and !painted_dual. Not stamped onto dual-eye / lens submit. Offline 69/69. Not HMD-proven.
 
+## 2026-09-18 cycle 16
+
+CViewRender locate/hook miss toasts once (dual never starts silently). Offline 70/70. Not HMD-proven.
+
 
 
 
