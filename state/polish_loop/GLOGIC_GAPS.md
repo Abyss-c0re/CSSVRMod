@@ -67,6 +67,7 @@
 - [x] SDL2 shim maps the hook on a normal Steam start (cycle 80). Live CSS `2370093` has the hook in maps.
 - [x] SDL `PollEvent` one-shot late-attaches present + ICvar (cycle 81). Hook via SDL NEEDED is not LD_PRELOAD, so `vkQueuePresentKHR` never interposed; cmd wrap / `cssvr_*` never ran. Plugin `CssvrLateAttach` never fires on the client.
 - [x] `bin/linux64/libvulkan.so.1` shim (cycle 82). DXVK `dlopen`s the loader and resolves present via GIPA — a GOT scan of `libvulkan`'s export misses. `VulkanSym` opens `libvulkan.css1` first so the shim does not recurse.
+- [x] ICvar Dispatch rebuilds `name args` from CCommand (cycle 85). `8d34b00` registered `cssvr_set` but Dispatch passed only the verb, so `cssvr_set eyescale 0.20` was a no-op.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.

@@ -364,6 +364,18 @@ SDL2 shim mapped the hook in live CSS `2370093`. Present/ICvar stayed dead (not 
 
 `bin/linux64/libvulkan.so.1` shim. DXVK dlopen + GIPA present is not the loader export; GOT scan misses. VulkanSym opens libvulkan.css1 first. Offline 125/125. Not HMD-proven. Start CSS from the menu.
 
+## 2026-09-19 cycle 83
+
+Idle hunt. Live CSS `2385343` has vulkan shim + hook. `vk: device ok` + cmd wrap. Help line fired. No dual/XR. No code. Not HMD-proven. Next: `cssvr_start` with SteamVR on.
+
+## 2026-09-19 cycle 84
+
+Idle hunt. CSS not running. Parallel `8d34b00` ICvar 004+007. CSS only has 004. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 85
+
+ICvar Dispatch rebuilds `name args` from CCommand. `cssvr_set eyescale 0.20` was a no-op. Offline 126/126. Not HMD-proven. Start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

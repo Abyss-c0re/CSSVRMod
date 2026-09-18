@@ -4,6 +4,7 @@
 #include "vec3.hpp"
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <string>
 
@@ -155,6 +156,27 @@ constexpr int kCvarFindCommand004 = 14;
 
 inline bool ICvar_Layout004(const char* ver) {
   return ver && std::strstr(ver, "004");
+}
+
+/// Rebuild `name args` from a Source CCommand (argc + argv0size + ArgS[512]).
+/// Insane blobs fall back to the verb name so cssvr_start still fires.
+inline bool ICvar_DispatchLine(const char* name, const void* cmd, char* out, int n) {
+  if (!out || n < 8 || !name || !name[0]) return false;
+  out[0] = 0;
+  int argc = 0, argv0 = -1;
+  if (cmd) {
+    std::memcpy(&argc, cmd, 4);
+    std::memcpy(&argv0, static_cast<const char*>(cmd) + 4, 4);
+  }
+  const char* args = "";
+  if (cmd && argc >= 1 && argc <= 16 && argv0 >= 0 && argv0 < 128) {
+    args = static_cast<const char*>(cmd) + 8 + argv0;
+  }
+  if (args && args[0] && (unsigned char)args[0] >= 32 && (unsigned char)args[0] < 127)
+    std::snprintf(out, (size_t)n, "%s %s", name, args);
+  else
+    std::snprintf(out, (size_t)n, "%s", name);
+  return out[0] != 0;
 }
 
 /// Get/Set viewangles only after angles_ok self-test.

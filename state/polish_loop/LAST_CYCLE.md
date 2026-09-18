@@ -1,14 +1,14 @@
-# Cycle 82 — 2026-09-19
+# Cycle 85 — 2026-09-19
 
 ## Focus
 
-`vulkan-shim-like-sdl` — DXVK `dlopen`s `libvulkan.so.1`; GOT scan of the loader export misses GIPA present.
+`icvar-dispatch-args` — ICvar Dispatch must keep `cssvr_set` key/value.
 
 ## Did
 
-- Recovered cycle 81 tip `acc59cc`. CSS is not running (2370093 gone). Late-attach never logged — that process had the pre-81 hook.
-- DXVK has no undefined `vk*` (runtime `dlopen` + GIPA). `bin/linux64` is first on `LD_LIBRARY_PATH`. Install now writes `libvulkan.css1` (renamed host loader) + a 14-byte-soname shim `libvulkan.so.1` that NEEDs the hook then the real loader. `VulkanSym` opens `libvulkan.css1` first (no recurse). Never copy the hook as vulkan on cc fail.
-- Built shim into CSS `bin/linux64`. Dual paint stays HMD-gated. Did not invent print/help/menu/toast/cfg chrome.
+- Recovered cycle 84 idle. Tip `8d34b00`. CSS is not running. Log unchanged since 01:27.
+- `8d34b00` registered `cssvr_set` but Dispatch passed only `m_pszName`. `ICvar_DispatchLine` rebuilds `name` + CCommand ArgS (argc/argv0size). Insane blobs fall back to the verb so `cssvr_start` still fires. Copied rebuilt hook into CSS `bin/linux64`.
+- Dual paint stays HMD-gated. Did not invent print/help/menu/toast/cfg chrome.
 
 ## Did not
 
@@ -17,8 +17,8 @@
 
 ## Tests
 
-`cssvrmod_tests` — 125 passed, 0 failed (981 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 126 passed, 0 failed (989 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`idle-no-shell-ladder` — start CSS from the menu so the vulkan shim can interpose GIPA. Look for `vk: device ok` / `cmd wrap` / `icvar register`. Dual paint stays HMD-gated.
+`idle-no-shell-ladder` — start CSS from the menu so `8d34b00`+Dispatch can log `icvar ver=` / `register cssvr_start=`. With SteamVR on, type `cssvr_start`. Dual paint stays HMD-gated.

@@ -108,8 +108,10 @@ class CssvrConCmd04 {
   virtual void Init() {}
   virtual int AutoCompleteSuggest(const char*, void*) { return 0; }
   virtual bool CanAutoComplete() { return false; }
-  virtual void Dispatch(const void*) {
-    if (g_cmd_filter && m_pszName) g_cmd_filter(m_pszName);
+  virtual void Dispatch(const void* cmd) {
+    char line[256];
+    if (!cssvr::ICvar_DispatchLine(m_pszName, cmd, line, (int)sizeof(line))) return;
+    if (g_cmd_filter) g_cmd_filter(line);
   }
   CssvrConCmd04* m_pNext = nullptr;
   bool m_bRegistered = false;
@@ -134,8 +136,10 @@ class CssvrConCmd07 {
   virtual void Init() {}
   virtual int AutoCompleteSuggest(const char*, void*) { return 0; }
   virtual bool CanAutoComplete() { return false; }
-  virtual void Dispatch(const void*) {
-    if (g_cmd_filter && m_pszName) g_cmd_filter(m_pszName);
+  virtual void Dispatch(const void* cmd) {
+    char line[256];
+    if (!cssvr::ICvar_DispatchLine(m_pszName, cmd, line, (int)sizeof(line))) return;
+    if (g_cmd_filter) g_cmd_filter(line);
   }
   CssvrConCmd07* m_pNext = nullptr;
   bool m_bRegistered = false;

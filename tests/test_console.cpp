@@ -35,6 +35,24 @@ TEST(icvar_004_slots) {
   ASSERT_EQ(kCvarFindCommand004, 14);
 }
 
+TEST(icvar_dispatch_line_keeps_set_args) {
+  unsigned char blob[520] = {};
+  int argc = 3, argv0 = 10; // "cssvr_set "
+  std::memcpy(blob, &argc, 4);
+  std::memcpy(blob + 4, &argv0, 4);
+  std::strcpy(reinterpret_cast<char*>(blob + 8), "cssvr_set eyescale 0.20");
+  char line[64];
+  ASSERT_TRUE(ICvar_DispatchLine("cssvr_set", blob, line, 64));
+  CssvrConsole c;
+  ASSERT_TRUE(CssvrParseConsole(line, &c));
+  ASSERT_TRUE(c.cmd == CssvrCmd::Set);
+  ASSERT_STREQ(c.key, "eyescale");
+  ASSERT_STREQ(c.val, "0.20");
+  ASSERT_TRUE(ICvar_DispatchLine("cssvr_start", nullptr, line, 64));
+  ASSERT_STREQ(line, "cssvr_start");
+  ASSERT_FALSE(ICvar_DispatchLine("", blob, line, 64));
+}
+
 TEST(console_decode_cbuf_jmp) {
   unsigned char buf[16] = {0x48, 0x89, 0xf7, 0xe9, 0x10, 0x00, 0x00, 0x00};
   void* t = EngineCmd_DecodeCbuf(buf);
