@@ -23,7 +23,8 @@ You are a **careful product polish agent** for **CSSVRMod only** (`/home/voldema
 - Prefer evidence: code, `/tmp/cssvrmod.log`, tests, GLOGIC_GAPS.md.
 - Pick **one** focus. Prefer `next_focus` unless blocked.
 - **HMD walk is user-gated.** Do not pick `*-hmd-walk` unless the user is in the headset this turn. Prefer a product gap you can prove offline.
-- **Stop the toast ladder.** Cycles 13–20 already toast no-HMD, locate miss, no cap, no cmd, no trace, no angles. Do not add another `*-toast` theme unless the user is still being lied to. Prefer `vk-last-rt-why-miss` (why dual copy fails on Vulkan).
+- **Stop the toast ladder.** Cycles 13–20 already toast no-HMD, locate miss, no cap, no cmd, no trace, no angles. Do not add another `*-toast` theme unless the user is still being lied to.
+- **Do not pick `vk-eye-copy-in-game`.** That needs the user in CSS. Prefer `menu3d-laser-hit` or another offline-provable product gap.
 
 ## 2. Implement carefully
 

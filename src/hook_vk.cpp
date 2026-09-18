@@ -567,10 +567,9 @@ bool CopyImageToEyeLayout(int eye, VkDevice dev, DeviceState* ds, VkImage img, u
 
 bool CopyImageToEye(int eye, VkDevice dev, DeviceState* ds, VkImage img, uint32_t w, uint32_t h,
                     VkFormat fmt, VkImageLayout src_layout) {
-  if (CopyImageToEyeLayout(eye, dev, ds, img, w, h, fmt, src_layout)) return true;
-  if (src_layout != VK_IMAGE_LAYOUT_GENERAL)
-    return CopyImageToEyeLayout(eye, dev, ds, img, w, h, fmt, VK_IMAGE_LAYOUT_GENERAL);
-  return false;
+  // One submit. A GENERAL retry after an 8 ms wait timeout reuses an in-flight
+  // command buffer and can hang the GPU.
+  return CopyImageToEyeLayout(eye, dev, ds, img, w, h, fmt, src_layout);
 }
 
 bool CaptureEyeImpl(int eye) {
