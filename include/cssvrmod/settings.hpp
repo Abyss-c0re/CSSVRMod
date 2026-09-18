@@ -158,4 +158,12 @@ bool Settings_Load(Settings* s);
 bool Settings_SaveLaunch(const Settings& s); // launch.cfg only — resize must not rewrite Vision
 bool Settings_Save(const Settings& s);
 
+/// One --print / --settings line: "launch.cfg /path ok" or "launch.cfg /path missing".
+inline std::string FormatLaunchPath(const char* path, bool exists) {
+  if (!path || !path[0]) return "launch.cfg -";
+  char buf[560];
+  std::snprintf(buf, sizeof(buf), "launch.cfg %s %s", path, exists ? "ok" : "missing");
+  return buf;
+}
+
 } // namespace cssvr

@@ -56,6 +56,16 @@ TEST(settings_seed_left_handed) {
   ASSERT_TRUE(Settings_LeftHandedSeed("0", true) == nullptr);
 }
 
+TEST(settings_format_launch_path) {
+  ASSERT_STREQ(FormatLaunchPath(nullptr, false).c_str(), "launch.cfg -");
+  ASSERT_STREQ(FormatLaunchPath("", true).c_str(), "launch.cfg -");
+  const std::string ok = FormatLaunchPath("/tmp/cssvr_launch.cfg", true);
+  ASSERT_TRUE(ok.find("/tmp/cssvr_launch.cfg") != std::string::npos);
+  ASSERT_TRUE(ok.find(" ok") != std::string::npos);
+  const std::string miss = FormatLaunchPath("/no/such/cssvr_launch.cfg", false);
+  ASSERT_TRUE(miss.find(" missing") != std::string::npos);
+}
+
 TEST(settings_note_win_size_and_debounce) {
   Settings s;
   s.win_w = 1920;
@@ -88,6 +98,7 @@ TEST(settings_roundtrip_tmp) {
   std::string launch = std::string(dir) + "/launch.cfg";
   setenv("CSSVR_CALIB", calib.c_str(), 1);
   setenv("CSSVR_LAUNCH", launch.c_str(), 1);
+  ASSERT_STREQ(LaunchPrefsPath(), launch.c_str());
   Settings s;
   s.calib.eyescale = 0.18f;
   s.backend = Backend::Vk;

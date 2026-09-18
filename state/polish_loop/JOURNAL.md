@@ -192,6 +192,10 @@ User-resized framed window persists to launch.cfg (debounce, ignore minimize). O
 
 Only persist the last CSS window. Destroy/SetWindowSize on a splash or popup must not overwrite the game size.
 
+## 2026-09-18 cycle 36
+
+`--print` / `--settings` now show launch.cfg path (ok/missing). Offline 90/90. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

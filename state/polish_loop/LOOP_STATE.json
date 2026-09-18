@@ -1,11 +1,11 @@
 {
-  "cycle": 35,
+  "cycle": 36,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T13:56:00Z",
-  "last_focus": "persist-resize",
-  "next_focus": "print-launch-path",
-  "last_commit": "faa9187",
+  "started_at": "2026-09-18T14:09:00Z",
+  "last_focus": "print-launch-path",
+  "next_focus": "help-launch-env",
+  "last_commit": "",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }

@@ -1,14 +1,13 @@
-# Cycle 35 — 2026-09-18
+# Cycle 36 — 2026-09-18
 
 ## Focus
 
-`persist-resize` — a user-resized framed window was forgotten next launch.
+`print-launch-path` — `--print` hid which launch.cfg width/height came from.
 
 ## Did
 
-- SDL resize / SetWindowSize / destroy writes clamped `width`/`height` to launch.cfg.
-- Minimize/garbage (below 640×480) is ignored. Debounce 400 ms; destroy forces a last write.
-- Launch-only save — resize must not rewrite Vision calib.
+- `--print` and `--settings` write `cssvr: launch.cfg PATH ok|missing`.
+- CSSVR_LAUNCH override is the path shown (same file persist-resize writes).
 
 ## Did not
 
@@ -17,8 +16,8 @@
 
 ## Tests
 
-`cssvrmod_tests` — 89 passed, 0 failed (700 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 90 passed, 0 failed (706 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`print-launch-path` — `--print` should show which launch.cfg size came from. Never queue `dual-renderview-ipd-origin`.
+`help-launch-env` — `--help` should mention CSSVR_LAUNCH / resize persist. Never queue `dual-renderview-ipd-origin`.

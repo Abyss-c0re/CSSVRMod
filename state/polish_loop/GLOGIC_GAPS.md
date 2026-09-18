@@ -32,6 +32,7 @@
 - [x] `--print` shows persisted `-w`/`-h` + argv (cycle 33). CSS-missing still prints planned size.
 - [x] `--print` shows framed vs `-noborder` (cycle 34). Argv truth; CSS-missing uses planned chrome.
 - [x] Persist a user-resized framed window back to launch.cfg (cycle 35). Ignore minimize; no Vision rewrite.
+- [x] `--print` / `--settings` show launch.cfg path ok/missing (cycle 36).
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.

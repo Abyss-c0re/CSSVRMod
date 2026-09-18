@@ -28,6 +28,12 @@ static void Usage() {
                "  --no-hook  spawn CSS without VR hook (debug)\n");
 }
 
+static void PrintLaunchPath() {
+  const char* p = cssvr::LaunchPrefsPath();
+  const bool ok = p && p[0] && access(p, R_OK) == 0;
+  std::fprintf(stdout, "cssvr: %s\n", cssvr::FormatLaunchPath(p, ok).c_str());
+}
+
 static std::string SiblingHook() {
   char buf[4096];
   ssize_t n = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
@@ -132,6 +138,7 @@ int main(int argc, char** argv) {
   if (did_set) cssvr::Settings_Save(set);
   if (settings_only || (did_set && !play && !find_only && !print_only)) {
     std::fputs(cssvr::Settings_Format(set).c_str(), stdout);
+    PrintLaunchPath();
     return 0;
   }
 
@@ -152,6 +159,7 @@ int main(int argc, char** argv) {
     std::fprintf(stdout, "cssvr: spawn %s\n", wh.c_str());
     std::fprintf(stdout, "cssvr: spawn chrome %s\n",
                  cssvr::FormatSpawnChrome(plan, opts.noborder));
+    PrintLaunchPath();
     if (print_only && !plan.argv.empty())
       std::fprintf(stdout, "cssvr: argv %s\n", cssvr::FormatSpawnArgv(plan).c_str());
   }
