@@ -160,6 +160,10 @@ Vision HAND row toggles L/R and persists (env + launch.cfg). Offline 81/81. Not 
 
 Title-click resets a grip-moved Vision panel to default STAGE pose. Offline 82/82. Not HMD-proven.
 
+## 2026-09-18 cycle 29
+
+HOME glyph on the Vision title when the panel is off default. Offline 83/83. Not HMD-proven.
+
 
 
 

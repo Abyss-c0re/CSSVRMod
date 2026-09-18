@@ -155,6 +155,11 @@ inline void Menu3d_ResetPose(Menu3d* m) {
   m->grip_off = {};
 }
 
+inline bool Menu3d_OffHome(const Menu3d& m) {
+  const Vec3 d = m.pos - Menu3d_DefaultPos();
+  return d.LengthSqr() > 0.01f * 0.01f;
+}
+
 // World-locked default. Grab while the laser is on the quad starts a drag (offset = panel − hand).
 inline bool Menu3d_GripTick(Menu3d* m, bool grab, const Vec3& hand, bool on_quad) {
   if (!m) return false;
@@ -320,6 +325,11 @@ inline void Menu3d_Raster(unsigned char* rgba, int w, int h, const Menu3d& m) {
   Menu3d_Fill(rgba, w, h, 0, 0, w, titleH, 140, 16, 28);
   const int scaleT = std::max(1, titleH / 10);
   Menu3d_DrawText(rgba, w, h, 8, (titleH - 7 * scaleT) / 2, scaleT, "VISION", 240, 230, 220);
+  if (Menu3d_OffHome(m) && w > 96) {
+    const int tw = 4 * 6 * scaleT;
+    Menu3d_DrawText(rgba, w, h, w - tw - 8, (titleH - 7 * scaleT) / 2, scaleT, "HOME", 120, 220,
+                    255);
+  }
   const int rowH = std::max(8, (h - titleH - 8) / kMenuRows);
   for (int i = 0; i < kMenuRows; ++i) {
     const int y = titleH + 6 + i * rowH;

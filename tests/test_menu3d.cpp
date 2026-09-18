@@ -136,6 +136,26 @@ TEST(menu3d_reset_pose) {
   ASSERT_FALSE(Menu3d_TitleHit(mid));
 }
 
+TEST(menu3d_home_hint) {
+  Menu3d m;
+  ASSERT_FALSE(Menu3d_OffHome(m));
+  m.pos.x = 0.2f;
+  ASSERT_TRUE(Menu3d_OffHome(m));
+  unsigned char pix[256 * 96 * 4];
+  Menu3d home;
+  Menu3d_Raster(pix, 256, 96, home);
+  auto hint = [&](const unsigned char* p) {
+    int n = 0;
+    for (int i = 0; i < 256 * 96; ++i)
+      if (p[i * 4 + 0] > 80 && p[i * 4 + 0] < 160 && p[i * 4 + 1] > 180 && p[i * 4 + 2] > 200) n++;
+    return n;
+  };
+  ASSERT_EQ(hint(pix), 0);
+  home.pos.x = 0.5f;
+  Menu3d_Raster(pix, 256, 96, home);
+  ASSERT_TRUE(hint(pix) > 8);
+}
+
 TEST(menu3d_primary_hand) {
   ASSERT_EQ(Menu3d_PrimaryHand(false), 1);
   ASSERT_EQ(Menu3d_PrimaryHand(true), 0);

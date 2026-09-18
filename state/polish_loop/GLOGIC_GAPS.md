@@ -25,7 +25,8 @@
 - [x] Laser + grip from primary hand (cycle 26). `--set left_handed` / CSSVR_LEFT_HANDED; not hardcoded right.
 - [x] Vision-panel HAND row to toggle left/right (cycle 27). Persists env + launch.cfg.
 - [x] Snap a grip-moved Vision panel back to default STAGE pose (cycle 28). Title-click reset.
-- [ ] HOME glyph on the title when the panel is off default.
+- [x] HOME glyph on the title when the panel is off default (cycle 29).
+- [ ] Highlight the VISION title while the laser is on it (reset affordance).
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.

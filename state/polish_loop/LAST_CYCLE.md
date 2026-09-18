@@ -1,24 +1,24 @@
-# Cycle 28 — 2026-09-18
+# Cycle 29 — 2026-09-18
 
 ## Focus
 
-`menu3d-reset-pose` — a grip-moved Vision panel had no way home.
+`menu3d-home-hint` — title-click reset was invisible when the panel was moved.
 
 ## Did
 
-- `Menu3d_ResetPose` snaps STAGE pos + yaw back to default.
-- Trigger on the VISION title (not a row) resets. Stick-focus click still applies a row on a miss.
+- `Menu3d_OffHome` (1 cm from default STAGE pos).
+- Raster HOME on the title (right side) only when off-home so the reset target is readable.
 
 ## Did not
 
 - HMD walk (user-gated).
-- A HOME glyph on the title when moved (next).
+- Highlight the title while the laser is on it (next).
 - Claim live reset UX from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 82 passed, 0 failed (618 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 83 passed, 0 failed (622 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`menu3d-home-hint` — show HOME on the title when the panel is off default so the reset target is readable.
+`menu3d-title-hot` — light the VISION header when the laser is on the title so reset/home is an obvious hit.

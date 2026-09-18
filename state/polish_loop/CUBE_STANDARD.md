@@ -22,7 +22,7 @@ Same framebuffer submitted twice is **not** stereo. gVRMod forbids submitting on
 | HMD drives look | yes | CViewSetup + SetViewAngles after self-test; miss toasts |
 | Controls from XR | yes | CreateMove overlay; locate miss toasts; not HMD-proven |
 | Wall / hand collision | last-free hull | TraceRay self-test + miss toast; not HMD-proven |
-| Vision cal | scale→V→H→eye | settings host + 3D panel + laser + grip + HAND + title reset |
+| Vision cal | scale→V→H→eye | settings host + 3D panel + laser + grip + HAND + title HOME |
 | Framed window | yes | yes (SDL/X11 hook) |
 | Honest no-HMD | toast | toast + fail banner; MONO on desktop until dual paint |
 
