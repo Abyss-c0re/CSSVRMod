@@ -1,24 +1,23 @@
-# Cycle 26 — 2026-09-18
+# Cycle 27 — 2026-09-18
 
 ## Focus
 
-`menu3d-primary-hand` — Vision laser/grip/trigger were hardcoded to the right hand.
+`menu3d-hand-row` — handedness was CLI-only (`--set` / env).
 
 ## Did
 
-- Primary hand index + axis helpers. Laser, grip, and menu trigger follow `left_handed`.
-- Persist via `CSSVR --set left_handed 1` / `CSSVR_LEFT_HANDED`. Tick input uses the same live flag.
+- Vision panel HAND row toggles L/R. Click writes `CSSVR_LEFT_HANDED` + launch.cfg so the next poll does not revert it.
 
 ## Did not
 
 - HMD walk (user-gated).
-- A 3D-panel HAND row (next).
-- Claim live left-hand UX from offline green.
+- A way to snap a dragged panel back (next).
+- Claim live hand-row UX from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 81 passed, 0 failed (600 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 81 passed, 0 failed (608 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`menu3d-hand-row` — toggle left/right on the Vision panel so handedness is not CLI-only.
+`menu3d-reset-pose` — snap the world-locked panel back to default STAGE pose after a grip-drag.

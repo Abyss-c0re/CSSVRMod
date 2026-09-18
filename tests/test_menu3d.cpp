@@ -10,6 +10,10 @@ TEST(menu3d_hit_and_click) {
   m.calib.eyescale = 0.20f;
   ASSERT_TRUE(Menu3d_ApplyClick(&m, 0, 1));
   ASSERT_NEAR(m.calib.eyescale, 0.25f, 0.001);
+  ASSERT_TRUE(Menu3d_ApplyClick(&m, (int)MenuRow::Hand, 1));
+  ASSERT_TRUE(m.left_handed);
+  ASSERT_TRUE(Menu3d_ApplyClick(&m, (int)MenuRow::Hand, 1));
+  ASSERT_FALSE(m.left_handed);
   ASSERT_TRUE(Menu3d_ApplyClick(&m, (int)MenuRow::Dismiss, 1));
   ASSERT_TRUE(!m.visible);
 }
@@ -161,12 +165,19 @@ TEST(menu3d_raster_not_empty) {
 TEST(menu3d_labels_and_values) {
   ASSERT_STREQ(Menu3d_RowLabel(0), "EYE");
   ASSERT_STREQ(Menu3d_RowLabel(1), "SCALE");
-  ASSERT_STREQ(Menu3d_RowLabel(4), "DONE");
+  ASSERT_STREQ(Menu3d_RowLabel(4), "HAND");
+  ASSERT_STREQ(Menu3d_RowLabel(5), "DONE");
+  ASSERT_EQ(kMenuRows, 6);
   Menu3d m;
   m.calib.eyescale = 0.20f;
   char val[16];
   Menu3d_RowValue(m, 0, val, 16);
   ASSERT_TRUE(val[0] == '0');
+  Menu3d_RowValue(m, (int)MenuRow::Hand, val, 16);
+  ASSERT_STREQ(val, "R");
+  m.left_handed = true;
+  Menu3d_RowValue(m, (int)MenuRow::Hand, val, 16);
+  ASSERT_STREQ(val, "L");
   unsigned char tiny[32 * 16 * 4] = {};
   Menu3d_DrawText(tiny, 32, 16, 0, 0, 1, "EYE", 255, 255, 255);
   int lit = 0;

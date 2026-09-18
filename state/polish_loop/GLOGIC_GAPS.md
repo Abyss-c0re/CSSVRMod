@@ -23,7 +23,8 @@
 - [x] Grip-reposition the world-locked Vision panel (cycle 24). Grab+laser on quad offset-locks; still +Z facing.
 - [x] Yaw the Vision panel toward the HMD (cycle 25). Laser plane matches the quad.
 - [x] Laser + grip from primary hand (cycle 26). `--set left_handed` / CSSVR_LEFT_HANDED; not hardcoded right.
-- [ ] Vision-panel HAND row to toggle left/right without CLI.
+- [x] Vision-panel HAND row to toggle left/right (cycle 27). Persists env + launch.cfg.
+- [ ] Snap a grip-moved Vision panel back to default STAGE pose.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.

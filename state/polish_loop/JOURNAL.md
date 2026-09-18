@@ -152,6 +152,10 @@ Vision panel yaws toward the HMD (STAGE XZ). Laser plane matches the quad. Offli
 
 Menu laser/grip/trigger follow primary hand (`left_handed` / CSSVR_LEFT_HANDED). Offline 81/81. Not HMD-proven.
 
+## 2026-09-18 cycle 27
+
+Vision HAND row toggles L/R and persists (env + launch.cfg). Offline 81/81. Not HMD-proven.
+
 
 
 

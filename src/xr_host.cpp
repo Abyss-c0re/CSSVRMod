@@ -799,7 +799,18 @@ bool XrHostPollInput(XrSample* out) {
   if (g_menu3d.visible && trig && !g_prev_trig && !g_menu3d.gripping) {
     const int row = laser.hit ? laser.row : g_menu3d.focus;
     const int dir = (out->stick_rx > 0.4f) ? 1 : (out->stick_rx < -0.4f) ? -1 : 1;
-    if (Menu3d_ApplyClick(&g_menu3d, row, dir)) CalibSave(g_menu3d.calib);
+    if (Menu3d_ApplyClick(&g_menu3d, row, dir)) {
+      if (row == (int)MenuRow::Hand) {
+        setenv("CSSVR_LEFT_HANDED", g_menu3d.left_handed ? "1" : "0", 1);
+        Settings s;
+        Settings_Load(&s);
+        s.left_handed = g_menu3d.left_handed;
+        s.calib = g_menu3d.calib;
+        Settings_Save(s);
+      } else {
+        CalibSave(g_menu3d.calib);
+      }
+    }
   }
   if (g_menu3d.visible && std::fabs(out->stick_ry) > 0.55f && !trig && !g_menu3d.gripping) {
     int n = g_menu3d.focus + (out->stick_ry < 0.f ? 1 : -1);

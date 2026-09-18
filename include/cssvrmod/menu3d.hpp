@@ -9,13 +9,13 @@
 
 namespace cssvr {
 
-constexpr int kMenuRows = 5;
+constexpr int kMenuRows = 6;
 constexpr float kMenuW = 1.05f; // metres
-constexpr float kMenuH = 0.60f;
+constexpr float kMenuH = 0.68f;
 constexpr float kMenuZ = -1.25f;
 constexpr float kMenuY = 1.35f;
 
-enum class MenuRow { Eye = 0, Scale = 1, HOff = 2, VOff = 3, Dismiss = 4 };
+enum class MenuRow { Eye = 0, Scale = 1, HOff = 2, VOff = 3, Hand = 4, Dismiss = 5 };
 
 struct Menu3d {
   bool visible = true;
@@ -176,6 +176,9 @@ inline bool Menu3d_ApplyClick(Menu3d* m, int row, int dir) {
   case MenuRow::VOff:
     c.voffset = CalibClamp(c.voffset + 0.05f * (float)dir, -1.f, 1.f);
     break;
+  case MenuRow::Hand:
+    m->left_handed = !m->left_handed;
+    break;
   case MenuRow::Dismiss:
     m->visible = false;
     break;
@@ -206,6 +209,7 @@ inline const char* Menu3d_RowLabel(int row) {
   case MenuRow::Scale: return "SCALE";
   case MenuRow::HOff: return "H";
   case MenuRow::VOff: return "V";
+  case MenuRow::Hand: return "HAND";
   case MenuRow::Dismiss: return "DONE";
   }
   return "";
@@ -220,6 +224,7 @@ inline void Menu3d_RowValue(const Menu3d& m, int row, char* out, int n) {
   case MenuRow::Scale: std::snprintf(out, (size_t)n, "%.2f", c.scalefactor); break;
   case MenuRow::HOff: std::snprintf(out, (size_t)n, "%+.2f", c.hoffset); break;
   case MenuRow::VOff: std::snprintf(out, (size_t)n, "%+.2f", c.voffset); break;
+  case MenuRow::Hand: std::snprintf(out, (size_t)n, "%s", m.left_handed ? "L" : "R"); break;
   case MenuRow::Dismiss: std::snprintf(out, (size_t)n, "OK"); break;
   }
 }
