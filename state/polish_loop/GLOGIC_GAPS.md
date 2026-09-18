@@ -21,6 +21,7 @@
 - [x] Mono UV IPD dropped (cycle 53). Same framebuffer + per-eye UV shift is two planes. Shared H/V/scale stay.
 - [x] Dual world IPD ignores Vision eyescale (cycle 51). Live `eye=0.13` must not place cameras 8 mm apart.
 - [x] VIEW pose IPD stays 0 after dual paint (cycle 52). IPD is the two world origins; pose IPD on those rasters is a second plane.
+- [x] Dual origins honor `swap_eyes` (cycle 54). Pose/UV IPD stay 0; SWAP swaps the two cameras.
 - [x] Identical L/R pixels stay MONO (cycle 46). Two copies of one RT must not unlock pose IPD.
 - [x] Vulkan-live CopyEye ignores GL blit (cycle 47). `GL_NO_ERROR` on a foreign context is not a world capture.
 - [x] HMD writes `CViewSetup` angles for both eye paints (cycle 6). Shared orientation. No guessed `SetViewAngles`.

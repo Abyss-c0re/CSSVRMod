@@ -264,6 +264,10 @@ VIEW pose IPD stays 0 after dual paint. IPD is the two world origins; a second V
 
 Mono UV IPD dropped. Same framebuffer + per-eye UV shift is two planes. Shared Vision pan stays. Offline 105/105. Not HMD-proven.
 
+## 2026-09-18 cycle 54
+
+Dual origins honor swap_eyes. Pose/UV IPD stay 0. Offline 106/106. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

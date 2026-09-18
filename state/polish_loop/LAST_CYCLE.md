@@ -1,13 +1,13 @@
-# Cycle 53 — 2026-09-18
+# Cycle 54 — 2026-09-18
 
 ## Focus
 
-`mono-uv-ipd-is-second-plane` — live path is MONO; per-eye UV IPD split one framebuffer.
+`dual-origin-honors-swap-eyes` — Vision SWAP did nothing after pose/UV IPD went to 0.
 
 ## Did
 
-- `CalibEye` no longer shifts L/R UV by eyescale. Same crop both eyes.
-- Shared Vision pan/zoom stay. Dual IPD remains world origins only.
+- Dual world origins swap when `swap_eyes` is set.
+- VIEW pose and UV stay identity (no second plane).
 
 ## Did not
 
@@ -16,7 +16,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 105 passed, 0 failed (846 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 106 passed, 0 failed (851 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

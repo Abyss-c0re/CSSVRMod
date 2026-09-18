@@ -80,8 +80,11 @@ inline StereoViewPlan StereoView_Decide(const StereoViewIn& in, bool painted_dua
     ev.origin = painted_dual ? (in.origin + right * (sign * p.half_ipd)) : in.origin;
     ev.pose_x = StereoView_SubmitPoseX(c, eye, painted_dual);
   };
-  fill(p.left, 0, -1.f);
-  fill(p.right, 1, +1.f);
+  // SWAP is a camera swap. Pose/UV IPD stay 0 (no second plane).
+  const float sign_l = c.swap_eyes ? +1.f : -1.f;
+  const float sign_r = c.swap_eyes ? -1.f : +1.f;
+  fill(p.left, 0, sign_l);
+  fill(p.right, 1, sign_r);
   p.reason = painted_dual ? "dual_ipd_origin" : "mono_identity_pose";
   return p;
 }

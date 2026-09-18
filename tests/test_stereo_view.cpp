@@ -120,6 +120,23 @@ TEST(stereo_dual_ipd_ignores_uv_eyescale) {
   ASSERT_NEAR(p.right.origin.y - in.origin.y, -full, 0.001);
 }
 
+TEST(stereo_dual_swap_eyes_swaps_origins) {
+  StereoViewIn in;
+  in.origin = {0.f, 0.f, 64.f};
+  in.angles = {0.f, 0.f, 0.f};
+  in.calib.ipd_m = 0.064f;
+  in.calib.eyescale = 0.13f;
+  in.calib.swap_eyes = false;
+  const auto n = StereoView_Decide(in, true);
+  in.calib.swap_eyes = true;
+  const auto s = StereoView_Decide(in, true);
+  ASSERT_NEAR(s.left.origin.y, n.right.origin.y, 0.001);
+  ASSERT_NEAR(s.right.origin.y, n.left.origin.y, 0.001);
+  ASSERT_NEAR(s.left.pose_x, 0.f, 0.0001);
+  ASSERT_NEAR(s.right.pose_x, 0.f, 0.0001);
+  ASSERT_TRUE(s.left.origin.y < in.origin.y); // swapped: left camera on -Y (right)
+}
+
 TEST(stereo_uv_crop_never_fakes_ipd) {
   Calib c;
   c.eyescale = 1.f;
