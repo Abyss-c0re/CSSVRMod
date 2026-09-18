@@ -148,6 +148,10 @@ Grip-drag the world-locked Vision panel (offset-lock while grab+laser on quad). 
 
 Vision panel yaws toward the HMD (STAGE XZ). Laser plane matches the quad. Offline 80/80. Not HMD-proven.
 
+## 2026-09-18 cycle 26
+
+Menu laser/grip/trigger follow primary hand (`left_handed` / CSSVR_LEFT_HANDED). Offline 81/81. Not HMD-proven.
+
 
 
 

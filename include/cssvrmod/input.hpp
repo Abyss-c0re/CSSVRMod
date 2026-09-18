@@ -3,6 +3,7 @@
 #include "aim.hpp"
 #include "vec3.hpp"
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 
 namespace cssvr {
@@ -46,6 +47,13 @@ struct InputConfig {
   bool smooth_turn = true;
   float turn_speed = 120.f; // deg/s
 };
+
+// Env wins. Else CSSVR --set left_handed / launch.cfg (seeded into the env at init).
+inline bool Input_LeftHandedLive() {
+  const char* e = std::getenv("CSSVR_LEFT_HANDED");
+  if (e && e[0]) return !(e[0] == '0' && e[1] == 0);
+  return false;
+}
 
 inline float ApplyDead(float v, float dead) {
   if (std::fabs(v) < dead) return 0.f;

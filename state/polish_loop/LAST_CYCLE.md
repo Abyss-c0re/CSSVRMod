@@ -1,24 +1,24 @@
-# Cycle 25 — 2026-09-18
+# Cycle 26 — 2026-09-18
 
 ## Focus
 
-`menu3d-face-hmd` — dragged Vision panel stayed +Z, so it could sit edge-on.
+`menu3d-primary-hand` — Vision laser/grip/trigger were hardcoded to the right hand.
 
 ## Did
 
-- Yaw-only billboard: local +Z points at the HMD on the STAGE XZ plane.
-- Laser plane and quad pose share that yaw. Default in front of origin stays identity.
+- Primary hand index + axis helpers. Laser, grip, and menu trigger follow `left_handed`.
+- Persist via `CSSVR --set left_handed 1` / `CSSVR_LEFT_HANDED`. Tick input uses the same live flag.
 
 ## Did not
 
 - HMD walk (user-gated).
-- Pitch the panel or persist yaw.
-- Claim live billboard UX from offline green.
+- A 3D-panel HAND row (next).
+- Claim live left-hand UX from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 80 passed, 0 failed (587 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 81 passed, 0 failed (600 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`menu3d-primary-hand` — laser + grip from the primary hand, not hardcoded right.
+`menu3d-hand-row` — toggle left/right on the Vision panel so handedness is not CLI-only.

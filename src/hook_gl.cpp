@@ -361,6 +361,7 @@ void HookOnSwap() {
     tin.now = g_now;
     tin.dt = 0.011f;
     tin.input = g_icfg;
+    tin.input.left_handed = Input_LeftHandedLive();
     tin.melee = g_mcfg;
     tin.current_view = xr.hmd.ang;
     tin.trace = EngineMakeTraceFn(g_eng);

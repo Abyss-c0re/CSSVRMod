@@ -255,6 +255,7 @@ void* XrWorker(void*) {
         tin.wep = nullptr; // no live weapon query yet — fist only on melee_intent
         tin.now = now;
         tin.dt = 0.011f;
+        tin.input.left_handed = Input_LeftHandedLive();
         tin.current_view = xr.hmd.ang;
         tin.trace = EngineMakeTraceFn(g_eng);
         tin.right_vel = &rightVel;

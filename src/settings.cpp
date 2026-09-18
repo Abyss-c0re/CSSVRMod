@@ -66,7 +66,8 @@ bool Settings_Save(const Settings& s) {
   if (!out) return false;
   out << "backend " << BackendName(s.backend) << "\n"
       << "map " << (s.map.empty() ? "-" : s.map) << "\n"
-      << "noborder " << (s.noborder ? 1 : 0) << "\n";
+      << "noborder " << (s.noborder ? 1 : 0) << "\n"
+      << "left_handed " << (s.left_handed ? 1 : 0) << "\n";
   return true;
 }
 

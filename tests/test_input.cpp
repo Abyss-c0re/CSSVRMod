@@ -26,6 +26,11 @@ TEST(input_map_fire_and_move) {
   ASSERT_STREQ(cmd.reason, "aim_gun");
 
   xr.trigger_r = 0.f;
+  xr.trigger_l = 0.9f;
+  cfg.left_handed = true;
+  auto lefty = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_TRUE(lefty.firing);
+  cfg.left_handed = false;
   auto idle = InputMap(xr, gun, cfg, 0.01f);
   ASSERT_FALSE(idle.firing);
   ASSERT_FALSE(idle.look_from_gun);

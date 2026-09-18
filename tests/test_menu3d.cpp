@@ -110,6 +110,17 @@ TEST(menu3d_grip_moves_panel) {
   ASSERT_TRUE(c.pos.z <= -0.29f);
 }
 
+TEST(menu3d_primary_hand) {
+  ASSERT_EQ(Menu3d_PrimaryHand(false), 1);
+  ASSERT_EQ(Menu3d_PrimaryHand(true), 0);
+  ASSERT_NEAR(Menu3d_HandAxis(false, 0.1f, 0.9f), 0.9f, 0.001);
+  ASSERT_NEAR(Menu3d_HandAxis(true, 0.1f, 0.9f), 0.1f, 0.001);
+  Menu3d m;
+  ASSERT_FALSE(m.left_handed);
+  m.left_handed = true;
+  ASSERT_EQ(Menu3d_PrimaryHand(m.left_handed), 0);
+}
+
 TEST(menu3d_faces_hmd_yaw) {
   const Vec3 panel{0.f, kMenuY, kMenuZ};
   const Vec3 hmd0{0.f, 1.6f, 0.f};

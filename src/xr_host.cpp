@@ -2,6 +2,7 @@
 #include "cssvrmod/calib.hpp"
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/menu3d.hpp"
+#include "cssvrmod/settings.hpp"
 #include "cssvrmod/stereo_view.hpp"
 #include "cssvrmod/toast.hpp"
 #include "openxr_paths.hpp"
@@ -9,6 +10,7 @@
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <dlfcn.h>
 #include <mutex>
@@ -474,16 +476,25 @@ void BlitToSwapchain(unsigned int src, int srcW, int srcH, int eye, bool vflip) 
   xrReleaseSwapchainImage(g_sc[eye], &rel);
 }
 
+int MenuAimHand() { return Menu3d_PrimaryHand(g_menu3d.left_handed); }
+
 bool LocateAimHand(Vec3* o, Vec3* d) {
-  if (!o || !d || !g_aim[1] || !g_fs.predictedDisplayTime || !g_stage || !xrLocateSpace)
+  const int hand = MenuAimHand();
+  if (!o || !d || hand < 0 || hand > 1 || !g_aim[hand] || !g_fs.predictedDisplayTime || !g_stage ||
+      !xrLocateSpace)
     return false;
   XrSpaceLocation loc{XR_TYPE_SPACE_LOCATION};
-  if (xrLocateSpace(g_aim[1], g_stage, g_fs.predictedDisplayTime, &loc) != XR_SUCCESS) return false;
+  if (xrLocateSpace(g_aim[hand], g_stage, g_fs.predictedDisplayTime, &loc) != XR_SUCCESS)
+    return false;
   if (!(loc.locationFlags & XR_SPACE_LOCATION_POSITION_VALID_BIT)) return false;
   *o = {loc.pose.position.x, loc.pose.position.y, loc.pose.position.z};
   *d = Menu3d_AimFromQuat(loc.pose.orientation.x, loc.pose.orientation.y, loc.pose.orientation.z,
                           loc.pose.orientation.w);
   return true;
+}
+
+void SyncMenuHandedness() {
+  g_menu3d.left_handed = Input_LeftHandedLive();
 }
 
 bool LocateHmdStage(Vec3* p) {
@@ -503,6 +514,7 @@ void FaceMenuToHmd() {
 
 Menu3dLaserHit LocateMenuLaser() {
   Vec3 o, d;
+  SyncMenuHandedness();
   if (!g_menu3d.visible || !LocateAimHand(&o, &d)) return {};
   FaceMenuToHmd();
   return Menu3d_RayHit(o, d, g_menu3d.pos, g_menu3d.yaw);
@@ -536,6 +548,12 @@ bool UploadMenuSwapchain() {
 bool XrHostInit() {
   if (g_info.session) return true;
   Log("cssvr xr init begin");
+  if (!std::getenv("CSSVR_LEFT_HANDED")) {
+    Settings s;
+    Settings_Load(&s);
+    setenv("CSSVR_LEFT_HANDED", s.left_handed ? "1" : "0", 0);
+  }
+  SyncMenuHandedness();
   if (!LoadLoader()) {
     HonestToastIfNeeded(g_info.reason);
     return false;
@@ -762,6 +780,7 @@ bool XrHostPollInput(XrSample* out) {
   out->a_click = bval(g_abxy, 1);
   pose(0, &out->left);
   pose(1, &out->right);
+  SyncMenuHandedness();
   Vec3 hand{}, dir{};
   const bool have_hand = LocateAimHand(&hand, &dir);
   if (g_menu3d.visible) FaceMenuToHmd();
@@ -770,11 +789,13 @@ bool XrHostPollInput(XrSample* out) {
                                    : Menu3dLaserHit{};
   Menu3d_SetCursor(&g_menu3d, laser);
   if (laser.hit && !g_menu3d.gripping) g_menu3d.focus = laser.row;
+  const float grab = Menu3d_HandAxis(g_menu3d.left_handed, out->grab_l, out->grab_r);
   if (g_menu3d.visible && have_hand)
-    Menu3d_GripTick(&g_menu3d, out->grab_r > 0.55f, hand, laser.on_quad);
+    Menu3d_GripTick(&g_menu3d, grab > 0.55f, hand, laser.on_quad);
   if (out->menu && !g_prev_menu_btn) g_menu3d.visible = !g_menu3d.visible;
   g_prev_menu_btn = out->menu;
-  const bool trig = out->trigger_r > 0.55f;
+  const bool trig =
+      Menu3d_HandAxis(g_menu3d.left_handed, out->trigger_l, out->trigger_r) > 0.55f;
   if (g_menu3d.visible && trig && !g_prev_trig && !g_menu3d.gripping) {
     const int row = laser.hit ? laser.row : g_menu3d.focus;
     const int dir = (out->stick_rx > 0.4f) ? 1 : (out->stick_rx < -0.4f) ? -1 : 1;

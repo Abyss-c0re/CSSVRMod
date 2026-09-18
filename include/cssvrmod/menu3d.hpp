@@ -28,7 +28,15 @@ struct Menu3d {
   float yaw = 0.f; // STAGE +Y; 0 = identity, local +Z toward +STAGE Z
   bool gripping = false;
   Vec3 grip_off{};
+  bool left_handed = false;
 };
+
+// Cube: laser + grip from the primary hand. 0 = left, 1 = right.
+inline int Menu3d_PrimaryHand(bool left_handed) { return left_handed ? 0 : 1; }
+
+inline float Menu3d_HandAxis(bool left_handed, float left, float right) {
+  return left_handed ? left : right;
+}
 
 inline int Menu3d_HitRow(float u, float v) {
   if (u < 0.06f || u > 0.94f || v < 0.18f || v > 0.92f) return -1;

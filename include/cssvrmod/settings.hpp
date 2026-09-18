@@ -13,6 +13,7 @@ struct Settings {
   Backend backend = Backend::Vk;
   std::string map;
   bool noborder = false;
+  bool left_handed = false;
 };
 
 inline bool Settings_ApplyKey(Settings* s, const char* key, const char* val) {
@@ -27,6 +28,10 @@ inline bool Settings_ApplyKey(Settings* s, const char* key, const char* val) {
   }
   if (std::strcmp(key, "noborder") == 0) {
     s->noborder = !(val[0] == '0' && val[1] == 0);
+    return true;
+  }
+  if (std::strcmp(key, "left_handed") == 0 || std::strcmp(key, "lefthanded") == 0) {
+    s->left_handed = !(val[0] == '0' && val[1] == 0);
     return true;
   }
   char buf[160];
@@ -60,10 +65,11 @@ inline std::string Settings_Format(const Settings& s) {
                 "swap_eyes %d\n"
                 "backend %s\n"
                 "map %s\n"
-                "noborder %d\n",
+                "noborder %d\n"
+                "left_handed %d\n",
                 c.eyescale, c.hoffset, c.voffset, c.scalefactor, c.lens_bend, c.ipd_m,
                 c.swap_eyes ? 1 : 0, BackendName(s.backend), s.map.empty() ? "-" : s.map.c_str(),
-                s.noborder ? 1 : 0);
+                s.noborder ? 1 : 0, s.left_handed ? 1 : 0);
   return buf;
 }
 

@@ -18,11 +18,18 @@ TEST(settings_apply_vision_and_launch) {
   ASSERT_EQ((int)s.backend, (int)Backend::Vk);
   ASSERT_TRUE(Settings_ApplyKey(&s, "map", "de_dust2"));
   ASSERT_TRUE(s.map == "de_dust2");
+  ASSERT_TRUE(Settings_ApplyKey(&s, "left_handed", "1"));
+  ASSERT_TRUE(s.left_handed);
+  ASSERT_TRUE(Settings_ApplyKey(&s, "lefthanded", "0"));
+  ASSERT_FALSE(s.left_handed);
   ASSERT_FALSE(Settings_ApplyKey(&s, "cinema", "1"));
   const std::string t = Settings_Format(s);
   ASSERT_TRUE(t.find("eyescale") != std::string::npos);
   ASSERT_TRUE(t.find("backend vk") != std::string::npos);
   ASSERT_TRUE(t.find("de_dust2") != std::string::npos);
+  s.left_handed = true;
+  const std::string t2 = Settings_Format(s);
+  ASSERT_TRUE(t2.find("left_handed 1") != std::string::npos);
 }
 
 TEST(settings_roundtrip_tmp) {
@@ -36,11 +43,13 @@ TEST(settings_roundtrip_tmp) {
   s.calib.eyescale = 0.18f;
   s.backend = Backend::Vk;
   s.map = "de_inferno";
+  s.left_handed = true;
   ASSERT_TRUE(Settings_Save(s));
   Settings b;
   ASSERT_TRUE(Settings_Load(&b));
   ASSERT_NEAR(b.calib.eyescale, 0.18f, 0.01);
   ASSERT_TRUE(b.map == "de_inferno");
+  ASSERT_TRUE(b.left_handed);
   unsetenv("CSSVR_CALIB");
   unsetenv("CSSVR_LAUNCH");
 }
