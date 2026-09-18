@@ -280,6 +280,10 @@ Retry no_patch. One splash vtable miss no longer permanently kills dual paint. O
 
 Wrap ClientCmd_Unrestricted (slot 106) so typed `cssvr_start` reaches the filter. Slot 7 stays restricted ClientCmd. Offline 113/113. Not HMD-proven.
 
+## 2026-09-18 cycle 57 follow
+
+Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

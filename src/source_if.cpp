@@ -38,6 +38,10 @@ bool ProtectSlot(void* p, bool wr) {
 
 void PatchCmdSlot(ClientCmdFn* slot, ClientCmdFn wrap, ClientCmdFn* orig) {
   if (!slot || !*slot || !wrap || !orig || *orig) return;
+  Dl_info info{};
+  if (!dladdr(reinterpret_cast<void*>(*slot), &info) || !info.dli_fname ||
+      !std::strstr(info.dli_fname, "engine.so"))
+    return;
   *orig = *slot;
   ProtectSlot(slot, true);
   *slot = wrap;
