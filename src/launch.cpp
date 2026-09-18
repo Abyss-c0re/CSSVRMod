@@ -323,6 +323,23 @@ bool InstallToGame(const InstallPlan& p) {
        << "Then in console: cssvr_start\n"
        << "Or: plugin_load addons/cssvrmod/cssvrmod_plugin\n";
   }
+  {
+    const std::string autoexec = p.game_root + "/cstrike/cfg/autoexec.cfg";
+    std::string prev;
+    {
+      std::ifstream in(autoexec);
+      if (in) {
+        std::stringstream buf;
+        buf << in.rdbuf();
+        prev = buf.str();
+      }
+    }
+    const std::string next = Autoexec_WithPluginLoad(prev);
+    if (next != prev) {
+      std::ofstream out(autoexec, std::ios::binary | std::ios::trunc);
+      if (out) out << next;
+    }
+  }
   InstallSteamLaunchOptions(p.hook_dst);
   return true;
 }

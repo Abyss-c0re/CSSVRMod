@@ -81,6 +81,19 @@ inline std::string CssRootFromExe(const char* exe) {
   return std::string(exe, static_cast<size_t>(slash - exe));
 }
 
+/// Steam Cloud wipes App 240 LaunchOptions. autoexec plugin_load is the durable hook load.
+inline bool Autoexec_HasPluginLoad(const char* text) {
+  return text && std::strstr(text, "plugin_load") && std::strstr(text, "cssvrmod_plugin");
+}
+
+inline std::string Autoexec_WithPluginLoad(const std::string& existing) {
+  if (Autoexec_HasPluginLoad(existing.c_str())) return existing;
+  std::string o = existing;
+  if (!o.empty() && o.back() != '\n') o += '\n';
+  o += "plugin_load addons/cssvrmod/cssvrmod_plugin\n";
+  return o;
+}
+
 /// Pure: never skip spawn unless hook path is empty (tests).
 inline bool SpawnNeedsHook(const LaunchOpts& o) { return !o.hook_so.empty(); }
 

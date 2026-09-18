@@ -292,6 +292,10 @@ Console parser treats CR/LF as whitespace so `cssvr_start\n` is Start, not Help.
 
 In-process hook finds CSS from `/proc/self/exe` and cwd, not only HOME Steam paths. Offline 115/115. Not HMD-proven.
 
+## 2026-09-18 cycle 64
+
+Steam Cloud wiped App 240 LaunchOptions. `--install` now writes `autoexec.cfg` `plugin_load` (durable) and re-upserts LaunchOptions. Offline 116/116. Not HMD-proven.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

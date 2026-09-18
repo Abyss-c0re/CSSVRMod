@@ -58,6 +58,18 @@ TEST(install_plan_paths) {
   ASSERT_TRUE(steam.find("CSSVR_XR=0") != std::string::npos);
 }
 
+TEST(autoexec_plugin_load_once) {
+  ASSERT_FALSE(Autoexec_HasPluginLoad(""));
+  ASSERT_FALSE(Autoexec_HasPluginLoad("echo hi\n"));
+  std::string a = Autoexec_WithPluginLoad("");
+  ASSERT_TRUE(Autoexec_HasPluginLoad(a.c_str()));
+  ASSERT_TRUE(a.find("plugin_load addons/cssvrmod/cssvrmod_plugin") != std::string::npos);
+  ASSERT_TRUE(Autoexec_WithPluginLoad(a) == a);
+  std::string keep = Autoexec_WithPluginLoad("cl_showfps 1");
+  ASSERT_TRUE(keep.find("cl_showfps 1") != std::string::npos);
+  ASSERT_TRUE(Autoexec_HasPluginLoad(keep.c_str()));
+}
+
 TEST(steam_merge_launch_options) {
   const char* hook = "/opt/css/bin/linux64/libcssvrmod_hook.so";
   ASSERT_FALSE(SteamLaunchHasHook("", hook));
