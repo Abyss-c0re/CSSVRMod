@@ -1,25 +1,24 @@
-# Cycle 13 — 2026-09-18
+# Cycle 14 — 2026-09-18
 
 ## Focus
 
-`honest-no-hmd-toast` — Cube toasts no-HMD; CSSVRMod only logged.
+`desktop-xr-status-banner` — NO HMD was toast-only; desktop present stayed silent.
 
 ## Did
 
-- Pure `Toast_*` law: one-shot on `no_hmd` / runtime fail; never abort VR; silent-fail audit.
-- `Toast_FireDesktop` writes `/tmp/cssvrmod.toast` and `notify-send` (skip with `CSSVR_TOAST=0`).
-- `XrHostInit` / GL bind fail fire the toast once.
+- Pure `Banner_Stamp`: fail-only top bar (`NO HMD` / `NO XR`). Never stamps `session_ok`.
+- Glyphs X/R/M. VK dump + GL capture/front strip. Window title `CSSVRMod · …`.
+- Dual-eye submit path is untouched (not a cinema overlay).
 
 ## Did not
 
 - HMD walk (user-gated).
 - Claim stereo from offline green.
-- Desktop framebuffer banner (next).
 
 ## Tests
 
-`cssvrmod_tests` — 64 passed, 0 failed (446 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 68 passed, 0 failed (460 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`desktop-xr-status-banner` — stamp XR / NO HMD on the CSS present so it is visible without notify-send.
+`honest-mono-submit-label` — say MONO on desktop until `painted_dual`; do not look like stereo.

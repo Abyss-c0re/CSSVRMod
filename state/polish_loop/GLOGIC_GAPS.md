@@ -16,7 +16,7 @@
 - [x] 3D panel row labels + values (cycle 12). Glyphs, not engine VGUI.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
-- [ ] Desktop XR status banner on the CSS present (so NO HMD is visible without notify-send).
+- [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.
 - [ ] Optional GTK/Qt window (CLI host is enough to persist knobs).
 - [x] `CUserCmd` overlay + CreateMove hook (RTTI/xmm0 self-test, cycle 8). Analog stick writes forwardmove.
 - [ ] Live XR input proven in-game (HMD). Offline green ≠ controls smoke.

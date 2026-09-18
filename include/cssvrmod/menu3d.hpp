@@ -117,9 +117,12 @@ inline uint32_t Menu3d_GlyphBits(char ch) {
   case 'I': return 0x0E2108E;
   case 'K': return 0x1154C63;
   case 'L': return 0x1E42108;
+  case 'M': return 0xF040117F;
   case 'N': return 0x115D671;
   case 'O': return 0x0E94A4E;
+  case 'R': return 0x02C244FF;
   case 'S': return 0x0E8382E;
+  case 'X': return 0x32820A63;
   case 'V': return 0x0454A31;
   case 'Y': return 0x04254A5;
   case '+': return 0x0045D00;

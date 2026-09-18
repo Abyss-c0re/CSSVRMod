@@ -84,6 +84,10 @@ Standalone settings host: `CSSVR --settings` / `--set`. Vision + backend/map per
 
 Honest no-HMD toast: one-shot desktop notify + toast file when OpenXR has no headset/runtime. Offline 64/64. Not HMD-proven.
 
+## 2026-09-18 cycle 14
+
+Fail-only NO HMD / NO XR banner on the captured CSS present + window title. Dual-eye submit not stamped. Offline 68/68. Not HMD-proven.
+
 
 
 

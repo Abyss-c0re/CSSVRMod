@@ -48,6 +48,9 @@ SetReszFn g_set_resz = nullptr;
 XChangePropFn g_xchange = nullptr;
 void* g_last_win = nullptr;
 int g_creates = 0;
+using SetTitleFn = void (*)(void*, const char*);
+SetTitleFn g_set_title = nullptr;
+char g_last_label[32] = {};
 
 void* OpenLib(const char* name) {
   void* h = dlopen(name, RTLD_NOW | RTLD_NOLOAD);
@@ -104,6 +107,28 @@ void ForceDecorated(void* win) {
 }
 
 } // namespace
+
+namespace cssvr {
+
+void Chrome_NoteStatus(const char* label) {
+  if (!label || !label[0] || !g_last_win) return;
+  if (g_last_label[0] && std::strcmp(g_last_label, label) == 0) return;
+  std::snprintf(g_last_label, sizeof(g_last_label), "%s", label);
+  EnsureSdl();
+  if (!g_set_title) {
+    void* sdl = OpenLib("libSDL2-2.0.so.0");
+    if (!sdl) sdl = OpenLib("libSDL2.so");
+    g_set_title = (SetTitleFn)(sdl ? dlsym(sdl, "SDL_SetWindowTitle")
+                                   : dlsym(RTLD_NEXT, "SDL_SetWindowTitle"));
+  }
+  if (!g_set_title) return;
+  char title[160];
+  std::snprintf(title, sizeof(title), "CSSVRMod · %s", label);
+  g_set_title(g_last_win, title);
+  Log("title %s", title);
+}
+
+} // namespace cssvr
 
 extern "C" {
 

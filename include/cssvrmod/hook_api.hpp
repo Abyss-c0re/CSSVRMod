@@ -8,5 +8,6 @@ void HookOnSwap(); // called from SDL_GL_SwapWindow / glXSwapBuffers
 void HookCallGlxSwap(void* dpy, unsigned long drawable);
 void HookCallSdlSwap(void* window);
 const char* HookStatus();
+void Chrome_NoteStatus(const char* label);
 
 } // namespace cssvr

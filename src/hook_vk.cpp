@@ -1,7 +1,9 @@
 // CSS 64-bit defaults to shaderapivk / DXVK. GL swap never runs.
 // Intercept vkQueuePresentKHR and dump the presented swapchain image.
 #include "xr_host.hpp"
+#include "cssvrmod/banner.hpp"
 #include "cssvrmod/collision.hpp"
+#include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/tick.hpp"
@@ -423,21 +425,33 @@ void HarvestCopy(DeviceState* ds, VkDevice dev, bool want_ppm) {
   void* mapped = nullptr;
   if (ds->fn.map(dev, ds->stage_mem, 0, bytes, 0, &mapped) != VK_SUCCESS || !mapped) return;
   const auto* srcp = static_cast<const unsigned char*>(mapped);
+  const char* reason = XrHostStatus().reason;
+  const bool bgra = FormatIsBgra(ds->copy_fmt);
+  std::vector<unsigned char> stamped;
+  const unsigned char* xr_px = srcp;
+  if (Banner_ShouldStamp(reason)) {
+    stamped.assign(srcp, srcp + (size_t)bytes);
+    if (Banner_Stamp(stamped.data(), (int)w, (int)h, bgra, false, reason)) {
+      xr_px = stamped.data();
+      Chrome_NoteStatus(Banner_Text(reason));
+    }
+  }
   if (take_xr) {
     EnsureXrWorker();
-    PushXrFrame(srcp, (int)w, (int)h, FormatIsBgra(ds->copy_fmt));
+    PushXrFrame(xr_px, (int)w, (int)h, bgra);
   }
   if (want_ppm && g_dumps < 2) {
     std::vector<unsigned char> rgba((size_t)bytes);
-    if (FormatIsBgra(ds->copy_fmt)) {
+    const unsigned char* src = xr_px;
+    if (bgra) {
       for (size_t i = 0; i < (size_t)w * h; ++i) {
-        rgba[i * 4 + 0] = srcp[i * 4 + 2];
-        rgba[i * 4 + 1] = srcp[i * 4 + 1];
-        rgba[i * 4 + 2] = srcp[i * 4 + 0];
-        rgba[i * 4 + 3] = srcp[i * 4 + 3];
+        rgba[i * 4 + 0] = src[i * 4 + 2];
+        rgba[i * 4 + 1] = src[i * 4 + 1];
+        rgba[i * 4 + 2] = src[i * 4 + 0];
+        rgba[i * 4 + 3] = src[i * 4 + 3];
       }
     } else {
-      std::memcpy(rgba.data(), srcp, (size_t)bytes);
+      std::memcpy(rgba.data(), src, (size_t)bytes);
     }
     mkdir(DumpDir().c_str(), 0755);
     char path[512];

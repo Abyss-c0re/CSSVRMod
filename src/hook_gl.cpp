@@ -1,3 +1,4 @@
+#include "cssvrmod/banner.hpp"
 #include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/launch.hpp"
@@ -230,6 +231,20 @@ void CaptureBackbuffer() {
   }
 
   if (ok) {
+    const char* reason = XrHostStatus().reason;
+    if (Banner_Stamp(pix.data(), (int)w, (int)h, false, true, reason)) {
+      Chrome_NoteStatus(Banner_Text(reason));
+      GLint prev = 0;
+      glGetIntegerv(GL_DRAW_BUFFER, &prev);
+      glDrawBuffer(GL_FRONT);
+      glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+      const int bar = Banner_Height((int)h);
+      glWindowPos2i(0, (int)h - bar);
+      glDrawPixels((GLsizei)w, (GLsizei)bar, GL_RGBA, GL_UNSIGNED_BYTE,
+                   pix.data() + (size_t)((int)h - bar) * (size_t)w * 4);
+      glFlush();
+      if (prev) glDrawBuffer((GLenum)prev);
+    }
     glBindTexture(GL_TEXTURE_2D, g_cap);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)w, (GLsizei)h, GL_RGBA, GL_UNSIGNED_BYTE,
