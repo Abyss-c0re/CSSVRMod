@@ -33,6 +33,7 @@
 - [x] `--print` shows framed vs `-noborder` (cycle 34). Argv truth; CSS-missing uses planned chrome.
 - [x] Persist a user-resized framed window back to launch.cfg (cycle 35). Ignore minimize; no Vision rewrite.
 - [x] PollEvent persist only the last CSS window id (cycle 39). Splash/popup resize must not overwrite.
+- [x] CreateWindow persist target prefers larger/first window (cycle 40). Splash must not steal.
 - [x] `--print` / `--settings` show launch.cfg path ok/missing (cycle 36).
 - [x] `--help` documents CSSVR_LAUNCH + resize persist (cycle 37).
 - [x] Seed default launch.cfg on first `--print`/`--settings`/spawn (cycle 38). No overwrite.

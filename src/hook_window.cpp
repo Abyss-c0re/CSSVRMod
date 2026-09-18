@@ -205,11 +205,13 @@ void* SDL_CreateWindow(const char* title, int x, int y, int w, int h, uint32_t f
     return nullptr;
   }
   void* win = g_create(title, x, y, w, h, flags);
-  g_last_win = win;
   g_creates++;
-  if (cssvr::Settings_WinSizePlausible(w, h)) {
-    g_last_w = cssvr::Settings_ClampWin(w, 640, 3840);
-    g_last_h = cssvr::Settings_ClampWin(h, 480, 2160);
+  if (cssvr::Settings_PreferPersistWin(g_last_win != nullptr, g_last_w, g_last_h, w, h)) {
+    g_last_win = win;
+    if (cssvr::Settings_WinSizePlausible(w, h)) {
+      g_last_w = cssvr::Settings_ClampWin(w, 640, 3840);
+      g_last_h = cssvr::Settings_ClampWin(h, 480, 2160);
+    }
   }
   Log("SDL_CreateWindow #%d '%s' %dx%d flags 0x%x->0x%x win=%p", g_creates,
       title ? title : "", w, h, raw, flags, win);

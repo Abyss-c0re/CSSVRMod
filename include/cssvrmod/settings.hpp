@@ -30,6 +30,18 @@ inline bool Settings_WinSizePlausible(int w, int h) {
   return w >= 640 && h >= 480 && w <= 4096 && h <= 2304;
 }
 
+/// Which CreateWindow is the persist target. First window always (1×1 then SetWindowSize).
+/// Later window only if plausible and area >= current — splash must not steal the game.
+inline bool Settings_PreferPersistWin(bool have_cur, int cur_w, int cur_h, int w, int h) {
+  if (!have_cur) return true;
+  if (!Settings_WinSizePlausible(w, h)) return false;
+  const int nw = Settings_ClampWin(w, 640, 3840);
+  const int nh = Settings_ClampWin(h, 480, 2160);
+  const long cur = (long)cur_w * (long)cur_h;
+  if (cur <= 0) return true;
+  return (long)nw * (long)nh >= cur;
+}
+
 /// True if clamped size differs. Does not write the file.
 inline bool Settings_NoteWinSize(Settings* s, int w, int h) {
   if (!s || !Settings_WinSizePlausible(w, h)) return false;

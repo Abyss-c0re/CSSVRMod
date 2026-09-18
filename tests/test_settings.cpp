@@ -75,6 +75,16 @@ TEST(settings_format_launch_path) {
   ASSERT_TRUE(miss.find(" missing") != std::string::npos);
 }
 
+TEST(settings_prefer_persist_win) {
+  ASSERT_TRUE(Settings_PreferPersistWin(false, 0, 0, 1, 1)); // first, even tiny
+  ASSERT_TRUE(Settings_PreferPersistWin(false, 0, 0, 1920, 1080));
+  ASSERT_FALSE(Settings_PreferPersistWin(true, 1920, 1080, 640, 480)); // splash
+  ASSERT_FALSE(Settings_PreferPersistWin(true, 1920, 1080, 200, 200));
+  ASSERT_TRUE(Settings_PreferPersistWin(true, 1280, 720, 1920, 1080));
+  ASSERT_TRUE(Settings_PreferPersistWin(true, 0, 0, 1920, 1080)); // last was unknown
+  ASSERT_TRUE(Settings_PreferPersistWin(true, 1920, 1080, 1920, 1080));
+}
+
 TEST(settings_note_win_size_and_debounce) {
   Settings s;
   s.win_w = 1920;

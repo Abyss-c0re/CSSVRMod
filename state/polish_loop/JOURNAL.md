@@ -208,6 +208,10 @@ First `--print`/`--settings`/spawn seeds default launch.cfg if missing (no overw
 
 PollEvent persist only matches the last CSS window id (splash resize must not overwrite). Offline 92/92. Not HMD-proven.
 
+## 2026-09-18 cycle 40
+
+CreateWindow persist target prefers larger/first window; splash must not steal. Offline 93/93. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.
