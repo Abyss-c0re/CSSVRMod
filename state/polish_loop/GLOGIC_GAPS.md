@@ -10,6 +10,7 @@
 - [ ] Dual paint proven in-game (HMD). Offline green ≠ stereo. Layout miss on a given RT stays gated.
 - [x] Why `VkCaptureEye` misses: color RTs lacked TRANSFER_SRC; last RT only tracked BeginRenderPass (cycle 21). Dynamic rendering + GENERAL retry added. In-game copy still unproven.
 - [x] Same-frame submit must use **identity VIEW pose** (cycle 1). Pose IPD on a mono frame = two planes + black.
+- [x] Dual-eye blit drops UV IPD (cycle 41). `CalibSubmitCrop(..., painted_dual)` — Vision pan stays; a second UV plane on two world paints is heresy.
 - [x] HMD writes `CViewSetup` angles for both eye paints (cycle 6). Shared orientation. No guessed `SetViewAngles`.
 - [x] `SetViewAngles` only after Get+Set roundtrip + `engine.so` dladdr (cycle 7). No write if the self-test fails.
 - [x] ViewAngles self-test miss toasts once (cycle 20). Engine yaw stay-off is not silent.

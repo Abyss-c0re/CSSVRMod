@@ -65,6 +65,11 @@ inline EyeBlit CalibEye(const Calib& raw, int eye, bool painted_dual = false) {
   return b;
 }
 
+/// Lens blit crop. `painted_dual` is required — default CalibEye is mono Vision.
+inline EyeBlit CalibSubmitCrop(const Calib& raw, int eye, bool painted_dual) {
+  return CalibEye(raw, eye, painted_dual);
+}
+
 /// Parse `key value` text (cfg / unit tests). Unknown keys ignored.
 inline bool ParseCalibText(const char* text, Calib* out) {
   if (!text || !out) return false;

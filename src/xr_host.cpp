@@ -435,7 +435,7 @@ bool SetupInput() {
   return true;
 }
 
-void BlitToSwapchain(unsigned int src, int srcW, int srcH, int eye, bool vflip) {
+void BlitToSwapchain(unsigned int src, int srcW, int srcH, int eye, bool vflip, bool painted_dual) {
   uint32_t idx = 0;
   XrSwapchainImageAcquireInfo ac{XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO};
   if (xrAcquireSwapchainImage(g_sc[eye], &ac, &idx) != XR_SUCCESS) return;
@@ -455,7 +455,7 @@ void BlitToSwapchain(unsigned int src, int srcW, int srcH, int eye, bool vflip) 
     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, src, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, df);
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst, 0);
-    const EyeBlit crop = CalibEye(CalibLive(), eye);
+    const EyeBlit crop = CalibSubmitCrop(CalibLive(), eye, painted_dual);
     const GLint sx0 = (GLint)(crop.u0 * (float)srcW);
     const GLint sx1 = (GLint)(crop.u1 * (float)srcW);
     GLint sy0 = (GLint)(crop.v0 * (float)srcH);
@@ -640,8 +640,8 @@ bool XrHostSubmitEyes(unsigned int gl_l, unsigned int gl_r, int src_w, int src_h
   if (!g_begun || !g_fs.shouldRender) return false;
   if (!g_sc[0] || !g_sc[1]) return false;
   const bool dual = painted_dual && g_note_dual && gl_l && gl_r && gl_l != gl_r;
-  BlitToSwapchain(gl_l, src_w, src_h, 0, vflip);
-  BlitToSwapchain(dual ? gl_r : gl_l, src_w, src_h, 1, vflip);
+  BlitToSwapchain(gl_l, src_w, src_h, 0, vflip, dual);
+  BlitToSwapchain(dual ? gl_r : gl_l, src_w, src_h, 1, vflip, dual);
 
   // Pose IPD only when two distinct world paints were captured.
   XrView located[2] = {{XR_TYPE_VIEW}, {XR_TYPE_VIEW}};

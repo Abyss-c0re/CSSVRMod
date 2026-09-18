@@ -1,22 +1,23 @@
-# Cycle 40 — 2026-09-18
+# Cycle 41 — 2026-09-18
 
 ## Focus
 
-`persist-win-prefer-larger` — a later splash CreateWindow stole `g_last_win`.
+`submit-uv-drop-dual` — dual-eye blit still called `CalibEye` with the mono default.
 
 ## Did
 
-- First window is always the persist target (1×1 then SetWindowSize still works).
-- A later window only replaces it if plausible and area >= current. Splash cannot steal.
+- `BlitToSwapchain` takes `painted_dual` and uses `CalibSubmitCrop`.
+- Dual submit no longer adds a second UV IPD plane on top of origin IPD.
+- Vision H/V/scale pan still applies equally to both eyes.
 
 ## Did not
 
-- HMD walk (user-gated). Dual-origin remains P0 but in-game.
-- Menu / toast / print / help / cfg seed. No force `-noborder`.
+- HMD walk (user-gated). Dual paint still unproven in-game.
+- Menu / toast / print / help / cfg chrome. No force `-noborder`.
 
 ## Tests
 
-`cssvrmod_tests` — 93 passed, 0 failed (733 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 93 passed, 0 failed (735 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

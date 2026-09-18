@@ -100,12 +100,19 @@ TEST(stereo_pose_x_legal_only_after_dual_paint) {
 TEST(stereo_uv_crop_drops_fake_ipd_when_dual) {
   Calib c;
   c.eyescale = 1.f;
-  const auto mono_l = CalibEye(c, 0, false);
-  const auto mono_r = CalibEye(c, 1, false);
+  c.hoffset = 0.2f;
+  const auto mono_l = CalibSubmitCrop(c, 0, false);
+  const auto mono_r = CalibSubmitCrop(c, 1, false);
   ASSERT_TRUE(mono_l.u0 > mono_r.u0);
-  const auto dual_l = CalibEye(c, 0, true);
-  const auto dual_r = CalibEye(c, 1, true);
+  const auto dual_l = CalibSubmitCrop(c, 0, true);
+  const auto dual_r = CalibSubmitCrop(c, 1, true);
   ASSERT_NEAR(dual_l.u0, dual_r.u0, 0.0001);
+  ASSERT_NEAR(dual_l.u1, dual_r.u1, 0.0001);
   ASSERT_NEAR(dual_l.pose_x, 0.f, 0.0001);
   ASSERT_NEAR(dual_r.pose_x, 0.f, 0.0001);
+  // Shared Vision pan stays; it is not a second IPD plane.
+  Calib flat = c;
+  flat.hoffset = 0.f;
+  const auto centered = CalibSubmitCrop(flat, 0, true);
+  ASSERT_TRUE(dual_l.u0 > centered.u0);
 }
