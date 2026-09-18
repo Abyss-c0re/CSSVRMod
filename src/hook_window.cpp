@@ -40,6 +40,7 @@ using SetSizeFn = void (*)(void*, int, int);
 using GetSizeFn = void (*)(void*, int*, int*);
 using DestroyFn = void (*)(void*);
 using PollEventFn = int (*)(void*);
+using GetWinIdFn = uint32_t (*)(void*);
 using XChangePropFn = int (*)(Display*, Window, Atom, Atom, int, int, const unsigned char*, int);
 
 extern "C" void* SDL_CreateWindow(const char*, int, int, int, int, uint32_t);
@@ -58,6 +59,7 @@ SetSizeFn g_set_size = nullptr;
 GetSizeFn g_get_size = nullptr;
 DestroyFn g_destroy = nullptr;
 PollEventFn g_poll = nullptr;
+GetWinIdFn g_get_id = nullptr;
 XChangePropFn g_xchange = nullptr;
 void* g_last_win = nullptr;
 int g_creates = 0;
@@ -121,6 +123,9 @@ void EnsureSdl() {
     if (!g_poll) g_poll = (PollEventFn)dlsym(RTLD_NEXT, "SDL_PollEvent");
     if (g_poll == (PollEventFn)SDL_PollEvent) g_poll = nullptr;
   }
+  if (!g_get_id)
+    g_get_id = (GetWinIdFn)(sdl ? dlsym(sdl, "SDL_GetWindowID")
+                                : dlsym(RTLD_NEXT, "SDL_GetWindowID"));
 }
 
 void EnsureX11() {
@@ -233,7 +238,9 @@ int SDL_PollEvent(void* event) {
   EnsureSdl();
   const int r = g_poll ? g_poll(event) : 0;
   int w = 0, h = 0;
-  if (r == 1 && event && cssvr::SdlEventWinSize(event, 56, &w, &h)) PersistWinSize(w, h, false);
+  const uint32_t want = (g_last_win && g_get_id) ? g_get_id(g_last_win) : 0;
+  if (r == 1 && event && cssvr::SdlEventWinSizeFor(event, 56, want, &w, &h))
+    PersistWinSize(w, h, false);
   return r;
 }
 

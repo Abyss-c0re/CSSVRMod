@@ -24,7 +24,7 @@ inline uint32_t SanitizeSdlWindowFlags(uint32_t flags, bool allow_noborder) {
 }
 
 /// Parse SDL_WINDOWEVENT RESIZED / SIZE_CHANGED without linking SDL.
-inline bool SdlEventWinSize(const void* ev, int ev_bytes, int* w, int* h) {
+inline bool SdlEventWinSize(const void* ev, int ev_bytes, int* w, int* h, uint32_t* window_id) {
   if (!ev || ev_bytes < 24 || !w || !h) return false;
   const unsigned char* p = static_cast<const unsigned char*>(ev);
   uint32_t type = 0;
@@ -38,7 +38,20 @@ inline bool SdlEventWinSize(const void* ev, int ev_bytes, int* w, int* h) {
   if (dw <= 0 || dh <= 0) return false;
   *w = (int)dw;
   *h = (int)dh;
+  if (window_id) std::memcpy(window_id, p + 8, 4);
   return true;
+}
+
+inline bool SdlEventWinSize(const void* ev, int ev_bytes, int* w, int* h) {
+  return SdlEventWinSize(ev, ev_bytes, w, h, nullptr);
+}
+
+/// Splash/popup resize must not persist. want_id 0 = no last CSS window.
+inline bool SdlEventWinSizeFor(const void* ev, int ev_bytes, uint32_t want_id, int* w, int* h) {
+  if (want_id == 0) return false;
+  uint32_t got = 0;
+  if (!SdlEventWinSize(ev, ev_bytes, w, h, &got)) return false;
+  return got == want_id;
 }
 
 } // namespace cssvr

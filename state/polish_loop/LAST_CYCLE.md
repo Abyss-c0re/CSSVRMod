@@ -1,23 +1,23 @@
-# Cycle 38 — 2026-09-18
+# Cycle 39 — 2026-09-18
 
 ## Focus
 
-`seed-launch-cfg` — first `--print` reported launch.cfg missing.
+`persist-resize-last-win` — PollEvent persisted any window resize (splash could write 640×480).
 
 ## Did
 
-- `--print` / `--settings` / spawn seed default launch.cfg if the file is absent.
-- Never overwrite an existing file. `--help` / `--find` do not write.
+- `SdlEventWinSizeFor` requires SDL window id == last CSS window.
+- PollEvent no longer writes launch.cfg from a popup/splash resize.
 
 ## Did not
 
 - HMD walk (user-gated). Dual-origin remains P0 but in-game.
-- Menu chrome / toasts / print-* / help-* ladder. No force `-noborder`.
+- Menu / toast / print / help / launch.cfg seed. No force `-noborder`.
 
 ## Tests
 
-`cssvrmod_tests` — 92 passed, 0 failed (722 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 92 passed, 0 failed (726 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`idle-no-shell-ladder` — desktop shell is enough. Close with no commit unless a real offline bug appears. Never queue `dual-renderview-ipd-origin`.
+`idle-no-shell-ladder` — close with no commit unless a real offline bug appears. Never queue `dual-renderview-ipd-origin`.

@@ -113,6 +113,13 @@ TEST(sdl_event_win_size) {
   ev[12] = 1; // shown
   ASSERT_FALSE(SdlEventWinSize(ev, 56, &w, &h));
   ASSERT_FALSE(SdlEventWinSize(ev, 8, &w, &h));
+  ev[12] = kSdlWindowEventResized;
+  uint32_t wid = 7;
+  std::memcpy(ev + 8, &wid, 4);
+  ASSERT_TRUE(SdlEventWinSizeFor(ev, 56, 7, &w, &h));
+  ASSERT_EQ(w, 1280);
+  ASSERT_FALSE(SdlEventWinSizeFor(ev, 56, 8, &w, &h)); // splash / other window
+  ASSERT_FALSE(SdlEventWinSizeFor(ev, 56, 0, &w, &h)); // no last CSS window
 }
 
 TEST(sdl_window_flags_force_decorated) {
