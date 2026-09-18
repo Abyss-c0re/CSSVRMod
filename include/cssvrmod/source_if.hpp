@@ -1,5 +1,6 @@
 #pragma once
 // Source CreateInterface probe. No guessed vtable calls unless a self-test passes.
+#include "collision.hpp"
 #include "vec3.hpp"
 #include <cmath>
 #include <string>
@@ -21,6 +22,8 @@ struct EngineIf {
   bool angles_ok = false; // Get/SetViewAngles roundtrip
   int get_angles_idx = -1;
   int set_angles_idx = -1;
+  bool trace_ok = false; // IEngineTrace TraceRay self-test
+  int trace_ray_idx = -1;
   bool ok = false;
   const char* reason = "idle";
 };
@@ -64,5 +67,8 @@ bool EngineClientCmd(const EngineIf& e, const char* cmd);
 /// Get/Set viewangles only after angles_ok self-test.
 bool EngineGetViewAngles(const EngineIf& e, Ang3* out);
 bool EngineSetViewAngles(const EngineIf& e, const Ang3& a);
+
+/// Hull/point sweep. Empty function if !trace_ok.
+TraceFn EngineMakeTraceFn(const EngineIf& e);
 
 } // namespace cssvr

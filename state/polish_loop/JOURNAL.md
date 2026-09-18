@@ -52,6 +52,11 @@ Analog XR → `CUserCmd` via `IClientMode::CreateMove` (RTTI + xmm0/rsi self-tes
 
 Apply XR overlay *after* the original CreateMove (orig was wiping analog). Vulkan path no longer also sends +forward when the hook is live. Overlay mailbox mutexed.
 
+## 2026-09-18 cycle 9
+
+`IEngineTrace::TraceRay` gated on dladdr + sane fraction (003/004). Last-free hull hooked into Tick when the probe passes. Offline 55/55. Not HMD-proven collision.
+
+
 
 
 

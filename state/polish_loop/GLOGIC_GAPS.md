@@ -19,7 +19,8 @@
 
 ## P2 — world law
 
-- [ ] `IEngineTrace` wired; collision last-free sweep runs on live hands.
+- [x] `IEngineTrace::TraceRay` self-test + Tick last-free hull (cycle 9). No write if fraction insane.
+- [ ] Live wall collision proven in-game (HMD).
 - [ ] Melee / knife from hand velocity in live CSS.
 
 ## Honest limits (do not delete)

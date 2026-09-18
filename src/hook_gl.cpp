@@ -335,6 +335,7 @@ void HookOnSwap() {
     tin.input = g_icfg;
     tin.melee = g_mcfg;
     tin.current_view = xr.hmd.ang;
+    tin.trace = EngineMakeTraceFn(g_eng);
     TickOut tout = Tick(tin, g_leftWall, g_rightWall, &g_nextMelee);
     UserCmd_NoteOverlay(tout.cmd);
     ApplyClientCmd(tout.cmd, g_prevCmd);

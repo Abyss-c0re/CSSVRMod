@@ -37,6 +37,7 @@ add_executable(cssvrmod_tests
   tests/test_vk_eye.cpp
   tests/test_look.cpp
   tests/test_usercmd.cpp
+  tests/test_engine_trace.cpp
 )
 target_include_directories(cssvrmod_tests PRIVATE
   ${CSSVR_ROOT}/include

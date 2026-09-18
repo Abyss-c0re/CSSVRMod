@@ -1,25 +1,25 @@
-# Cycle 8 — 2026-09-18
+# Cycle 9 — 2026-09-18
 
 ## Focus
 
-`live-xr-input-proven` — analog stick into `CUserCmd`, not only `+forward`.
+`ienginetrace-live` — last-free hull on live hands.
 
 ## Did
 
-- `usercmd.hpp`: detect vptr vs no-vptr via sane viewangles; apply forward/side/up/buttons.
-- Locate `ClientModeShared::CreateMove` by RTTI + `xmm0` dt + `rsi` cmd (slot 22 on this CSS).
-- Vtable hook applies the last `InputMap` overlay. Movement `ClientCmd` skipped if hooked.
-- Offline locator ran on live `client.so`.
+- `engine_trace.hpp`: Ray_t hull init (Source center/extents) + CGameTrace field map.
+- `TraceRay` self-test: `engine.so` dladdr + downward point ray; fraction must be sane.
+- Index 4 (Trace003) or 5 (Trace004). One-shot probe.
+- hook_gl Tick uses `EngineMakeTraceFn` only when `trace_ok`.
 
 ## Did not
 
-- Claim in-game XR controls from offline green.
-- Hook `IEngineTrace` (next).
+- Claim live wall collision from offline green.
+- Wire melee hull to the same trace (next).
 
 ## Tests
 
-`cssvrmod_tests` — 50 passed, 0 failed (366 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 55 passed, 0 failed (380 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`ienginetrace-live` — last-free hull on live hands.
+`melee-live-hands` — knife / fist from hand velocity using this trace.

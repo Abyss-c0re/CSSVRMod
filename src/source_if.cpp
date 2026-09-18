@@ -1,4 +1,5 @@
 #include "cssvrmod/source_if.hpp"
+#include "cssvrmod/engine_trace.hpp"
 #include <dlfcn.h>
 #include <cstdio>
 #include <cstring>
@@ -21,6 +22,34 @@ void* ProbeNamed(CreateInterfaceFn fn, const char* const* names, const char** us
     }
   }
   return nullptr;
+}
+
+class WorldOnlyFilter {
+public:
+  virtual bool ShouldHitEntity(void*, int) { return false; }
+  virtual int GetTraceType() const { return kTraceWorldOnly; }
+};
+
+using TraceRayFn = void (*)(void*, const RayBlob*, unsigned, void*, void*);
+
+static bool TraceRaySelfTest(void* trace, int idx) {
+  if (!trace || idx < 0) return false;
+  auto** vt = *reinterpret_cast<TraceRayFn**>(trace);
+  if (!vt || !vt[idx]) return false;
+  Dl_info info{};
+  if (!dladdr(reinterpret_cast<void*>(vt[idx]), &info) || !info.dli_fname ||
+      !std::strstr(info.dli_fname, "engine.so"))
+    return false;
+  RayBlob ray{};
+  Ray_InitHull(&ray, {0.f, 0.f, 128.f}, {0.f, 0.f, -256.f}, {0, 0, 0}, {0, 0, 0});
+  unsigned char tr[128]{};
+  WorldOnlyFilter filter;
+  vt[idx](trace, &ray, kMaskSolid, &filter, tr);
+  float frac = 2.f;
+  std::memcpy(&frac, tr + kTrFraction, 4);
+  Vec3 end{};
+  std::memcpy(&end, tr + kTrEnd, 12);
+  return TraceBlobSane(frac, end);
 }
 
 static bool ScreenSelfTest(void* engine, int* w, int* h) {
@@ -100,7 +129,30 @@ bool ProbeLiveEngine(EngineIf& out) {
       }
     }
   }
-  if (out.angles_ok) out.reason = "probed_angles_ok";
+  if (out.trace) {
+    static int trace_probe = 0; // 0 idle  1 fail  2 ok
+    static int ok_idx = -1;
+    if (trace_probe == 2) {
+      out.trace_ok = true;
+      out.trace_ray_idx = ok_idx;
+    } else if (trace_probe == 0) {
+      const int a = (out.trace_ver && std::strstr(out.trace_ver, "004")) ? 5 : 4;
+      const int b = (a == 4) ? 5 : 4;
+      int hit = -1;
+      if (TraceRaySelfTest(out.trace, a)) hit = a;
+      else if (TraceRaySelfTest(out.trace, b)) hit = b;
+      if (hit >= 0) {
+        out.trace_ok = true;
+        out.trace_ray_idx = hit;
+        ok_idx = hit;
+        trace_probe = 2;
+      } else {
+        trace_probe = 1;
+      }
+    }
+  }
+  if (out.trace_ok) out.reason = "probed_trace_ok";
+  else if (out.angles_ok) out.reason = "probed_angles_ok";
   else out.reason = out.screen_ok ? "probed_screen_ok" : "probed_no_screen";
   return true;
 }
@@ -130,6 +182,32 @@ bool EngineSetViewAngles(const EngineIf& e, const Ang3& a) {
   Ang3 tmp = a;
   vt[e.set_angles_idx](e.engine, &tmp);
   return true;
+}
+
+static TraceHit LiveHull(void* trace, int idx, Vec3 start, Vec3 end, Vec3 mins, Vec3 maxs) {
+  TraceHit miss;
+  miss.fraction = 1.f;
+  miss.end_pos = end;
+  if (!trace || idx < 0) return miss;
+  auto** vt = *reinterpret_cast<TraceRayFn**>(trace);
+  if (!vt || !vt[idx]) return miss;
+  RayBlob ray{};
+  Ray_InitHull(&ray, start, end, mins, maxs);
+  unsigned char tr[128]{};
+  WorldOnlyFilter filter;
+  vt[idx](trace, &ray, kMaskSolid, &filter, tr);
+  TraceHit hit = TraceHitFromBlob(tr, sizeof(tr));
+  if (!hit.hit && !hit.start_solid && !hit.all_solid) hit.end_pos = end;
+  return hit;
+}
+
+TraceFn EngineMakeTraceFn(const EngineIf& e) {
+  if (!e.trace_ok || !e.trace || e.trace_ray_idx < 0) return {};
+  void* tr = e.trace;
+  const int idx = e.trace_ray_idx;
+  return [tr, idx](Vec3 s, Vec3 epos, Vec3 mins, Vec3 maxs) {
+    return LiveHull(tr, idx, s, epos, mins, maxs);
+  };
 }
 
 } // namespace cssvr

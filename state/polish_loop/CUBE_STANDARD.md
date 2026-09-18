@@ -21,7 +21,7 @@ Same framebuffer submitted twice is **not** stereo. gVRMod forbids submitting on
 | Dual OUT submit | yes | VK per-eye copy after each paint; gated on two captures |
 | HMD drives look | yes | CViewSetup + SetViewAngles after roundtrip self-test |
 | Controls from XR | yes | CreateMove overlay hooked; not HMD-proven |
-| Wall / hand collision | last-free hull | C++ laws exist, **not wired to live traces** |
+| Wall / hand collision | last-free hull | TraceRay self-test + Tick; not HMD-proven |
 | Vision cal | scale→V→H→eye | cfg file only, no standalone UI |
 | Framed window | yes | yes (SDL/X11 hook) |
 | Honest no-HMD | toast | logs only |
