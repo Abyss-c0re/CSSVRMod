@@ -97,11 +97,14 @@ if(CSSVR_BUILD_HOOK AND NOT WIN32)
       ${CSSVR_ROOT}/src
       ${OPENXR_INCLUDE_DIR}
     )
+    # X11 + Xext only. FindX11's X11_LIBRARIES also pulls SM/ICE, which Steam
+    # pressure-vessel does not put on the search path (not in overrides / cache).
     target_link_libraries(cssvrmod_hook PRIVATE
       cssvrmod_core
       ${GL_LIB}
       ${GLX_LIB}
-      ${X11_LIBRARIES}
+      ${X11_X11_LIB}
+      ${X11_Xext_LIB}
       dl
     )
     target_compile_options(cssvrmod_hook PRIVATE -O2 -Wall -fvisibility=default)

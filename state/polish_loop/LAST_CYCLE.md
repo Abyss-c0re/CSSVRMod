@@ -1,14 +1,14 @@
-# Cycle 67 — 2026-09-18
+# Cycle 68 — 2026-09-18
 
 ## Focus
 
-`hook-delay-openxr` — Steam pressure-vessel cannot resolve `libopenxr_loader.so.1`, so LD_PRELOAD / plugin_load never mapped the hook.
+`hook-no-needed-sm-ice` — FindX11's `X11_LIBRARIES` NEEDED `libSM`/`libICE`. Steam PV has neither on the search path, so the hook still would not map after cycle 67.
 
 ## Did
 
-- Live CSS `2221372` still predates autoexec (19:20). LaunchOptions/plugin/VDF/autoexec are on disk. Hook NEEDED `libopenxr_loader.so.1`; PV overrides have the runtime under `openxr/`, not the Khronos loader. Loader exists only at `/run/host/usr/lib`.
-- Stopped linking `openxr_loader` into `cssvrmod_hook` (already `XR_NO_PROTOTYPES` + `dlopen`). Search sonames, then `/run/host/usr/lib{,64}` and `/usr/lib{,64}`.
-- Copied rebuilt hook into CSS `bin/linux64/`. Did not restart or inject the live process.
+- Live CSS `2221372` still predates autoexec (19:20). No cssvrmod in maps. LaunchOptions/plugin/VDF on disk.
+- Linked X11 + Xext only. Hook does not call SM/ICE. Those .so are not in PV overrides or ld.so.cache; X11/Xext/GL are already mapped.
+- Copied rebuilt hook into CSS `bin/linux64/`. Did not restart or inject.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 117 passed, 0 failed (934 asserts). Built `CSSVR` + `cssvrmod_hook`. `readelf` NEEDED has no `libopenxr_loader`.
+`cssvrmod_tests` — 117 passed, 0 failed (934 asserts). Built `CSSVR` + `cssvrmod_hook`. `readelf` NEEDED has no `libSM` / `libICE` / `libopenxr_loader`.
 
 ## Next
 

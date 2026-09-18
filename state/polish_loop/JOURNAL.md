@@ -304,6 +304,10 @@ Idle hunt. Live Steam CSS `2221372` still predates autoexec; no hook in maps. La
 
 Hook no longer NEEDs `libopenxr_loader`. Steam PV cannot resolve that .so (runtime is under overrides/openxr). Delay-load + `/run/host/usr/lib` search. Offline 117/117. Not HMD-proven. Restart CSS from the menu.
 
+## 2026-09-18 cycle 68
+
+Hook no longer NEEDs libSM/libICE. FindX11 pulled session libs PV cannot resolve. Link X11+Xext only. Offline 117/117. Not HMD-proven. Restart CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
