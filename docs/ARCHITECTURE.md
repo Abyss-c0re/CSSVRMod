@@ -10,10 +10,10 @@ Priority: OpenGL/togl (gVRMod Linux)     Also: DX9 CreateTexture (original modul
    SDL_GL_SwapWindow / glXSwap             Windows shaderapidx9.dll
                                            Linux libtogl.so (same D3D9 ABI)
 Default launch: `-vulkan` + decorated window. Each `vkQueuePresentKHR` copies
-the swapchain off-thread. Submit is gmod-style synthetic stereo: the same CSS
-frame is blitted into both eye swapchains with a slight horizontal / IPD offset
-and projected onto each eye FOV (not a cinema quad, not full world-space IPD).
-`CSSVR_XR=0` skips submit.
+the swapchain off-thread. Submit is still one CSS present (identity VIEW pose).
+`stereo_view.hpp` is the gmod dual-origin law (same angles, origin ± head Right ×
+halfIPD). Pose IPD stays 0 until `CViewRender` paints both eyes. `CSSVR_XR=0`
+skips submit.
 ```
 
 ## Layers
@@ -27,7 +27,8 @@ and projected onto each eye FOV (not a cinema quad, not full world-space IPD).
 | Hook window | `src/hook_window.cpp` | strip `SDL_WINDOW_BORDERLESS` / Motif no-decor |
 | Hook DX9 | `src/hook_d3d9.cpp` | original vrmod `CreateTexture` / `Present` (togl) |
 | Hook VK | `src/hook_vk.cpp` | 64-bit CSS `shaderapivk` present (fallback) |
-| XR | `src/xr_host.cpp` | Session + dual-eye projection, same frame + slight IPD |
+| XR | `src/xr_host.cpp` | Session + dual-eye projection; pose IPD gated on dual paint |
+| Stereo | `include/cssvrmod/stereo_view.hpp` | IPD origins + heresy gate (pure) |
 | Engine | `src/source_if.cpp` | `CreateInterface` probe; `ClientCmd` only after GetScreenSize self-test |
 
 ## Combat (from Lua)
@@ -39,7 +40,7 @@ and projected onto each eye FOV (not a cinema quad, not full world-space IPD).
 
 ## Honest limits (do not claim HMD smoke from offline green)
 
-- Submit is **mono capture → both eyes, identity VIEW pose, UV Vision crop**. Pose IPD on that frame was two planes + black (heresy). Dual `RenderView` is still P0.
+- Submit is **mono capture → both eyes, identity VIEW pose, UV Vision crop**. Dual-origin law is in `stereo_view.hpp`; live `CViewRender` two-paint is still P0.
 - World traces in-game need `IEngineTrace` wired (P2). Offline tests inject a `TraceFn`.
 - `ClientCmd` digital move/fire is P0; analog `CUserCmd` is P2.
 - Offline `cssvrmod_tests` ≠ headset-proven.

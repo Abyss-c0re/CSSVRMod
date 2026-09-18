@@ -1,27 +1,26 @@
-# Cycle 1 — 2026-09-18
+# Cycle 2 — 2026-09-18
 
 ## Focus
 
-Stop same-frame **projection pose IPD**. User: two planes, no stereo, black frames.
+`dual-renderview-ipd-origin` — gmod method: same angles, origin ± head Right × halfIPD.
 
 ## Did
 
-- Confessed: this is still a mono CSS present, not a VRMOD.
-- `CalibEye.pose_x` is always 0. xrEndFrame uses identity VIEW pose + HMD FOV.
-- UV `eyescale` crop remains for Vision dials only.
-- Stood up `state/polish_loop/` and a 13-minute audit scheduler.
-- Offline tests after the submit law change.
+- `stereo_view.hpp`: halfIPD from `ipd_m * scale * 0.5 * eyescale`; L/R origins along head right.
+- Pose IPD (`StereoView_SubmitPoseX`) is 0 unless `painted_dual` — mono present still identity VIEW.
+- Dual paint drops UV eyescale stereo so IPD is not a second plane on the same frame.
+- xrEndFrame calls the law with `painted_dual=false` (no live second CSS world paint yet).
+- Offline tests for origin offset, yaw, heresy gate, UV crop.
 
 ## Did not
 
-- Dual RenderView (next_focus).
-- Standalone settings UI.
-- Live IEngineTrace collisions.
+- Hook `CViewRender::RenderView` / live two paints (next_focus). No guessed vtable.
+- Claim stereo or HMD from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — see journal after build.
+`cssvrmod_tests` — 33 passed, 0 failed (282 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`dual-renderview-ipd-origin` — hook CSS view origin, paint twice, then pose IPD is legal.
+`hook-cviewrender-dual-paint` — intercept CSS view, paint left then right with this law, then `painted_dual=true`.

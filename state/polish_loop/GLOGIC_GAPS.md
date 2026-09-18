@@ -2,7 +2,8 @@
 
 ## P0 — stereo is fake
 
-- [ ] Hook CSS `CViewSetup` / `CViewRender::RenderView` and paint **left then right** with origin ± IPD along head right (gmod method).
+- [x] Dual-origin law: cyclopean ± head-right × halfIPD; pose IPD gated on `painted_dual` (cycle 2).
+- [ ] Hook CSS `CViewSetup` / `CViewRender::RenderView` and paint **left then right** with that law (sets `painted_dual`).
 - [x] Same-frame submit must use **identity VIEW pose** (cycle 1). Pose IPD on a mono frame = two planes + black.
 - [ ] HMD orientation writes game viewangles (look around is VR).
 

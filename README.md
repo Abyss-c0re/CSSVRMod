@@ -6,7 +6,7 @@ OpenXR · texture hook · C++ combat laws (from gVRMod Lua)</p>
 **Repo name is `CSSVRMod` (that letter case).** Sibling of [gVRMod](https://github.com/Abyss-c0re/gVRMod). Start it from the **Cube** launcher (New Game → category **CSSVRMod**) or `scripts/CSSVR.sh`.
 
 - **Texture hook** — Vulkan `vkQueuePresentKHR` (working 64-bit CSS path). OpenGL/togl is the gVRMod Linux priority; DX9 is the original vrmod `CreateTexture` path.
-- **OpenXR** — same-frame slight-IPD stereo (gmod synthetic) + shared controller paths
+- **OpenXR** — one CSS present on the lenses (identity VIEW pose until dual `RenderView`) + shared controller paths
 - **Cube** — gVRMod `CubeUI` Start Game on the CSSVRMod category execs this launcher
 - **Combat** — melee, hand-bullet, wall, gun-aim — ported from `vrmod-x64` Lua to **pure C++**
 

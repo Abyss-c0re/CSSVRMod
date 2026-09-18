@@ -18,7 +18,7 @@ Same framebuffer submitted twice is **not** stereo. gVRMod forbids submitting on
 
 | Law | gVRMod | CSSVRMod now |
 |-----|--------|----------------|
-| Dual OUT submit | yes | no — one CSS present |
+| Dual OUT submit | yes | no — one CSS present; origin law ready |
 | HMD drives look | yes | no — mouse/game view |
 | Controls from XR | yes | stub poll + SDL inject, not live-proven |
 | Wall / hand collision | last-free hull | C++ laws exist, **not wired to live traces** |

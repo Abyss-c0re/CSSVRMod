@@ -1,6 +1,7 @@
 #include "xr_host.hpp"
 #include "cssvrmod/calib.hpp"
 #include "cssvrmod/input.hpp"
+#include "cssvrmod/stereo_view.hpp"
 #include "openxr_paths.hpp"
 
 #include <cstdarg>
@@ -480,9 +481,7 @@ bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vfli
   BlitToSwapchain(gl_tex, src_w, src_h, 0, vflip);
   BlitToSwapchain(gl_tex, src_w, src_h, 1, vflip);
 
-  // Same CSS frame, mapped onto each lens. Identity VIEW pose — any pose IPD
-  // on this mono present is two floating planes with black around them.
-  // True stereo is a second world paint (next polish-loop focus).
+  // One CSS present. Pose IPD stays 0 until CViewRender paints both IPD origins.
   XrView located[2] = {{XR_TYPE_VIEW}, {XR_TYPE_VIEW}};
   uint32_t nloc = 0;
   if (xrLocateViews && g_view) {
@@ -496,11 +495,12 @@ bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vfli
   XrFovf fallback{-0.85f, 0.85f, 0.85f, -0.85f};
 
   const Calib cal = CalibLive();
+  const bool painted_dual = false;
   XrCompositionLayerProjectionView pv[2]{};
   for (int e = 0; e < 2; ++e) {
     pv[e].type = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
     pv[e].pose.orientation.w = 1.f;
-    pv[e].pose.position.x = 0.f;
+    pv[e].pose.position.x = StereoView_SubmitPoseX(cal, e, painted_dual);
     pv[e].fov = (nloc >= 2) ? located[e].fov : fallback;
     pv[e].subImage.swapchain = g_sc[e];
     pv[e].subImage.imageRect.offset = {0, 0};

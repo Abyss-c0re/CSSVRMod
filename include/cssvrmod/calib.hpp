@@ -39,16 +39,16 @@ struct EyeBlit {
   float pose_x = 0.f; // VIEW-space metres
 };
 
-// Same-frame synthetic stereo. Gains match vrmod ComputeSubmitBounds.
-inline EyeBlit CalibEye(const Calib& raw, int eye) {
+// Vision UV crop. Dual world paints own IPD (stereo_view.hpp); UV stereo then drops.
+inline EyeBlit CalibEye(const Calib& raw, int eye, bool painted_dual = false) {
   const Calib c = ClampCalib(raw);
   if (c.swap_eyes) eye = 1 - eye;
   const float halfU = std::max(0.02f, 0.5f / c.scalefactor);
   const float halfV = std::max(0.02f, 0.5f / c.scalefactor);
   const float panU = c.hoffset * 0.22f;
   const float panV = c.voffset * 0.45f;
-  // Opposite U shift per eye — this is the "eye" / IPD dial.
-  const float stereo = 0.04f * c.eyescale;
+  // Mono: eyescale is a UV crop. Dual paint: IPD is origin, not a second UV plane.
+  const float stereo = painted_dual ? 0.f : (0.04f * c.eyescale);
   float cx = 0.5f + (eye == 0 ? stereo : -stereo);
   float cy = 0.5f;
   cx = cx + (0.5f - cx) * c.lens_bend;
@@ -60,8 +60,7 @@ inline EyeBlit CalibEye(const Calib& raw, int eye) {
   b.v1 = CalibClamp(cy + halfV - panV, 0.f, 1.f);
   if (b.u1 < b.u0 + 0.04f) b.u1 = CalibClamp(b.u0 + 0.04f, 0.f, 1.f);
   if (b.v1 < b.v0 + 0.04f) b.v1 = CalibClamp(b.v0 + 0.04f, 0.f, 1.f);
-  // Same-frame law: IPD in projection pose makes two floating planes + black
-  // frames. pose_x stays 0 until a real second RenderView exists.
+  // pose_x stays 0 here. Submit uses StereoView_SubmitPoseX(painted_dual).
   b.pose_x = 0.f;
   return b;
 }
