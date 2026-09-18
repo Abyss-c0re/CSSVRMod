@@ -2,6 +2,7 @@
 #include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/menu3d.hpp"
+#include "cssvrmod/plugin_hook.hpp"
 #include "test_framework.h"
 
 using namespace cssvr;
@@ -56,6 +57,21 @@ TEST(install_plan_paths) {
   std::string steam = FormatSteamLaunch(p.hook_dst);
   ASSERT_TRUE(steam.find("LD_PRELOAD=") != std::string::npos);
   ASSERT_TRUE(steam.find("CSSVR_XR=0") != std::string::npos);
+}
+
+TEST(plugin_bind_allows_rtld_default) {
+  ASSERT_TRUE(Plugin_DlsymAllow(RTLD_DEFAULT, true));
+  ASSERT_FALSE(Plugin_DlsymAllow(nullptr, false));
+  ASSERT_TRUE(Plugin_DlsymAllow(reinterpret_cast<void*>(1), false));
+  ASSERT_STREQ(Plugin_HookSoname(), "libcssvrmod_hook.so");
+  char path[256];
+  ASSERT_TRUE(Plugin_HookPathFromPlugin("/opt/css/cstrike/addons/cssvrmod/cssvrmod_plugin.so",
+                                        path, 256));
+  ASSERT_TRUE(std::strstr(path, "/opt/css/cstrike/addons/cssvrmod/../../../bin/linux64/") !=
+              nullptr);
+  ASSERT_TRUE(std::strstr(path, "libcssvrmod_hook.so") != nullptr);
+  ASSERT_FALSE(Plugin_HookPathFromPlugin("cssvrmod_plugin.so", path, 256));
+  ASSERT_FALSE(Plugin_HookPathFromPlugin(nullptr, path, 256));
 }
 
 TEST(autoexec_plugin_load_once) {

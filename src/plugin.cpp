@@ -1,5 +1,6 @@
 // Source server plugin — plugin_load addons/cssvrmod/cssvrmod_plugin
 // Loads the hook if Steam was started without LD_PRELOAD, then late-attaches present.
+#include "cssvrmod/plugin_hook.hpp"
 #include <cstdio>
 #include <cstring>
 #include <dlfcn.h>
@@ -24,8 +25,8 @@ void Log(const char* m) {
   std::fclose(f);
 }
 
-bool BindHook(void* h) {
-  if (!h) return false;
+bool BindHook(void* h, bool default_search) {
+  if (!cssvr::Plugin_DlsymAllow(h, default_search)) return false;
   g_late = (LateFn)dlsym(h, "CssvrLateAttach");
   g_enable = (EnableFn)dlsym(h, "CssvrEnable");
   g_try = (TryFn)dlsym(h, "CssvrTryConsoleLine");
@@ -33,22 +34,24 @@ bool BindHook(void* h) {
 }
 
 bool OpenHook() {
-  if (BindHook(RTLD_DEFAULT)) return true;
-  Dl_info info{};
-  std::string hook = "libcssvrmod_hook.so";
-  if (dladdr((void*)&OpenHook, &info) && info.dli_fname) {
-    std::string p(info.dli_fname);
-    auto slash = p.find_last_of('/');
-    if (slash != std::string::npos) p.resize(slash);
-    // .../cstrike/addons/cssvrmod → ../../../bin/linux64
-    hook = p + "/../../../bin/linux64/libcssvrmod_hook.so";
+  if (BindHook(RTLD_DEFAULT, true)) return true;
+  void* loaded = dlopen(cssvr::Plugin_HookSoname(), RTLD_NOW | RTLD_NOLOAD);
+  if (BindHook(loaded, false)) {
+    g_hook = loaded;
+    return true;
   }
+  char path[512];
+  std::string hook = cssvr::Plugin_HookSoname();
+  Dl_info info{};
+  if (dladdr((void*)&OpenHook, &info) && info.dli_fname &&
+      cssvr::Plugin_HookPathFromPlugin(info.dli_fname, path, (int)sizeof(path)))
+    hook = path;
   g_hook = dlopen(hook.c_str(), RTLD_NOW | RTLD_GLOBAL);
   if (!g_hook) {
     Log(dlerror() ? dlerror() : "dlopen hook failed");
     return false;
   }
-  return BindHook(g_hook);
+  return BindHook(g_hook, false);
 }
 
 class Plugin {

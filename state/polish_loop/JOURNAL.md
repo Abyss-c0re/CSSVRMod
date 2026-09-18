@@ -324,6 +324,14 @@ Idle hunt. Same Steam CSS `2221372`; no hook in maps. VDF `addons/*.vdf` / `plug
 
 Steam LaunchOptions hook match uses basename. `.steam/steam` vs `.local/share/Steam` no longer stacks a second LD_PRELOAD. Offline 118/118. Not HMD-proven. Restart CSS from the menu.
 
+## 2026-09-18 cycle 73
+
+Idle hunt. Same Steam CSS `2221372`; no hook in maps. 23:00 log lines are host hook ctor/toasts, not this pid. No code. Not HMD-proven. Next: restart CSS from the menu.
+
+## 2026-09-18 cycle 74
+
+Plugin default-search bind allows Linux `RTLD_DEFAULT` (NULL). Then RTLD_NOLOAD soname, then constructed path. Offline 119/119. Not HMD-proven. Restart CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

@@ -1,13 +1,13 @@
-# Cycle 72 — 2026-09-18
+# Cycle 74 — 2026-09-18
 
 ## Focus
 
-`steam-launch-hook-basename` — `SteamLaunchHasHook` used the full path. `.steam/steam` vs `.local/share/Steam` (same file) would prepend a second `LD_PRELOAD` on re-install.
+`plugin-bind-rtld-default` — `BindHook` treated Linux `RTLD_DEFAULT` (NULL) as a missing handle, so `plugin_load` never dlsym'd an already-preloaded hook.
 
 ## Did
 
 - Live CSS `2221372` still predates autoexec (19:20). No cssvrmod in maps.
-- Match LaunchOptions on hook basename so symlink spellings do not stack `LD_PRELOAD`.
+- Default-search bind is allowed; then `RTLD_NOLOAD` of the hook soname; then the constructed `../../../bin/linux64` path. Copied rebuilt plugin into CSS addons.
 - Did not restart or inject CSS.
 
 ## Did not
@@ -18,8 +18,8 @@
 
 ## Tests
 
-`cssvrmod_tests` — 118 passed, 0 failed (945 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 119 passed, 0 failed (954 asserts). Built `CSSVR` + `cssvrmod_hook` + `cssvrmod_plugin`.
 
 ## Next
 
-`idle-no-shell-ladder` — restart CSS from the menu (not mid-map) so autoexec/`addons/*.vdf` can load the hook. Dual paint stays HMD-gated.
+`idle-no-shell-ladder` — restart CSS from the menu (not mid-map) so autoexec/`addons/*.vdf` can load. Dual paint stays HMD-gated.
