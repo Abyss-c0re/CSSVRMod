@@ -1,14 +1,14 @@
-# Cycle 41 — 2026-09-18
+# Cycle 42 — 2026-09-18
 
 ## Focus
 
-`submit-uv-drop-dual` — dual-eye blit still called `CalibEye` with the mono default.
+`client-base-maps` — `dlopen("client.so", NOLOAD)` misses CSS's path-loaded module.
 
 ## Did
 
-- `BlitToSwapchain` takes `painted_dual` and uses `CalibSubmitCrop`.
-- Dual submit no longer adds a second UV IPD plane on top of origin IPD.
-- Vision H/V/scale pan still applies equally to both eyes.
+- Parse `/proc/self/maps` for `client.so` (prefer r-x, keep full path).
+- `Module_ClientBase` tries short name, install path, then maps path + `dladdr`.
+- RenderView + CreateMove hooks share it. Log `renderview install try` so a miss is not silent.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 93 passed, 0 failed (735 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 94 passed, 0 failed (741 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

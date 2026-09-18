@@ -216,6 +216,10 @@ CreateWindow persist target prefers larger/first window; splash must not steal. 
 
 Dual-eye blit now uses `CalibSubmitCrop(..., painted_dual)` so UV IPD drops after two world paints. Vision pan stays. Offline 93/93. Not HMD-proven.
 
+## 2026-09-18 cycle 42
+
+`client.so` base from install path + `/proc/self/maps`. Short-name NOLOAD misses a path-loaded module so RenderView/CreateMove never patched. Offline 94/94. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

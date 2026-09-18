@@ -1,5 +1,6 @@
 #include "cssvrmod/dual_paint.hpp"
 #include "cssvrmod/launch.hpp"
+#include "cssvrmod/module_base.hpp"
 #include "cssvrmod/view_hook.hpp"
 #include "test_framework.h"
 #include <cstring>
@@ -155,4 +156,19 @@ TEST(dual_capture_miss_toast_after_hold) {
   in.captures = 0;
   in.incomplete_frames = DualCapture_MissHold();
   ASSERT_FALSE(DualCapture_ToastDecide(in).should_toast);
+}
+
+TEST(maps_module_prefers_exec_and_full_path) {
+  const char* maps =
+      "7f00000000-7f00001000 r--p 00000000 08:01 1 /opt/css/cstrike/bin/linux64/client.so\n"
+      "7f00001000-7f00080000 r-xp 00001000 08:01 1 /opt/css/cstrike/bin/linux64/client.so\n"
+      "7f00080000-7f00090000 r--p 00080000 08:01 1 /opt/css/cstrike/bin/linux64/client.so\n"
+      "7f10000000-7f10001000 r-xp 00000000 08:01 2 /usr/lib/libother.so\n";
+  ASSERT_EQ(Maps_ModuleBase(maps, "client.so"), (uintptr_t)0x7f00001000ull);
+  ASSERT_EQ(Maps_ModuleBase(maps, "nope.so"), (uintptr_t)0);
+  ASSERT_EQ(Maps_ModuleBase(nullptr, "client.so"), (uintptr_t)0);
+  char path[256] = {};
+  ASSERT_TRUE(Maps_ModulePath(maps, "client.so", path, (int)sizeof(path)));
+  ASSERT_STREQ(path, "/opt/css/cstrike/bin/linux64/client.so");
+  ASSERT_FALSE(Maps_ModulePath(maps, "missing.so", path, (int)sizeof(path)));
 }

@@ -4,6 +4,7 @@
 #include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/look.hpp"
+#include "cssvrmod/module_base.hpp"
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/toast.hpp"
 #include "cssvrmod/vk_eye.hpp"
@@ -171,20 +172,13 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
   NoteCaptureToast(r);
 }
 
-uintptr_t ClientBase() {
-  void* h = dlopen("client.so", RTLD_NOW | RTLD_NOLOAD);
-  if (!h) return 0;
-  void* ci = dlsym(h, "CreateInterface");
-  if (!ci) return 0;
-  Dl_info info{};
-  if (!dladdr(ci, &info) || !info.dli_fbase) return 0;
-  return reinterpret_cast<uintptr_t>(info.dli_fbase);
-}
+uintptr_t ClientBase(const char* full_path) { return Module_ClientBase(full_path); }
 
 } // namespace
 
 void ViewHookTryInstall() {
   if (g_orig) return;
+  Logf("renderview install try");
   CssInstall inst = FindCssInstall();
   if (!inst.found) {
     Logf("renderview locate skip: no css");
@@ -196,7 +190,7 @@ void ViewHookTryInstall() {
     NoteLocateToast(g_loc.reason ? g_loc.reason : "no_xref", false);
     return;
   }
-  const uintptr_t base = ClientBase();
+  const uintptr_t base = ClientBase(inst.client_so.c_str());
   if (!base) {
     Logf("renderview no client base (fn_rva=0x%llx)", (unsigned long long)g_loc.fn_rva);
     NoteLocateToast("no_client_base", false);

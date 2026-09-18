@@ -1,6 +1,7 @@
 #include "cssvrmod/create_move.hpp"
 #include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/launch.hpp"
+#include "cssvrmod/module_base.hpp"
 #include "cssvrmod/toast.hpp"
 #include "cssvrmod/usercmd.hpp"
 
@@ -50,15 +51,7 @@ bool HookedCreateMove(void* self, float dt, void* cmd) {
   return rc;
 }
 
-uintptr_t ClientBase() {
-  void* h = dlopen("client.so", RTLD_NOW | RTLD_NOLOAD);
-  if (!h) return 0;
-  void* ci = dlsym(h, "CreateInterface");
-  if (!ci) return 0;
-  Dl_info info{};
-  if (!dladdr(ci, &info) || !info.dli_fbase) return 0;
-  return reinterpret_cast<uintptr_t>(info.dli_fbase);
-}
+uintptr_t ClientBase(const char* full_path) { return Module_ClientBase(full_path); }
 
 void NoteCreateMoveToast(const char* reason, bool hooked) {
   CreateMoveToastIn in;
@@ -90,7 +83,7 @@ bool UserCmd_HookLive() {
     NoteCreateMoveToast(g_loc.reason ? g_loc.reason : "no_rtti", false);
     return false;
   }
-  const uintptr_t base = ClientBase();
+  const uintptr_t base = ClientBase(inst.client_so.c_str());
   if (!base) {
     Logf("createmove no client base");
     NoteCreateMoveToast("no_client_base", false);
