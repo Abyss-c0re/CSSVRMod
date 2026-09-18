@@ -1,24 +1,24 @@
-# Cycle 14 — 2026-09-18
+# Cycle 15 — 2026-09-18
 
 ## Focus
 
-`desktop-xr-status-banner` — NO HMD was toast-only; desktop present stayed silent.
+`honest-mono-submit-label` — session_ok still looked like stereo on the desktop.
 
 ## Did
 
-- Pure `Banner_Stamp`: fail-only top bar (`NO HMD` / `NO XR`). Never stamps `session_ok`.
-- Glyphs X/R/M. VK dump + GL capture/front strip. Window title `CSSVRMod · …`.
-- Dual-eye submit path is untouched (not a cinema overlay).
+- `Banner_Decide`: fail → NO HMD/NO XR (may stamp XR copy); `session_ok` + !dual → MONO desktop-only; dual → no stamp.
+- MONO is not drawn onto the lens submit (not a cinema bar). Window title + dump/front strip only.
+- Dual-eye `PushXrDual` still unstamped.
 
 ## Did not
 
 - HMD walk (user-gated).
-- Claim stereo from offline green.
+- Claim stereo from offline green or from `painted_dual`.
 
 ## Tests
 
-`cssvrmod_tests` — 68 passed, 0 failed (460 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 69 passed, 0 failed (469 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`honest-mono-submit-label` — say MONO on desktop until `painted_dual`; do not look like stereo.
+`renderview-locate-miss-toast` — if `CViewRender` locate fails, dual never starts; toast that honestly.

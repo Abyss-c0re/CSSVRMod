@@ -207,6 +207,7 @@ inline bool LocateRenderViewInImage(const uint8_t* img, size_t len, RenderViewLo
 void ViewHookTryInstall();
 void ViewHookOnSwap();
 bool ViewHookTakeEyes(unsigned* l, unsigned* r, int* w, int* h);
+bool ViewHookHaveEyes();
 
 inline bool LocateRenderViewFile(const char* path, RenderViewLoc* out) {
   if (!path || !out) return false;

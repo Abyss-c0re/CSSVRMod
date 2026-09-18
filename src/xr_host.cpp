@@ -580,6 +580,7 @@ bool XrHostBeginFrame() {
 static bool g_note_dual = false;
 
 void XrHostNoteDualPaint(bool painted_dual) { g_note_dual = painted_dual; }
+bool XrHostPaintedDual() { return g_note_dual; }
 
 bool XrHostSubmitEyes(unsigned int gl_l, unsigned int gl_r, int src_w, int src_h, bool vflip,
                       bool painted_dual) {

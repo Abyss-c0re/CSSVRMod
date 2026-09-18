@@ -23,6 +23,7 @@ bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vfli
 bool XrHostSubmitEyes(unsigned int gl_l, unsigned int gl_r, int src_w, int src_h, bool vflip,
                       bool painted_dual);
 void XrHostNoteDualPaint(bool painted_dual);
+bool XrHostPaintedDual();
 // Upload CPU 8-bit pixels (top-left origin). bgra=true skips a CPU swizzle from DXVK.
 bool XrHostSubmitRgba(const unsigned char* rgba, int w, int h);
 bool XrHostSubmitPixels(const unsigned char* px, int w, int h, bool bgra);

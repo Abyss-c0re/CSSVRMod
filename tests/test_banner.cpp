@@ -7,11 +7,34 @@ using namespace cssvr;
 TEST(banner_fail_only) {
   ASSERT_TRUE(Banner_ShouldStamp("no_hmd"));
   ASSERT_TRUE(Banner_ShouldStamp("no_loader"));
-  ASSERT_FALSE(Banner_ShouldStamp("session_ok"));
   ASSERT_FALSE(Banner_ShouldStamp("idle"));
   ASSERT_STREQ(Banner_Text("no_hmd"), "NO HMD");
   ASSERT_STREQ(Banner_Text("create_instance"), "NO XR");
-  ASSERT_STREQ(Banner_Text("session_ok"), "");
+  const auto fail = Banner_Decide("no_hmd", false);
+  ASSERT_TRUE(fail.stamp_xr);
+}
+
+TEST(banner_mono_until_dual) {
+  const auto mono = Banner_Decide("session_ok", false);
+  ASSERT_TRUE(mono.should_stamp);
+  ASSERT_FALSE(mono.stamp_xr);
+  ASSERT_STREQ(mono.text, "MONO");
+  const auto dual = Banner_Decide("session_ok", true);
+  ASSERT_FALSE(dual.should_stamp);
+  ASSERT_STREQ(dual.text, "");
+  ASSERT_FALSE(Banner_ShouldStamp("session_ok", true));
+  unsigned char pix[160 * 90 * 4];
+  std::memset(pix, 8, sizeof(pix));
+  ASSERT_TRUE(Banner_Stamp(pix, 160, 90, false, false, "session_ok", false));
+  int slate = 0, yellow = 0;
+  for (int i = 0; i < 160 * 90; ++i) {
+    const unsigned char* p = pix + i * 4;
+    if (p[0] < 50 && p[2] > 40 && p[2] < 80) slate++;
+    if (p[0] > 200 && p[1] > 180 && p[2] < 120) yellow++;
+  }
+  ASSERT_TRUE(slate > 80);
+  ASSERT_TRUE(yellow > 16);
+  ASSERT_FALSE(Banner_Stamp(pix, 160, 90, false, false, "session_ok", true));
 }
 
 TEST(banner_stamp_no_hmd) {
@@ -26,7 +49,7 @@ TEST(banner_stamp_no_hmd) {
   }
   ASSERT_TRUE(crimson > 80);
   ASSERT_TRUE(yellow > 20);
-  ASSERT_FALSE(Banner_Stamp(pix, 160, 90, false, false, "session_ok"));
+  ASSERT_FALSE(Banner_Stamp(pix, 160, 90, false, false, "idle"));
 }
 
 TEST(banner_bgra_and_flip) {

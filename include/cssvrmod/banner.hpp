@@ -1,5 +1,5 @@
 #pragma once
-// Desktop present stamp. Fail-only — never paint on a live dual-eye submit.
+// Desktop present stamp. Fail + honest MONO. Never paint on a live dual-eye submit.
 #include "menu3d.hpp"
 #include "toast.hpp"
 #include <algorithm>
@@ -7,12 +7,38 @@
 
 namespace cssvr {
 
-inline bool Banner_ShouldStamp(const char* xr_reason) { return Toast_IsFailReason(xr_reason); }
+struct BannerPlan {
+  bool should_stamp = false;
+  bool stamp_xr = false; // fail only — MONO stays desktop (not a cinema bar on the lenses)
+  const char* text = "";
+  const char* reason = "idle";
+};
 
-inline const char* Banner_Text(const char* xr_reason) {
-  if (Toast_IsNoHmdReason(xr_reason)) return "NO HMD";
-  if (Toast_IsFailReason(xr_reason)) return "NO XR";
-  return "";
+inline BannerPlan Banner_Decide(const char* xr_reason, bool painted_dual) {
+  BannerPlan p;
+  p.reason = (xr_reason && xr_reason[0]) ? xr_reason : "idle";
+  if (Toast_IsNoHmdReason(p.reason)) {
+    p.should_stamp = true;
+    p.stamp_xr = true;
+    p.text = "NO HMD";
+  } else if (Toast_IsFailReason(p.reason)) {
+    p.should_stamp = true;
+    p.stamp_xr = true;
+    p.text = "NO XR";
+  } else if (!painted_dual && std::strcmp(p.reason, "session_ok") == 0) {
+    p.should_stamp = true;
+    p.stamp_xr = false;
+    p.text = "MONO";
+  }
+  return p;
+}
+
+inline bool Banner_ShouldStamp(const char* xr_reason, bool painted_dual = false) {
+  return Banner_Decide(xr_reason, painted_dual).should_stamp;
+}
+
+inline const char* Banner_Text(const char* xr_reason, bool painted_dual = false) {
+  return Banner_Decide(xr_reason, painted_dual).text;
 }
 
 inline int Banner_Height(int h) { return std::max(16, std::min(40, h / 14)); }
@@ -53,20 +79,20 @@ inline void Banner_DrawText(unsigned char* px, int w, int h, bool bgra, bool fli
   }
 }
 
-// Stamp a top bar. Returns true if pixels changed. Never stamps session_ok.
+// Stamp a top bar. Returns true if pixels changed. Dual paint stays unstamped.
 inline bool Banner_Stamp(unsigned char* px, int w, int h, bool bgra, bool flip_y,
-                         const char* xr_reason) {
+                         const char* xr_reason, bool painted_dual = false) {
   if (!px || w < 32 || h < 16) return false;
-  if (!Banner_ShouldStamp(xr_reason)) return false;
-  const char* text = Banner_Text(xr_reason);
-  if (!text || !text[0]) return false;
+  const BannerPlan plan = Banner_Decide(xr_reason, painted_dual);
+  if (!plan.should_stamp || !plan.text[0]) return false;
   const int bar = Banner_Height(h);
-  Banner_Fill(px, w, h, bgra, flip_y, 0, 0, w, bar, 140, 16, 28);
+  if (plan.stamp_xr) Banner_Fill(px, w, h, bgra, flip_y, 0, 0, w, bar, 140, 16, 28);
+  else Banner_Fill(px, w, h, bgra, flip_y, 0, 0, w, bar, 36, 42, 58);
   const int sc = std::max(1, (bar - 6) / 7);
-  const int tw = (int)std::strlen(text) * 6 * sc;
+  const int tw = (int)std::strlen(plan.text) * 6 * sc;
   const int tx = std::max(4, (w - tw) / 2);
   const int ty = std::max(1, (bar - 7 * sc) / 2);
-  Banner_DrawText(px, w, h, bgra, flip_y, tx, ty, sc, text, 255, 220, 80);
+  Banner_DrawText(px, w, h, bgra, flip_y, tx, ty, sc, plan.text, 255, 220, 80);
   return true;
 }
 

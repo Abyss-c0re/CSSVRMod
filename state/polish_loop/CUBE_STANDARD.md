@@ -24,7 +24,7 @@ Same framebuffer submitted twice is **not** stereo. gVRMod forbids submitting on
 | Wall / hand collision | last-free hull | TraceRay self-test + Tick; not HMD-proven |
 | Vision cal | scale→V→H→eye | `CSSVR --settings` / `--set` + 3D panel |
 | Framed window | yes | yes (SDL/X11 hook) |
-| Honest no-HMD | toast | one-shot toast + present banner + window title |
+| Honest no-HMD | toast | toast + fail banner; MONO on desktop until dual paint |
 
 ## Standalone launcher
 

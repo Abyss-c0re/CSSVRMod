@@ -88,6 +88,10 @@ Honest no-HMD toast: one-shot desktop notify + toast file when OpenXR has no hea
 
 Fail-only NO HMD / NO XR banner on the captured CSS present + window title. Dual-eye submit not stamped. Offline 68/68. Not HMD-proven.
 
+## 2026-09-18 cycle 15
+
+Desktop MONO label while session_ok and !painted_dual. Not stamped onto dual-eye / lens submit. Offline 69/69. Not HMD-proven.
+
 
 
 

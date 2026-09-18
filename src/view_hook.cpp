@@ -189,4 +189,6 @@ bool ViewHookTakeEyes(unsigned* l, unsigned* r, int* w, int* h) {
   return true;
 }
 
+bool ViewHookHaveEyes() { return g_have_eyes && g_eye[0] && g_eye[1] && g_eye[0] != g_eye[1]; }
+
 } // namespace cssvr

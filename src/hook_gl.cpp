@@ -232,24 +232,36 @@ void CaptureBackbuffer() {
 
   if (ok) {
     const char* reason = XrHostStatus().reason;
-    if (Banner_Stamp(pix.data(), (int)w, (int)h, false, true, reason)) {
-      Chrome_NoteStatus(Banner_Text(reason));
-      GLint prev = 0;
-      glGetIntegerv(GL_DRAW_BUFFER, &prev);
-      glDrawBuffer(GL_FRONT);
-      glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-      const int bar = Banner_Height((int)h);
-      glWindowPos2i(0, (int)h - bar);
-      glDrawPixels((GLsizei)w, (GLsizei)bar, GL_RGBA, GL_UNSIGNED_BYTE,
-                   pix.data() + (size_t)((int)h - bar) * (size_t)w * 4);
-      glFlush();
-      if (prev) glDrawBuffer((GLenum)prev);
+    const bool dual = ViewHookHaveEyes();
+    const BannerPlan plan = Banner_Decide(reason, dual);
+    std::vector<unsigned char> desk;
+    const unsigned char* cap = pix.data();
+    bool dumped = false;
+    if (plan.should_stamp) {
+      desk = pix;
+      if (Banner_Stamp(desk.data(), (int)w, (int)h, false, true, reason, dual)) {
+        Chrome_NoteStatus(plan.text);
+        GLint prev = 0;
+        glGetIntegerv(GL_DRAW_BUFFER, &prev);
+        glDrawBuffer(GL_FRONT);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        const int bar = Banner_Height((int)h);
+        glWindowPos2i(0, (int)h - bar);
+        glDrawPixels((GLsizei)w, (GLsizei)bar, GL_RGBA, GL_UNSIGNED_BYTE,
+                     desk.data() + (size_t)((int)h - bar) * (size_t)w * 4);
+        glFlush();
+        if (prev) glDrawBuffer((GLenum)prev);
+        if (plan.stamp_xr) cap = desk.data();
+        MaybeDump(desk, (int)w, (int)h, drawFbo, scene);
+        dumped = true;
+      }
+    } else if (dual) {
+      Chrome_NoteStatus("CSS");
     }
     glBindTexture(GL_TEXTURE_2D, g_cap);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)w, (GLsizei)h, GL_RGBA, GL_UNSIGNED_BYTE,
-                    pix.data());
-    MaybeDump(pix, (int)w, (int)h, drawFbo, scene);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)w, (GLsizei)h, GL_RGBA, GL_UNSIGNED_BYTE, cap);
+    if (!dumped) MaybeDump(pix, (int)w, (int)h, drawFbo, scene);
     if (scene) g_status = "captured";
     if (g_swaps < 8 || scene || (g_swaps % 120) == 0)
       Logf("capture swap=%d fbo=%d %dx%d ok=%d nz=%d uniq=%d scene=%d", g_swaps, (int)drawFbo,

@@ -412,7 +412,7 @@ bool FormatIsBgra(VkFormat fmt) {
   return fmt == VK_FORMAT_B8G8R8A8_UNORM || fmt == VK_FORMAT_B8G8R8A8_SRGB;
 }
 
-void HarvestCopy(DeviceState* ds, VkDevice dev, bool want_ppm) {
+void HarvestCopy(DeviceState* ds, VkDevice dev, bool want_ppm, bool painted_dual) {
   if (!ds->copy_inflight || !ds->fn.waitFences) return;
   if (ds->fn.waitFences(dev, 1, &ds->fence, VK_TRUE, 0) != VK_SUCCESS) return;
   ds->copy_inflight = false;
@@ -427,14 +427,19 @@ void HarvestCopy(DeviceState* ds, VkDevice dev, bool want_ppm) {
   const auto* srcp = static_cast<const unsigned char*>(mapped);
   const char* reason = XrHostStatus().reason;
   const bool bgra = FormatIsBgra(ds->copy_fmt);
+  const BannerPlan plan = Banner_Decide(reason, painted_dual);
   std::vector<unsigned char> stamped;
   const unsigned char* xr_px = srcp;
-  if (Banner_ShouldStamp(reason)) {
+  const unsigned char* desk_px = srcp;
+  if (plan.should_stamp) {
     stamped.assign(srcp, srcp + (size_t)bytes);
-    if (Banner_Stamp(stamped.data(), (int)w, (int)h, bgra, false, reason)) {
-      xr_px = stamped.data();
-      Chrome_NoteStatus(Banner_Text(reason));
+    if (Banner_Stamp(stamped.data(), (int)w, (int)h, bgra, false, reason, painted_dual)) {
+      desk_px = stamped.data();
+      Chrome_NoteStatus(plan.text);
+      if (plan.stamp_xr) xr_px = stamped.data();
     }
+  } else if (painted_dual) {
+    Chrome_NoteStatus("CSS");
   }
   if (take_xr) {
     EnsureXrWorker();
@@ -442,7 +447,7 @@ void HarvestCopy(DeviceState* ds, VkDevice dev, bool want_ppm) {
   }
   if (want_ppm && g_dumps < 2) {
     std::vector<unsigned char> rgba((size_t)bytes);
-    const unsigned char* src = xr_px;
+    const unsigned char* src = desk_px;
     if (bgra) {
       for (size_t i = 0; i < (size_t)w * h; ++i) {
         rgba[i * 4 + 0] = src[i * 4 + 2];
@@ -592,7 +597,8 @@ struct CaptureReg {
 };
 CaptureReg g_cap_reg;
 
-void DumpSwapchain(VkQueue queue, VkSwapchainKHR sc, uint32_t idx, bool want_ppm) {
+void DumpSwapchain(VkQueue queue, VkSwapchainKHR sc, uint32_t idx, bool want_ppm,
+                   bool painted_dual) {
   DeviceState* ds = nullptr;
   SwapState* ss = nullptr;
   {
@@ -606,7 +612,7 @@ void DumpSwapchain(VkQueue queue, VkSwapchainKHR sc, uint32_t idx, bool want_ppm
   }
   if (!ds->fn.copy || idx >= ss->images.size() || ss->w == 0 || ss->h == 0 || !ds->fn.memProps) return;
   VkDevice dev = ss->device;
-  HarvestCopy(ds, dev, want_ppm);
+  HarvestCopy(ds, dev, want_ppm, painted_dual);
   const bool want_xr = XrWanted() && !MailboxFull();
   if (!want_xr && !want_ppm) return;
   if (ds->copy_inflight) return; // previous GPU copy still running — never stall present
@@ -669,8 +675,10 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
   }
   if (info && info->swapchainCount) {
     const bool want_ppm = g_dumps < 2;
-    if (!have_dual) DumpSwapchain(queue, info->pSwapchains[0], info->pImageIndices[0], want_ppm);
-    else if (want_ppm) DumpSwapchain(queue, info->pSwapchains[0], info->pImageIndices[0], true);
+    if (!have_dual)
+      DumpSwapchain(queue, info->pSwapchains[0], info->pImageIndices[0], want_ppm, false);
+    else if (want_ppm)
+      DumpSwapchain(queue, info->pSwapchains[0], info->pImageIndices[0], true, true);
   }
   if ((g_presents % 300) == 0)
     Log("present=%d xr_ok=%d xr_fail=%d dumps=%d", g_presents, g_xr_ok, g_xr_fail, g_dumps);
