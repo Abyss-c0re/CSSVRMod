@@ -194,6 +194,7 @@ TEST(dual_capture_miss_toast_after_hold) {
 
 TEST(maps_module_prefers_exec_and_full_path) {
   const char* maps =
+      "7f30000000-7f30080000 r-xp 00000000 08:01 4 /home/u/.steam/steamclient.so\n"
       "7f00000000-7f00001000 r--p 00000000 08:01 1 /opt/css/cstrike/bin/linux64/client.so\n"
       "7f00001000-7f00080000 r-xp 00001000 08:01 1 /opt/css/cstrike/bin/linux64/client.so\n"
       "7f00080000-7f00090000 r--p 00080000 08:01 1 /opt/css/cstrike/bin/linux64/client.so\n"

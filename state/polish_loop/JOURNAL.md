@@ -240,6 +240,10 @@ Identical L/R pixels stay MONO. Two copies of one RT must not unlock pose IPD. O
 
 Vulkan-live CopyEye no longer counts a GL blit as a world capture. GL_NO_ERROR on a foreign context is not dual. Offline 99/99. Not HMD-proven.
 
+## 2026-09-18 cycle 48
+
+Maps basename match: client.so must not bind steamclient.so. Offline 99/99. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

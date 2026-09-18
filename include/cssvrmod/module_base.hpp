@@ -1,5 +1,6 @@
 #pragma once
 // Resolve a path-loaded .so. dlopen("client.so", NOLOAD) misses CSS's full path.
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -8,15 +9,19 @@
 
 namespace cssvr {
 
+/// Basename match. "client.so" must not hit steamclient.so.
 inline bool Maps_LineHasNeedle(const char* path, const char* end, const char* needle) {
   if (!path || !needle || !needle[0] || path >= end) return false;
+  while (end > path && (end[-1] == ' ' || end[-1] == '\t' || end[-1] == '\r')) --end;
   const size_t n = std::strlen(needle);
-  for (const char* t = path; t + n <= end; ++t)
-    if (std::memcmp(t, needle, n) == 0) return true;
-  return false;
+  const size_t plen = (size_t)(end - path);
+  if (plen < n) return false;
+  const char* tail = end - (ptrdiff_t)n;
+  if (std::memcmp(tail, needle, n) != 0) return false;
+  return plen == n || tail[-1] == '/';
 }
 
-/// One /proc/self/maps line. True if the path contains needle.
+/// One /proc/self/maps line. True if the path basename is needle.
 inline bool Maps_ParseLine(const char* line, const char* needle, uintptr_t* start, bool* exec,
                            char* path_out, int path_n) {
   if (!line || !needle || !start) return false;

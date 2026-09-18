@@ -1,14 +1,14 @@
-# Cycle 47 — 2026-09-18
+# Cycle 48 — 2026-09-18
 
 ## Focus
 
-`vk-live-gl-copy-not-capture` — CopyEye counted a GL blit as a world capture on the Vulkan path.
+`maps-basename-not-substring` — `client.so` needle matched `steamclient.so`.
 
 ## Did
 
-- `DualCapture_Accept` — when a VK device is live, only `VkCaptureEye` counts.
-- CopyEye returns false on GL fallback if `VkEye_DeviceLive()`.
-- GL-only launch still uses the blit. No new toast.
+- Maps path match requires `/client.so` (basename), not a substring.
+- steamclient.so first in maps no longer steals the CSS module base.
+- Same rule for engine.so.
 
 ## Did not
 
