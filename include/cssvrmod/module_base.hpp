@@ -102,31 +102,74 @@ inline uintptr_t Module_DladdrBase(void* handle) {
   return reinterpret_cast<uintptr_t>(info.dli_fbase);
 }
 
-/// Live client.so base. Short-name NOLOAD misses a path-loaded CSS module.
-inline uintptr_t Module_ClientBase(const char* full_path) {
-  void* h = dlopen("client.so", RTLD_NOW | RTLD_NOLOAD);
-  if (!h && full_path && full_path[0]) h = dlopen(full_path, RTLD_NOW | RTLD_NOLOAD);
-  if (!h) {
+/// How to open a path-loaded Source .so. Never the main executable (RTLD_DEFAULT).
+struct ModuleSoPlan {
+  const char* short_name = nullptr;
+  const char* full_path = nullptr;
+  bool try_maps = false;
+  bool try_global = false;
+};
+
+inline ModuleSoPlan Module_SoPlan(const char* short_name, const char* full_path) {
+  ModuleSoPlan p;
+  p.short_name = (short_name && short_name[0]) ? short_name : nullptr;
+  p.full_path = (full_path && full_path[0]) ? full_path : nullptr;
+  p.try_maps = p.short_name != nullptr;
+  p.try_global = false;
+  return p;
+}
+
+/// Already-loaded handle. Short-name NOLOAD misses CSS's full path.
+inline void* Module_SoHandle(const char* short_name, const char* full_path) {
+  const ModuleSoPlan plan = Module_SoPlan(short_name, full_path);
+  void* h = nullptr;
+  if (plan.short_name) h = dlopen(plan.short_name, RTLD_NOW | RTLD_NOLOAD);
+  if (!h && plan.full_path) h = dlopen(plan.full_path, RTLD_NOW | RTLD_NOLOAD);
+  if (!h && plan.try_maps && plan.short_name) {
     FILE* f = std::fopen("/proc/self/maps", "r");
     if (f) {
       char line[768];
       char path[512];
-      uintptr_t maps_base = 0;
       while (std::fgets(line, sizeof(line), f)) {
         uintptr_t start = 0;
         bool exec = false;
-        if (!Maps_ParseLine(line, "client.so", &start, &exec, path, (int)sizeof(path))) continue;
-        if (path[0] == '/') {
-          h = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
-          if (h) break;
-        }
-        if (exec && !maps_base) maps_base = start;
+        if (!Maps_ParseLine(line, plan.short_name, &start, &exec, path, (int)sizeof(path)))
+          continue;
+        if (path[0] != '/') continue;
+        h = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+        if (h) break;
       }
       std::fclose(f);
-      if (!h) return maps_base;
     }
   }
-  return Module_DladdrBase(h);
+  return h;
+}
+
+/// Live .so base. Maps address is last resort when NOLOAD still misses.
+inline uintptr_t Module_SoBase(const char* short_name, const char* full_path) {
+  void* h = Module_SoHandle(short_name, full_path);
+  if (h) return Module_DladdrBase(h);
+  if (!short_name || !short_name[0]) return 0;
+  FILE* f = std::fopen("/proc/self/maps", "r");
+  if (!f) return 0;
+  char line[768];
+  uintptr_t maps_base = 0;
+  while (std::fgets(line, sizeof(line), f)) {
+    uintptr_t start = 0;
+    bool exec = false;
+    if (!Maps_ParseLine(line, short_name, &start, &exec, nullptr, 0)) continue;
+    if (exec) {
+      maps_base = start;
+      break;
+    }
+    if (!maps_base) maps_base = start;
+  }
+  std::fclose(f);
+  return maps_base;
+}
+
+inline uintptr_t Module_ClientBase(const char* full_path) {
+  return Module_SoBase("client.so", full_path);
 }
 
 } // namespace cssvr

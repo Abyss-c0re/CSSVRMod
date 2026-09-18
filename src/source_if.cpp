@@ -1,5 +1,7 @@
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/engine_trace.hpp"
+#include "cssvrmod/launch.hpp"
+#include "cssvrmod/module_base.hpp"
 #include "cssvrmod/toast.hpp"
 #include <dlfcn.h>
 #include <cstdio>
@@ -90,11 +92,11 @@ bool ProbeLiveEngine(EngineIf& out) {
   out = EngineIf{};
   CreateInterfaceFn eng = nullptr;
   CreateInterfaceFn cli = nullptr;
-  // Prefer already-loaded modules (hook is inside CSS).
-  void* e = dlopen("engine.so", RTLD_NOW | RTLD_NOLOAD);
-  if (!e) e = dlopen(nullptr, RTLD_NOW);
+  // Path-loaded engine.so / client.so. Never dlopen(nullptr) — that is the launcher.
+  const CssInstall inst = FindCssInstall();
+  void* e = Module_SoHandle("engine.so", inst.found ? inst.engine_so.c_str() : nullptr);
+  void* c = Module_SoHandle("client.so", inst.found ? inst.client_so.c_str() : nullptr);
   if (e) eng = reinterpret_cast<CreateInterfaceFn>(dlsym(e, "CreateInterface"));
-  void* c = dlopen("client.so", RTLD_NOW | RTLD_NOLOAD);
   if (c) cli = reinterpret_cast<CreateInterfaceFn>(dlsym(c, "CreateInterface"));
   if (!eng) {
     out.reason = "no_createinterface";

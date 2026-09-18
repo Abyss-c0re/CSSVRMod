@@ -1,14 +1,14 @@
-# Cycle 42 — 2026-09-18
+# Cycle 43 — 2026-09-18
 
 ## Focus
 
-`client-base-maps` — `dlopen("client.so", NOLOAD)` misses CSS's path-loaded module.
+`engine-so-noload-path` — ProbeLiveEngine used short-name NOLOAD then `dlopen(nullptr)`.
 
 ## Did
 
-- Parse `/proc/self/maps` for `client.so` (prefer r-x, keep full path).
-- `Module_ClientBase` tries short name, install path, then maps path + `dladdr`.
-- RenderView + CreateMove hooks share it. Log `renderview install try` so a miss is not silent.
+- `Module_SoHandle` / `Module_SoPlan` for any path-loaded Source .so. Never the main exe.
+- ProbeLiveEngine opens `engine.so` + `client.so` via install path + maps.
+- Look / trace factories no longer come from the launcher.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 94 passed, 0 failed (741 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 95 passed, 0 failed (752 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

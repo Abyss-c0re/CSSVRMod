@@ -163,12 +163,29 @@ TEST(maps_module_prefers_exec_and_full_path) {
       "7f00000000-7f00001000 r--p 00000000 08:01 1 /opt/css/cstrike/bin/linux64/client.so\n"
       "7f00001000-7f00080000 r-xp 00001000 08:01 1 /opt/css/cstrike/bin/linux64/client.so\n"
       "7f00080000-7f00090000 r--p 00080000 08:01 1 /opt/css/cstrike/bin/linux64/client.so\n"
+      "7f20000000-7f20080000 r-xp 00000000 08:01 3 /opt/css/bin/linux64/engine.so\n"
       "7f10000000-7f10001000 r-xp 00000000 08:01 2 /usr/lib/libother.so\n";
   ASSERT_EQ(Maps_ModuleBase(maps, "client.so"), (uintptr_t)0x7f00001000ull);
+  ASSERT_EQ(Maps_ModuleBase(maps, "engine.so"), (uintptr_t)0x7f20000000ull);
   ASSERT_EQ(Maps_ModuleBase(maps, "nope.so"), (uintptr_t)0);
   ASSERT_EQ(Maps_ModuleBase(nullptr, "client.so"), (uintptr_t)0);
   char path[256] = {};
   ASSERT_TRUE(Maps_ModulePath(maps, "client.so", path, (int)sizeof(path)));
   ASSERT_STREQ(path, "/opt/css/cstrike/bin/linux64/client.so");
+  ASSERT_TRUE(Maps_ModulePath(maps, "engine.so", path, (int)sizeof(path)));
+  ASSERT_STREQ(path, "/opt/css/bin/linux64/engine.so");
   ASSERT_FALSE(Maps_ModulePath(maps, "missing.so", path, (int)sizeof(path)));
+}
+
+TEST(module_so_plan_never_uses_main_exe) {
+  const auto p = Module_SoPlan("engine.so", "/opt/css/bin/linux64/engine.so");
+  ASSERT_STREQ(p.short_name, "engine.so");
+  ASSERT_STREQ(p.full_path, "/opt/css/bin/linux64/engine.so");
+  ASSERT_TRUE(p.try_maps);
+  ASSERT_FALSE(p.try_global);
+  const auto q = Module_SoPlan("", nullptr);
+  ASSERT_TRUE(q.short_name == nullptr);
+  ASSERT_TRUE(q.full_path == nullptr);
+  ASSERT_FALSE(q.try_maps);
+  ASSERT_FALSE(q.try_global);
 }
