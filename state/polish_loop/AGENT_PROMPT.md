@@ -22,6 +22,7 @@ You are a **careful product polish agent** for **CSSVRMod only** (`/home/voldema
 - Audit CSSVRMod vs CUBE_STANDARD (stereo RenderView, submit dual OUT, pose SoT, framed window, collisions, input).
 - Prefer evidence: code, `/tmp/cssvrmod.log`, tests, GLOGIC_GAPS.md.
 - Pick **one** focus. Prefer `next_focus` unless blocked.
+- **HMD walk is user-gated.** Do not pick `*-hmd-walk` unless the user is in the headset this turn. Prefer a product gap you can prove offline.
 
 ## 2. Implement carefully
 
