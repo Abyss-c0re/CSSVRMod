@@ -3,6 +3,7 @@
 #include "collision.hpp"
 #include "vec3.hpp"
 #include <cmath>
+#include <cstring>
 #include <string>
 
 namespace cssvr {
@@ -70,5 +71,45 @@ bool EngineSetViewAngles(const EngineIf& e, const Ang3& a);
 
 /// Hull/point sweep. Empty function if !trace_ok.
 TraceFn EngineMakeTraceFn(const EngineIf& e);
+
+// Honest toast if Get/SetViewAngles self-test fails. HMD look will not write engine yaw.
+struct EngineAnglesToastIn {
+  bool have_engine = false;
+  bool selftest_ok = false;
+  bool probed = false;
+  bool already_shown = false;
+};
+
+struct EngineAnglesToast {
+  bool should_toast = false;
+  bool abort_vr = false;
+  const char* reason = "idle";
+  const char* copy = "";
+  const char* label = "ANG · IDLE";
+};
+
+inline const char* EngineAngles_MissCopy(const char* reason) {
+  if (reason && std::strcmp(reason, "no_engine") == 0)
+    return "IVEngineClient missing — HMD look will not write engine yaw.";
+  if (reason && std::strcmp(reason, "selftest_fail") == 0)
+    return "ViewAngles self-test failed — HMD look will not write engine yaw.";
+  return "ViewAngles unavailable — HMD look will not write engine yaw.";
+}
+
+inline EngineAnglesToast EngineAngles_ToastDecide(const EngineAnglesToastIn& in) {
+  EngineAnglesToast t;
+  t.abort_vr = false;
+  if (!in.probed) return t;
+  if (in.selftest_ok) {
+    t.reason = "angles_ok";
+    t.label = "ANG · OK";
+    return t;
+  }
+  t.reason = in.have_engine ? "selftest_fail" : "no_engine";
+  t.copy = EngineAngles_MissCopy(t.reason);
+  t.label = "ANG · MISS";
+  t.should_toast = !in.already_shown;
+  return t;
+}
 
 } // namespace cssvr

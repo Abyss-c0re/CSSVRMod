@@ -2,6 +2,7 @@
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/view_setup.hpp"
 #include "test_framework.h"
+#include <cstring>
 
 using namespace cssvr;
 
@@ -68,6 +69,30 @@ TEST(viewangles_sane_and_roundtrip) {
   e.set_angles_idx = 20;
   // Fake object is not a real vtable — Set must refuse without a valid slot table.
   ASSERT_FALSE(EngineGetViewAngles(e, nullptr));
+}
+
+TEST(angles_selftest_miss_toast) {
+  EngineAnglesToastIn in;
+  ASSERT_FALSE(EngineAngles_ToastDecide(in).should_toast);
+  in.probed = true;
+  in.have_engine = false;
+  auto none = EngineAngles_ToastDecide(in);
+  ASSERT_TRUE(none.should_toast);
+  ASSERT_FALSE(none.abort_vr);
+  ASSERT_STREQ(none.reason, "no_engine");
+  ASSERT_STREQ(none.label, "ANG · MISS");
+  in.have_engine = true;
+  auto fail = EngineAngles_ToastDecide(in);
+  ASSERT_TRUE(fail.should_toast);
+  ASSERT_STREQ(fail.reason, "selftest_fail");
+  ASSERT_TRUE(std::strstr(fail.copy, "yaw") != nullptr);
+  in.already_shown = true;
+  ASSERT_FALSE(EngineAngles_ToastDecide(in).should_toast);
+  in.already_shown = false;
+  in.selftest_ok = true;
+  auto ok = EngineAngles_ToastDecide(in);
+  ASSERT_FALSE(ok.should_toast);
+  ASSERT_STREQ(ok.reason, "angles_ok");
 }
 
 TEST(look_write_angles_roundtrip) {

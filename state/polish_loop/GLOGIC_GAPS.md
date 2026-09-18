@@ -11,6 +11,7 @@
 - [x] Same-frame submit must use **identity VIEW pose** (cycle 1). Pose IPD on a mono frame = two planes + black.
 - [x] HMD writes `CViewSetup` angles for both eye paints (cycle 6). Shared orientation. No guessed `SetViewAngles`.
 - [x] `SetViewAngles` only after Get+Set roundtrip + `engine.so` dladdr (cycle 7). No write if the self-test fails.
+- [x] ViewAngles self-test miss toasts once (cycle 20). Engine yaw stay-off is not silent.
 
 ## P1 — product shell
 

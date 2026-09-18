@@ -116,6 +116,10 @@ CreateMove locate/hook miss toasts once; no per-tick client.so re-read. Offline 
 
 IEngineTrace missing / TraceRay self-test fail toasts once. Offline 73/73. Not HMD-proven.
 
+## 2026-09-18 cycle 20
+
+ViewAngles self-test miss toasts once; engine yaw stay-off is auditable. Offline 74/74. Not HMD-proven.
+
 
 
 

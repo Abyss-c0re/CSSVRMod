@@ -1,10 +1,10 @@
 {
-  "cycle": 19,
+  "cycle": 20,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T10:28:00Z",
-  "last_focus": "engine-trace-miss-toast",
-  "next_focus": "angles-selftest-miss-toast",
+  "started_at": "2026-09-18T10:41:00Z",
+  "last_focus": "angles-selftest-miss-toast",
+  "next_focus": "screen-selftest-miss-toast",
   "last_commit": "c7fabb4",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"

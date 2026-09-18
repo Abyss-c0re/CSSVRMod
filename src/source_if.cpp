@@ -102,6 +102,22 @@ bool ProbeLiveEngine(EngineIf& out) {
   }
   if (!ProbeEngineFromFactories(eng, cli, out)) return false;
   out.screen_ok = ScreenSelfTest(out.engine, &out.screen_w, &out.screen_h);
+  static bool ang_toast = false;
+  auto note_angles_toast = [&](bool have_engine, bool selftest_ok) {
+    EngineAnglesToastIn in;
+    in.have_engine = have_engine;
+    in.selftest_ok = selftest_ok;
+    in.probed = true;
+    in.already_shown = ang_toast;
+    const EngineAnglesToast t = EngineAngles_ToastDecide(in);
+    if (!t.should_toast) return;
+    ang_toast = true;
+    if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
+      std::fprintf(f, "cssvr toast %s %s\n", t.label, t.copy);
+      std::fclose(f);
+    }
+    Toast_FireDesktop(t.copy);
+  };
   if (out.engine) {
     auto** vt = *reinterpret_cast<ViewAngFn**>(out.engine);
     // 2013/CSS64 layout that already matches GetScreenSize=5 / ClientCmd=7.
@@ -112,23 +128,31 @@ bool ProbeLiveEngine(EngineIf& out) {
       out.angles_ok = true;
       out.get_angles_idx = ok_get;
       out.set_angles_idx = ok_set;
-    } else if (angles_probe == 0 && vt && vt[kGet] && vt[kSet]) {
-      Dl_info gi{}, si{};
-      const bool in_eng = dladdr(reinterpret_cast<void*>(vt[kGet]), &gi) && gi.dli_fname &&
-                          std::strstr(gi.dli_fname, "engine.so") &&
-                          dladdr(reinterpret_cast<void*>(vt[kSet]), &si) && si.dli_fname &&
-                          std::strstr(si.dli_fname, "engine.so");
-      if (in_eng && ViewAnglesRoundtripOk(out.engine, vt[kGet], vt[kSet])) {
-        out.angles_ok = true;
-        out.get_angles_idx = kGet;
-        out.set_angles_idx = kSet;
-        ok_get = kGet;
-        ok_set = kSet;
-        angles_probe = 2;
-      } else {
+    } else if (angles_probe == 0) {
+      bool ok = false;
+      if (vt && vt[kGet] && vt[kSet]) {
+        Dl_info gi{}, si{};
+        const bool in_eng = dladdr(reinterpret_cast<void*>(vt[kGet]), &gi) && gi.dli_fname &&
+                            std::strstr(gi.dli_fname, "engine.so") &&
+                            dladdr(reinterpret_cast<void*>(vt[kSet]), &si) && si.dli_fname &&
+                            std::strstr(si.dli_fname, "engine.so");
+        if (in_eng && ViewAnglesRoundtripOk(out.engine, vt[kGet], vt[kSet])) {
+          out.angles_ok = true;
+          out.get_angles_idx = kGet;
+          out.set_angles_idx = kSet;
+          ok_get = kGet;
+          ok_set = kSet;
+          angles_probe = 2;
+          ok = true;
+        }
+      }
+      if (!ok) {
         angles_probe = 1; // do not yank view again
+        note_angles_toast(true, false);
       }
     }
+  } else {
+    note_angles_toast(false, false);
   }
   static bool tr_toast = false;
   auto note_trace_toast = [&](bool have_iface, bool selftest_ok) {
