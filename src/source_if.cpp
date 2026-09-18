@@ -1,5 +1,6 @@
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/engine_trace.hpp"
+#include "cssvrmod/toast.hpp"
 #include <dlfcn.h>
 #include <cstdio>
 #include <cstring>
@@ -129,6 +130,22 @@ bool ProbeLiveEngine(EngineIf& out) {
       }
     }
   }
+  static bool tr_toast = false;
+  auto note_trace_toast = [&](bool have_iface, bool selftest_ok) {
+    EngineTraceToastIn in;
+    in.have_iface = have_iface;
+    in.selftest_ok = selftest_ok;
+    in.probed = true;
+    in.already_shown = tr_toast;
+    const EngineTraceToast t = EngineTrace_ToastDecide(in);
+    if (!t.should_toast) return;
+    tr_toast = true;
+    if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
+      std::fprintf(f, "cssvr toast %s %s\n", t.label, t.copy);
+      std::fclose(f);
+    }
+    Toast_FireDesktop(t.copy);
+  };
   if (out.trace) {
     static int trace_probe = 0; // 0 idle  1 fail  2 ok
     static int ok_idx = -1;
@@ -148,8 +165,11 @@ bool ProbeLiveEngine(EngineIf& out) {
         trace_probe = 2;
       } else {
         trace_probe = 1;
+        note_trace_toast(true, false);
       }
     }
+  } else {
+    note_trace_toast(false, false);
   }
   if (out.trace_ok) out.reason = "probed_trace_ok";
   else if (out.angles_ok) out.reason = "probed_angles_ok";

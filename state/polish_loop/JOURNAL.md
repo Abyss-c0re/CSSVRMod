@@ -112,6 +112,10 @@ If copies later succeed, drop the NO CAP window title. Two captures still are no
 
 CreateMove locate/hook miss toasts once; no per-tick client.so re-read. Offline 72/72. Not HMD-proven.
 
+## 2026-09-18 cycle 19
+
+IEngineTrace missing / TraceRay self-test fail toasts once. Offline 73/73. Not HMD-proven.
+
 
 
 

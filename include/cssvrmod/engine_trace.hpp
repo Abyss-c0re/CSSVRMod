@@ -74,4 +74,45 @@ inline TraceHit TraceHitFromBlob(const unsigned char* blob, size_t n) {
   return t;
 }
 
+// Honest toast if IEngineTrace is missing or TraceRay self-test fails.
+// Wall / melee hulls stay off. Never abort VR.
+struct EngineTraceToastIn {
+  bool have_iface = false;
+  bool selftest_ok = false;
+  bool probed = false;
+  bool already_shown = false;
+};
+
+struct EngineTraceToast {
+  bool should_toast = false;
+  bool abort_vr = false;
+  const char* reason = "idle";
+  const char* copy = "";
+  const char* label = "TR · IDLE";
+};
+
+inline const char* EngineTrace_MissCopy(const char* reason) {
+  if (reason && std::strcmp(reason, "no_trace") == 0)
+    return "IEngineTrace missing — wall / melee hulls stay off.";
+  if (reason && std::strcmp(reason, "selftest_fail") == 0)
+    return "TraceRay self-test failed — wall / melee hulls stay off.";
+  return "Engine trace unavailable — wall / melee hulls stay off.";
+}
+
+inline EngineTraceToast EngineTrace_ToastDecide(const EngineTraceToastIn& in) {
+  EngineTraceToast t;
+  t.abort_vr = false;
+  if (!in.probed) return t;
+  if (in.selftest_ok) {
+    t.reason = "trace_ok";
+    t.label = "TR · OK";
+    return t;
+  }
+  t.reason = in.have_iface ? "selftest_fail" : "no_trace";
+  t.copy = EngineTrace_MissCopy(t.reason);
+  t.label = "TR · MISS";
+  t.should_toast = !in.already_shown;
+  return t;
+}
+
 } // namespace cssvr

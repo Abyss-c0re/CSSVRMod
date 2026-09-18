@@ -59,3 +59,27 @@ TEST(engine_make_trace_empty_without_selftest) {
   auto fn = EngineMakeTraceFn(e);
   ASSERT_FALSE((bool)fn);
 }
+
+TEST(engine_trace_miss_toast) {
+  EngineTraceToastIn in;
+  ASSERT_FALSE(EngineTrace_ToastDecide(in).should_toast);
+  in.probed = true;
+  in.have_iface = false;
+  auto none = EngineTrace_ToastDecide(in);
+  ASSERT_TRUE(none.should_toast);
+  ASSERT_FALSE(none.abort_vr);
+  ASSERT_STREQ(none.reason, "no_trace");
+  ASSERT_STREQ(none.label, "TR · MISS");
+  ASSERT_TRUE(std::strstr(none.copy, "hulls") != nullptr);
+  in.have_iface = true;
+  auto fail = EngineTrace_ToastDecide(in);
+  ASSERT_TRUE(fail.should_toast);
+  ASSERT_STREQ(fail.reason, "selftest_fail");
+  in.already_shown = true;
+  ASSERT_FALSE(EngineTrace_ToastDecide(in).should_toast);
+  in.already_shown = false;
+  in.selftest_ok = true;
+  auto ok = EngineTrace_ToastDecide(in);
+  ASSERT_FALSE(ok.should_toast);
+  ASSERT_STREQ(ok.reason, "trace_ok");
+}

@@ -1,23 +1,23 @@
-# Cycle 18 — 2026-09-18
+# Cycle 19 — 2026-09-18
 
 ## Focus
 
-`createmove-locate-miss-toast` — analog overlay locate fail was log-only and retried every tick.
+`engine-trace-miss-toast` — TraceRay self-test fail was silent; wall/melee hulls stayed off.
 
 ## Did
 
-- Pure `CreateMove_ToastDecide`: one-shot on locate/hook miss; never abort VR.
-- `UserCmd_HookLive` toasts + title `NO CMD`; `g_attempted` stops per-tick client.so re-reads.
+- Pure `EngineTrace_ToastDecide`: one-shot on missing iface or failed self-test; never abort VR.
+- `ProbeLiveEngine` fires desktop toast. Tick still skips hulls unless `trace_ok`.
 
 ## Did not
 
 - HMD walk (user-gated).
-- Claim stereo or live stick smoke from offline green.
+- Claim live wall/melee smoke from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 72 passed, 0 failed (499 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 73 passed, 0 failed (510 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`engine-trace-miss-toast` — TraceRay self-test fail is still log-only.
+`angles-selftest-miss-toast` — Get/SetViewAngles self-test fail is still silent.
