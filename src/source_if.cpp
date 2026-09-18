@@ -36,12 +36,16 @@ bool ProtectSlot(void* p, bool wr) {
   return mprotect((void*)pg, (size_t)page, prot) == 0;
 }
 
+bool SlotInEngine(ClientCmdFn fn) {
+  if (!fn) return false;
+  Dl_info info{};
+  return dladdr(reinterpret_cast<void*>(fn), &info) && info.dli_fname &&
+         std::strstr(info.dli_fname, "engine.so");
+}
+
 void PatchCmdSlot(ClientCmdFn* slot, ClientCmdFn wrap, ClientCmdFn* orig) {
   if (!slot || !*slot || !wrap || !orig || *orig) return;
-  Dl_info info{};
-  if (!dladdr(reinterpret_cast<void*>(*slot), &info) || !info.dli_fname ||
-      !std::strstr(info.dli_fname, "engine.so"))
-    return;
+  if (!SlotInEngine(*slot)) return;
   *orig = *slot;
   ProtectSlot(slot, true);
   *slot = wrap;
@@ -53,9 +57,12 @@ void InstallCmdWrap(void* engine) {
   auto** vt = *reinterpret_cast<ClientCmdFn**>(engine);
   if (!vt) return;
   PatchCmdSlot(&vt[cssvr::kEngineClientCmdSlot], &WrappedClientCmd, &g_real_cmd);
+  ClientCmdFn slot106 = vt[cssvr::kEngineClientCmdUnrestrictedSlot];
   PatchCmdSlot(&vt[cssvr::kEngineClientCmdUnrestrictedSlot], &WrappedClientCmdUnrestricted,
                &g_orig_unrestricted);
-  if (!g_real_cmd && !g_orig_unrestricted) return;
+  if (!cssvr::EngineCmd_WrapComplete(g_orig_unrestricted != nullptr, slot106 != nullptr,
+                                     SlotInEngine(slot106)))
+    return;
   g_cmd_wrapped = true;
   if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
     std::fprintf(f, "cssvr cmd wrap slot7=%d slot106=%d\n", g_real_cmd ? 1 : 0,
@@ -66,6 +73,8 @@ void InstallCmdWrap(void* engine) {
 } // namespace
 
 namespace cssvr {
+
+bool EngineCmd_WrapReady() { return g_cmd_wrapped; }
 
 static const char* kEngineNames[] = {"VEngineClient014", "VEngineClient013", nullptr};
 static const char* kClientNames[] = {"VClient017", "VClient016", "VClient015", nullptr};

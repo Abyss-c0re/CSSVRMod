@@ -90,6 +90,15 @@ inline bool EngineCmd_ShouldWrapSlot(int slot) {
   return slot == kEngineClientCmdSlot || slot == kEngineClientCmdUnrestrictedSlot;
 }
 
+/// Stop retrying only when unrestricted is on, or slot 106 is present but not engine.so.
+inline bool EngineCmd_WrapComplete(bool have_unrestricted, bool slot106_present,
+                                   bool slot106_in_engine) {
+  if (have_unrestricted) return true;
+  return slot106_present && !slot106_in_engine;
+}
+
+bool EngineCmd_WrapReady();
+
 /// Get/Set viewangles only after angles_ok self-test.
 bool EngineGetViewAngles(const EngineIf& e, Ang3* out);
 bool EngineSetViewAngles(const EngineIf& e, const Ang3& a);

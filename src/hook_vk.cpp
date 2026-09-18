@@ -708,6 +708,8 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
     }
   }
   if (!real) return VK_ERROR_UNKNOWN;
+  // Cmd wrap must not wait on RenderView locate — Steam CSSVR_XR=0 starts XR via cssvr_start.
+  if (!EngineCmd_WrapReady()) ProbeLiveEngine(g_eng);
   ViewHookTryInstall();
   UserCmd_HookLive();
   const VkResult pr = real(queue, info);

@@ -270,3 +270,11 @@ TEST(engine_cmd_wraps_unrestricted) {
   ASSERT_EQ(p.slots[0], 7);
   ASSERT_EQ(p.slots[1], 106);
 }
+
+TEST(engine_cmd_wrap_retries_until_unrestricted) {
+  ASSERT_TRUE(EngineCmd_WrapComplete(true, true, true));
+  ASSERT_TRUE(EngineCmd_WrapComplete(true, false, false));
+  ASSERT_FALSE(EngineCmd_WrapComplete(false, false, false));
+  ASSERT_FALSE(EngineCmd_WrapComplete(false, true, true));
+  ASSERT_TRUE(EngineCmd_WrapComplete(false, true, false));
+}

@@ -1,13 +1,13 @@
-# Cycle 57 — 2026-09-18
+# Cycle 58 — 2026-09-18
 
 ## Focus
 
-`console-unrestricted-cmd` — typed `cssvr_start` goes through ClientCmd_Unrestricted (slot 106), not restricted ClientCmd (slot 7).
+`cmd-wrap-on-vk-present` — Vulkan present waited on RenderView locate before probing the engine, so `cssvr_start` could never attach.
 
 ## Did
 
-- Wrap both CEngineClient slots. 7 stays restricted; 106 is the console path (`mov rdi,rsi; jmp Cbuf_AddText`).
-- Same filter; each slot keeps its own original.
+- `WrapPresent` probes the engine until the console wrap is ready (does not wait on `CViewRender`).
+- Do not freeze the wrap plan until slot 106 is on, or it is present and not `engine.so`.
 
 ## Did not
 
@@ -17,8 +17,8 @@
 
 ## Tests
 
-`cssvrmod_tests` — 113 passed, 0 failed (903 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 114 passed, 0 failed (908 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`idle-no-shell-ladder` — close with no commit unless a real offline bug appears. Next CSS start needs the new hook (Steam LaunchOptions + `--install` copy). Never queue `dual-renderview-ipd-origin`.
+`idle-no-shell-ladder` — close with no commit unless a real offline bug appears. Live CSS is still the old unhooked Steam process. Never queue `dual-renderview-ipd-origin`.

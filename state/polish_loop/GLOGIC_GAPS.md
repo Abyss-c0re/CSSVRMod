@@ -54,6 +54,7 @@
 - [x] Seed default launch.cfg on first `--print`/`--settings`/spawn (cycle 38). No overwrite.
 - [x] `--install` writes Steam App 240 LaunchOptions (cycle 56). Empty options meant Steam never preloaded the hook. Steam may revert while running.
 - [x] Console filter wraps ClientCmd_Unrestricted (slot 106, cycle 57). Typed `cssvr_start` never hit restricted ClientCmd (slot 7).
+- [x] VK present probes engine / cmd wrap without waiting on RenderView locate (cycle 58). Retry 106 until engine.so or give up.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.
