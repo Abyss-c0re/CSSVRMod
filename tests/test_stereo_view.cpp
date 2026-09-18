@@ -97,6 +97,28 @@ TEST(stereo_pose_x_legal_only_after_dual_paint) {
   ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, false), 0.f, 0.0001);
 }
 
+TEST(stereo_dual_ipd_ignores_uv_eyescale) {
+  Calib c;
+  c.ipd_m = 0.064f;
+  c.eyescale = 0.13f; // live Vision knob — UV only
+  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, true), -0.032f, 0.0001);
+  ASSERT_NEAR(StereoView_SubmitPoseX(c, 1, true), 0.032f, 0.0001);
+  ASSERT_NEAR(StereoView_HalfIpdInches(c, kInchesPerMeter, true), 0.064f * kInchesPerMeter * 0.5f,
+              0.001);
+  ASSERT_TRUE(StereoView_HalfIpdInches(c, kInchesPerMeter, false) < 0.3f);
+
+  StereoViewIn in;
+  in.origin = {0.f, 0.f, 64.f};
+  in.angles = {0.f, 0.f, 0.f};
+  in.calib = c;
+  const auto p = StereoView_Decide(in, true);
+  const float full = 0.064f * kInchesPerMeter * 0.5f;
+  ASSERT_NEAR(p.half_ipd, full, 0.001);
+  ASSERT_NEAR(p.half_ipd_m, 0.032f, 0.0001);
+  ASSERT_NEAR(p.left.origin.y - in.origin.y, full, 0.001);
+  ASSERT_NEAR(p.right.origin.y - in.origin.y, -full, 0.001);
+}
+
 TEST(stereo_uv_crop_drops_fake_ipd_when_dual) {
   Calib c;
   c.eyescale = 1.f;

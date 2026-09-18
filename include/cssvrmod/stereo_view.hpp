@@ -38,20 +38,25 @@ struct StereoViewPlan {
   const char* reason = "idle";
 };
 
-inline float StereoView_HalfIpdInches(const Calib& raw, float world_scale = kInchesPerMeter) {
+/// World half-IPD in Source inches. Dual paint uses full ipd_m.
+/// eyescale is UV-only after cycle 1 — a Vision 0.13 must not crush camera sep.
+inline float StereoView_HalfIpdInches(const Calib& raw, float world_scale = kInchesPerMeter,
+                                      bool painted_dual = false) {
   const Calib c = ClampCalib(raw);
   float scale = world_scale;
   if (scale < 0.01f) scale = kInchesPerMeter;
-  return c.ipd_m * scale * 0.5f * c.eyescale;
+  const float eye = painted_dual ? 1.f : c.eyescale;
+  return c.ipd_m * scale * 0.5f * eye;
 }
 
 /// VIEW-space pose X. Zero on a mono CSS present (cycle 1 heresy gate).
+/// Dual pose uses full ipd_m; eyescale stays off the cameras.
 inline float StereoView_SubmitPoseX(const Calib& raw, int eye, bool painted_dual) {
   if (!painted_dual) return 0.f;
   const Calib c = ClampCalib(raw);
   int e = eye;
   if (c.swap_eyes) e = 1 - e;
-  const float half_m = c.ipd_m * 0.5f * c.eyescale;
+  const float half_m = c.ipd_m * 0.5f;
   return (e == 0) ? -half_m : half_m;
 }
 
@@ -62,8 +67,8 @@ inline StereoViewPlan StereoView_Decide(const StereoViewIn& in, bool painted_dua
   p.rigid = true;
   p.painted_dual = painted_dual;
   const Calib c = ClampCalib(in.calib);
-  p.half_ipd = StereoView_HalfIpdInches(c, in.world_scale);
-  p.half_ipd_m = c.ipd_m * 0.5f * c.eyescale;
+  p.half_ipd = StereoView_HalfIpdInches(c, in.world_scale, painted_dual);
+  p.half_ipd_m = painted_dual ? (c.ipd_m * 0.5f) : (c.ipd_m * 0.5f * c.eyescale);
 
   Vec3 right;
   AngleVectors(in.angles, nullptr, &right, nullptr);

@@ -252,6 +252,10 @@ Maps basename match: client.so must not bind steamclient.so. Offline 99/99. Not 
 
 Maps ELF load base, not RX text. CSS client.so R-at-0 + exec+RVA missed the hook. `(deleted)` still matches. Offline 104/104. Not HMD-proven.
 
+## 2026-09-18 cycle 51
+
+Dual world IPD ignores Vision eyescale. Live 0.13 would crush camera sep to ~8 mm. Offline 105/105. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

@@ -5,7 +5,7 @@ Audit source: gVRMod `state/polish_loop/CUBE_STANDARD.md` + `cl_vrmod.lua` dual 
 ## Stereo (non-negotiable)
 
 ```
-HMD pose → two cameras (same angles, origin ± head Right × IPD × eyescale)
+HMD pose → two cameras (same angles, origin ± head Right × ipd_m; eyescale is UV-only)
   → two world paints (RenderView / CViewSetup)
   → two OUT textures
   → OpenXR projection L/R with each eye FOV

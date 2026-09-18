@@ -1,14 +1,13 @@
-# Cycle 50 — 2026-09-18
+# Cycle 51 — 2026-09-18
 
 ## Focus
 
-`maps-elf-base-not-exec` — maps fallback used the RX segment as `client.so` base.
+`dual-ipd-ignores-uv-eyescale` — Vision eyescale crushed world camera sep.
 
 ## Did
 
-- First maps line is the ELF load base (vaddr 0). Hook RVAs are ELF vaddrs.
-- CSS `client.so` first PT_LOAD is R; RX is +0x644000. exec+RVA never hits RenderView.
-- Kernel ` (deleted)` suffix still matches and is stripped from the path.
+- Dual paint / submit pose use full `ipd_m`. eyescale stays UV-only (cycle 1 / pain point).
+- Live calib `eye=0.13` would have put cameras ~8 mm apart (no stereo even after two paints).
 
 ## Did not
 
@@ -17,7 +16,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 104 passed, 0 failed (835 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 105 passed, 0 failed (843 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

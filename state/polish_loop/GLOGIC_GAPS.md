@@ -18,6 +18,7 @@
 - [x] Why `VkCaptureEye` misses: color RTs lacked TRANSFER_SRC; last RT only tracked BeginRenderPass (cycle 21). Dynamic rendering + GENERAL retry added. In-game copy still unproven.
 - [x] Same-frame submit must use **identity VIEW pose** (cycle 1). Pose IPD on a mono frame = two planes + black.
 - [x] Dual-eye blit drops UV IPD (cycle 41). `CalibSubmitCrop(..., painted_dual)` — Vision pan stays; a second UV plane on two world paints is heresy.
+- [x] Dual world IPD ignores Vision eyescale (cycle 51). Live `eye=0.13` must not place cameras 8 mm apart.
 - [x] Identical L/R pixels stay MONO (cycle 46). Two copies of one RT must not unlock pose IPD.
 - [x] Vulkan-live CopyEye ignores GL blit (cycle 47). `GL_NO_ERROR` on a foreign context is not a world capture.
 - [x] HMD writes `CViewSetup` angles for both eye paints (cycle 6). Shared orientation. No guessed `SetViewAngles`.
