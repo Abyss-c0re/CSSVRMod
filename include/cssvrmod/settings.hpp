@@ -73,6 +73,34 @@ inline std::string Settings_Format(const Settings& s) {
   return buf;
 }
 
+// Env wins. nullptr = keep existing; else "1"/"0" to export before spawn.
+inline const char* Settings_LeftHandedSeed(const char* existing_env, bool cfg_left) {
+  if (existing_env && existing_env[0]) return nullptr;
+  return cfg_left ? "1" : "0";
+}
+
+inline bool Settings_LeftHandedFromLaunchText(const char* text) {
+  Settings s;
+  if (!text) return false;
+  const char* p = text;
+  while (*p) {
+    while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') ++p;
+    if (*p == '#' || *p == ';' || *p == '/') {
+      while (*p && *p != '\n') ++p;
+      continue;
+    }
+    char key[64] = {}, val[64] = {};
+    int ki = 0;
+    while (*p && *p != ' ' && *p != '\t' && *p != '\n' && *p != '=' && ki < 63) key[ki++] = *p++;
+    while (*p == ' ' || *p == '\t' || *p == '=') ++p;
+    int vi = 0;
+    while (*p && *p != ' ' && *p != '\t' && *p != '\n' && *p != '\r' && vi < 63) val[vi++] = *p++;
+    while (*p && *p != '\n') ++p;
+    if (key[0] && val[0]) Settings_ApplyKey(&s, key, val);
+  }
+  return s.left_handed;
+}
+
 const char* LaunchPrefsPath();
 bool Settings_Load(Settings* s);
 bool Settings_Save(const Settings& s);

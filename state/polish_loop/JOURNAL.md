@@ -168,6 +168,10 @@ HOME glyph on the Vision title when the panel is off default. Offline 83/83. Not
 
 VISION title lights when the laser is on it. Offline 84/84. Not HMD-proven. Menu chrome is enough.
 
+## 2026-09-18 cycle 31
+
+Start script + spawn seed CSSVR_LEFT_HANDED from launch.cfg. Offline 85/85. Not HMD-proven.
+
 
 
 

@@ -1,23 +1,24 @@
-# Cycle 30 — 2026-09-18
+# Cycle 31 — 2026-09-18
 
 ## Focus
 
-`menu3d-title-hot` — laser on the VISION header did not light it, so title-reset was not an obvious hit.
+`launch-seed-handed` — hook only saw `CSSVR_LEFT_HANDED` after XR init, so first Tick was right-only.
 
 ## Did
 
-- `Menu3d_TitleHot` from cursor UV (v < 0.18). Title bar rasters brighter when the laser is on it.
+- `Settings_LeftHandedSeed` / parse launch.cfg text. Env wins.
+- `CSSVR.sh` exports from `cssvr_launch.cfg` before exec. `CSSVR` setenv before spawn.
 
 ## Did not
 
-- HMD walk (user-gated).
-- Another menu3d chrome cycle (stop the panel ladder).
-- Claim live title UX from offline green.
+- HMD walk (user-gated). Dual-origin remains P0 but in-game.
+- Menu chrome.
+- Claim live left-hand start from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 84 passed, 0 failed (627 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 85 passed, 0 failed (635 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`launch-seed-handed` — export `CSSVR_LEFT_HANDED` from launch.cfg in the Start script so the hook sees it before XR init. Dual-origin stays HMD-gated.
+`dual-renderview-ipd-origin` — still HMD-gated. Do not add `menu3d-*`. Prefer a non-menu offline gap or wait for a headset walk.

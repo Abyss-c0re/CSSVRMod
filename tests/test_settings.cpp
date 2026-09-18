@@ -32,6 +32,17 @@ TEST(settings_apply_vision_and_launch) {
   ASSERT_TRUE(t2.find("left_handed 1") != std::string::npos);
 }
 
+TEST(settings_seed_left_handed) {
+  ASSERT_TRUE(Settings_LeftHandedFromLaunchText("backend vk\nleft_handed 1\n"));
+  ASSERT_FALSE(Settings_LeftHandedFromLaunchText("left_handed 0\n"));
+  ASSERT_FALSE(Settings_LeftHandedFromLaunchText("# left_handed 1\nbackend vk\n"));
+  ASSERT_TRUE(Settings_LeftHandedFromLaunchText("lefthanded 1\n"));
+  ASSERT_STREQ(Settings_LeftHandedSeed(nullptr, true), "1");
+  ASSERT_STREQ(Settings_LeftHandedSeed("", false), "0");
+  ASSERT_TRUE(Settings_LeftHandedSeed("1", false) == nullptr);
+  ASSERT_TRUE(Settings_LeftHandedSeed("0", true) == nullptr);
+}
+
 TEST(settings_roundtrip_tmp) {
   char dir[] = "/tmp/cssvr_setXXXXXX";
   ASSERT_TRUE(mkdtemp(dir) != nullptr);

@@ -139,5 +139,9 @@ int main(int argc, char** argv) {
                plan.xr_runtime_json.c_str(), cssvr::DetectCssExtraLibDir().c_str());
   if (print_only || !plan.ok) return plan.ok ? 0 : 1;
   setenv("CSSVR_NOBORDER", opts.noborder ? "1" : "0", 1);
+  {
+    const char* seed = cssvr::Settings_LeftHandedSeed(std::getenv("CSSVR_LEFT_HANDED"), set.left_handed);
+    if (seed) setenv("CSSVR_LEFT_HANDED", seed, 0);
+  }
   return Spawn(plan);
 }

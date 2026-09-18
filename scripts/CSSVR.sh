@@ -14,6 +14,14 @@ unset STEAM_RUNTIME_LIBRARY_PATH
 export DISPLAY="${DISPLAY:-:0}"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 export SDL_VIDEODRIVER="${SDL_VIDEODRIVER:-x11}"
+# Primary hand before CSSVR/hook so first Tick is not right-only.
+if [[ -z "${CSSVR_LEFT_HANDED:-}" ]]; then
+  launch="${CSSVR_LAUNCH:-${HOME}/.config/gvrmod/cssvr_launch.cfg}"
+  if [[ -r "$launch" ]]; then
+    v=$(awk '$1=="left_handed"||$1=="lefthanded"{print $2; exit}' "$launch" 2>/dev/null)
+    if [[ -n "$v" ]]; then export CSSVR_LEFT_HANDED="$v"; fi
+  fi
+fi
 # engine.so NEEDED libcurl-gnutls.so.4 — not on Arch. CSSVR also searches this.
 if [[ -z "${CSSVR_LIBDIR:-}" ]]; then
   for d in "$ROOT/.scratch/fakelibs" \
