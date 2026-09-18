@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T12:53:08Z",
   "last_focus": "hook-retry-until-client-mapped",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "pending",
+  "last_commit": "5bd8f38",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
