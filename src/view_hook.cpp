@@ -93,7 +93,9 @@ bool ProtectWrite(void* p, bool wr) {
 }
 
 bool CopyEye(int eye) {
-  if (VkCaptureEye(eye)) return true;
+  const bool vk_ok = VkCaptureEye(eye);
+  if (DualCapture_Accept(vk_ok, false, VkEye_DeviceLive())) return true;
+  if (VkEye_DeviceLive()) return false;
   GLint vp[4] = {};
   glGetIntegerv(GL_VIEWPORT, vp);
   const int w = vp[2], h = vp[3];

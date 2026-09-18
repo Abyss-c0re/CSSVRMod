@@ -1,14 +1,14 @@
-# Cycle 46 — 2026-09-18
+# Cycle 47 — 2026-09-18
 
 ## Focus
 
-`identical-eyes-stay-mono` — two copies of one RT still unlocked pose IPD.
+`vk-live-gl-copy-not-capture` — CopyEye counted a GL blit as a world capture on the Vulkan path.
 
 ## Did
 
-- `VkEye_WorldsDiffer` — byte-compare L/R; same pixels are one world view.
-- `DualPaint_AcceptPair` / view hook / WrapPresent stay MONO unless worlds differ.
-- No new toast.
+- `DualCapture_Accept` — when a VK device is live, only `VkCaptureEye` counts.
+- CopyEye returns false on GL fallback if `VkEye_DeviceLive()`.
+- GL-only launch still uses the blit. No new toast.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 98 passed, 0 failed (772 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 99 passed, 0 failed (778 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

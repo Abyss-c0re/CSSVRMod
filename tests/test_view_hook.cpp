@@ -30,6 +30,15 @@ TEST(view_setup_roundtrip_origin) {
   ASSERT_NEAR(fov, 87.5f, 0.0001);
 }
 
+TEST(dual_capture_vk_live_ignores_gl_blit) {
+  ASSERT_TRUE(DualCapture_Accept(true, false, true));
+  ASSERT_FALSE(DualCapture_Accept(false, true, true));
+  ASSERT_FALSE(DualCapture_Accept(false, false, true));
+  ASSERT_TRUE(DualCapture_Accept(false, true, false));
+  ASSERT_TRUE(DualCapture_Accept(true, true, false));
+  ASSERT_FALSE(DualCapture_Accept(false, false, false));
+}
+
 TEST(dual_paint_gate_needs_present) {
   DualPaintFrameGate g;
   ASSERT_TRUE(DualPaint_BeginFrame(&g));

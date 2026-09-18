@@ -573,6 +573,17 @@ bool CopyImageToEye(int eye, VkDevice dev, DeviceState* ds, VkImage img, uint32_
   return CopyImageToEyeLayout(eye, dev, ds, img, w, h, fmt, src_layout);
 }
 
+} // namespace
+
+namespace cssvr {
+bool VkEye_DeviceLive() {
+  std::lock_guard<std::mutex> lk(g_mu);
+  return !g_devs.empty();
+}
+} // namespace cssvr
+
+namespace {
+
 bool CaptureEyeImpl(int eye) {
   FbColor rt{};
   VkDevice dev = VK_NULL_HANDLE;

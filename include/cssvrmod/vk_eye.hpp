@@ -86,5 +86,7 @@ inline bool VkEye_WorldsDiffer(const VkEyePair& p) {
 /// Live: copy last Vulkan color RT into eye slot. False if no RT / copy miss.
 bool VkCaptureEye(int eye);
 bool VkEye_TakePair(VkEyePair* out);
+/// True after shaderapivk created a device. Then GL CopyEye must not count.
+bool VkEye_DeviceLive();
 
 } // namespace cssvr

@@ -43,6 +43,13 @@ inline bool DualPaint_AcceptPair(bool painted_dual, bool worlds_differ) {
   return painted_dual && worlds_differ;
 }
 
+/// Vulkan present path: only a VK RT copy counts. A GL blit of a foreign context
+/// is not a world paint (would unlock painted_dual on empty GL_NO_ERROR).
+inline bool DualCapture_Accept(bool vk_copied, bool gl_copied, bool vk_device_live) {
+  if (vk_device_live) return vk_copied;
+  return vk_copied || gl_copied;
+}
+
 // Hook live, both paints ran, but eye copies missed. One-shot after a short hold
 // so the first loading frames do not toast. Never abort VR (stay MONO).
 struct DualCaptureToastIn {
