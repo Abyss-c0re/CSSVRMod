@@ -76,7 +76,13 @@ bool ProbeLiveEngine(EngineIf& out) {
     auto** vt = *reinterpret_cast<ViewAngFn**>(out.engine);
     // 2013/CSS64 layout that already matches GetScreenSize=5 / ClientCmd=7.
     constexpr int kGet = 19, kSet = 20;
-    if (vt && vt[kGet] && vt[kSet]) {
+    static int angles_probe = 0; // 0 idle  1 failed  2 ok
+    static int ok_get = -1, ok_set = -1;
+    if (angles_probe == 2) {
+      out.angles_ok = true;
+      out.get_angles_idx = ok_get;
+      out.set_angles_idx = ok_set;
+    } else if (angles_probe == 0 && vt && vt[kGet] && vt[kSet]) {
       Dl_info gi{}, si{};
       const bool in_eng = dladdr(reinterpret_cast<void*>(vt[kGet]), &gi) && gi.dli_fname &&
                           std::strstr(gi.dli_fname, "engine.so") &&
@@ -86,6 +92,11 @@ bool ProbeLiveEngine(EngineIf& out) {
         out.angles_ok = true;
         out.get_angles_idx = kGet;
         out.set_angles_idx = kSet;
+        ok_get = kGet;
+        ok_set = kSet;
+        angles_probe = 2;
+      } else {
+        angles_probe = 1; // do not yank view again
       }
     }
   }

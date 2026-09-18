@@ -40,6 +40,10 @@ Stopped caching controller yaw as HMD when VIEW locate misses. Look stays game v
 
 `SetViewAngles` gated on Get+Set roundtrip and `engine.so` dladdr (19/20 only if that passes). Offline 46/46. Not HMD-proven.
 
+## 2026-09-18 cycle 7 follow
+
+Angles probe is process-wide one-shot. hook_gl + view_hook + hook_vk each had their own EngineIf and would yank yaw to 33.5° three times at start.
+
 
 
 
