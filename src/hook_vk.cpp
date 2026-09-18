@@ -1,8 +1,10 @@
 // CSS 64-bit defaults to shaderapivk / DXVK. GL swap never runs.
 // Intercept vkQueuePresentKHR and dump the presented swapchain image.
 #include "xr_host.hpp"
+#include "cssvrmod/collision.hpp"
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/source_if.hpp"
+#include "cssvrmod/tick.hpp"
 #include "cssvrmod/usercmd.hpp"
 #include "cssvrmod/vk_eye.hpp"
 #include "cssvrmod/weapons.hpp"
@@ -239,8 +241,20 @@ void* XrWorker(void*) {
         Log("xr submit #%d %ux%u %s", g_xr_ok, w, h, XrHostStatus().reason);
       XrSample xr{};
       if (XrHostPollInput(&xr)) {
-        GunPose gun = GunFromHand(xr.right, WeaponOffset{});
-        UserCmdOverlay cmd = InputMap(xr, gun, InputConfig{}, 0.011f);
+        static WallState leftWall, rightWall;
+        static float nextMelee = 0.f;
+        static float now = 0.f;
+        static const WeaponInfo* wep = FindWeapon("weapon_knife");
+        TickIn tin;
+        tin.xr = xr;
+        tin.wep = wep;
+        tin.now = now;
+        tin.dt = 0.011f;
+        tin.current_view = xr.hmd.ang;
+        tin.trace = EngineMakeTraceFn(g_eng);
+        TickOut tout = Tick(tin, leftWall, rightWall, &nextMelee);
+        now += 0.011f;
+        UserCmdOverlay cmd = tout.cmd;
         UserCmd_NoteOverlay(cmd);
         if (g_eng.screen_ok || ProbeLiveEngine(g_eng)) {
           auto edge = [&](int bit, const char* plus, const char* minus) {

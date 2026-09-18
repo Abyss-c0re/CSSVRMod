@@ -20,6 +20,7 @@ struct alignas(16) RayBlob {
   VecAligned delta;
   VecAligned start_off;
   VecAligned extents;
+  const void* world_axis = nullptr; // Source 2013 Ray_t; null = identity
   bool is_ray = true;
   bool is_swept = false;
 };

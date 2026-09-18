@@ -56,6 +56,10 @@ Apply XR overlay *after* the original CreateMove (orig was wiping analog). Vulka
 
 `IEngineTrace::TraceRay` gated on dladdr + sane fraction (003/004). Last-free hull hooked into Tick when the probe passes. Offline 55/55. Not HMD-proven collision.
 
+## 2026-09-18 cycle 9 follow
+
+Ray_t was missing `m_pWorldAxisTransform` (2013, offset 64) — engine would treat is_ray as a pointer and crash. Added null axis. Tick+trace now also runs on the Vulkan worker, not only GL swap.
+
 
 
 

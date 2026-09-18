@@ -1,6 +1,7 @@
 #include "cssvrmod/engine_trace.hpp"
 #include "cssvrmod/source_if.hpp"
 #include "test_framework.h"
+#include <cstddef>
 #include <cstring>
 
 using namespace cssvr;
@@ -13,6 +14,11 @@ TEST(ray_init_hull_swept) {
   ASSERT_NEAR(r.delta.x, 10.f, 0.001);
   ASSERT_NEAR(r.extents.x, 2.f, 0.001);
   ASSERT_NEAR(r.start.x, 0.f, 0.001);
+}
+
+TEST(ray_blob_2013_world_axis_at_64) {
+  ASSERT_EQ((int)offsetof(RayBlob, world_axis), 64);
+  ASSERT_EQ((int)offsetof(RayBlob, is_ray), 72);
 }
 
 TEST(ray_init_point_not_swept) {
