@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T15:14:04Z",
   "last_focus": "dual-pose-ipd-is-second-plane",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "pending",
+  "last_commit": "f5273c1",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
