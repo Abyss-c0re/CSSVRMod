@@ -38,7 +38,8 @@ inline bool Settings_PreferPersistWin(bool have_cur, int cur_w, int cur_h, int w
   const int nw = Settings_ClampWin(w, 640, 3840);
   const int nh = Settings_ClampWin(h, 480, 2160);
   const long cur = (long)cur_w * (long)cur_h;
-  if (cur <= 0) return true;
+  // First window was 1×1 (no plausible size yet) — keep it for SetWindowSize.
+  if (cur <= 0) return false;
   return (long)nw * (long)nh >= cur;
 }
 

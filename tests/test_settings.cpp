@@ -81,7 +81,7 @@ TEST(settings_prefer_persist_win) {
   ASSERT_FALSE(Settings_PreferPersistWin(true, 1920, 1080, 640, 480)); // splash
   ASSERT_FALSE(Settings_PreferPersistWin(true, 1920, 1080, 200, 200));
   ASSERT_TRUE(Settings_PreferPersistWin(true, 1280, 720, 1920, 1080));
-  ASSERT_TRUE(Settings_PreferPersistWin(true, 0, 0, 1920, 1080)); // last was unknown
+  ASSERT_FALSE(Settings_PreferPersistWin(true, 0, 0, 1920, 1080)); // 1x1 first, keep for SetWindowSize
   ASSERT_TRUE(Settings_PreferPersistWin(true, 1920, 1080, 1920, 1080));
 }
 
