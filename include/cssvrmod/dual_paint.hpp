@@ -38,6 +38,11 @@ inline DualPaintResult DualPaint_Run(const StereoViewIn& in, const DualPaintFn& 
   return r;
 }
 
+/// Two copies of one framebuffer are not dual. Stay MONO (no pose IPD).
+inline bool DualPaint_AcceptPair(bool painted_dual, bool worlds_differ) {
+  return painted_dual && worlds_differ;
+}
+
 // Hook live, both paints ran, but eye copies missed. One-shot after a short hold
 // so the first loading frames do not toast. Never abort VR (stay MONO).
 struct DualCaptureToastIn {

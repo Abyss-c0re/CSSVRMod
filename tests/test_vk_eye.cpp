@@ -1,3 +1,4 @@
+#include "cssvrmod/dual_paint.hpp"
 #include "cssvrmod/stereo_view.hpp"
 #include "cssvrmod/vk_eye.hpp"
 #include "test_framework.h"
@@ -52,6 +53,21 @@ TEST(vk_eye_miss_reason) {
   ASSERT_STREQ(VkEye_MissDecide(in), "copy_fail");
   in.copied = true;
   ASSERT_STREQ(VkEye_MissDecide(in), "ok");
+}
+
+TEST(vk_eye_identical_pixels_are_not_dual) {
+  VkEyePair p;
+  std::vector<unsigned char> a(16, 7), b(16, 7);
+  ASSERT_TRUE(VkEye_Store(&p, 0, a.data(), 2, 2, false));
+  ASSERT_TRUE(VkEye_Store(&p, 1, b.data(), 2, 2, false));
+  ASSERT_TRUE(VkEye_Ready(p));
+  ASSERT_FALSE(VkEye_WorldsDiffer(p));
+  ASSERT_FALSE(DualPaint_AcceptPair(true, false));
+  b[0] = 8;
+  ASSERT_TRUE(VkEye_Store(&p, 1, b.data(), 2, 2, false));
+  ASSERT_TRUE(VkEye_WorldsDiffer(p));
+  ASSERT_TRUE(DualPaint_AcceptPair(true, true));
+  ASSERT_FALSE(DualPaint_AcceptPair(false, true));
 }
 
 TEST(vk_eye_ready_does_not_unlock_pose_ipd_alone) {

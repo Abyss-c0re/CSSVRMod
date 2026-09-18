@@ -232,6 +232,10 @@ Retry RenderView/CreateMove until client.so is mapped. First present can be spla
 
 VK present now clears the dual-paint frame gate (ViewHookOnSwap was GL-only). Dual paint can run every frame, not once. Offline 97/97. Not HMD-proven.
 
+## 2026-09-18 cycle 46
+
+Identical L/R pixels stay MONO. Two copies of one RT must not unlock pose IPD. Offline 98/98. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

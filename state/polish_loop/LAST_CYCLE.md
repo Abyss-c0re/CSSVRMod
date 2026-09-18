@@ -1,14 +1,14 @@
-# Cycle 45 — 2026-09-18
+# Cycle 46 — 2026-09-18
 
 ## Focus
 
-`vk-present-clears-dual-gate` — ViewHookOnSwap ran only on GL swap.
+`identical-eyes-stay-mono` — two copies of one RT still unlocked pose IPD.
 
 ## Did
 
-- `DualPaintFrameGate` — one dual attempt per present; clear on swap.
-- `WrapPresent` calls `ViewHookOnSwap` so the next CViewRender may dual-paint again.
-- Tiny views still do not consume the gate.
+- `VkEye_WorldsDiffer` — byte-compare L/R; same pixels are one world view.
+- `DualPaint_AcceptPair` / view hook / WrapPresent stay MONO unless worlds differ.
+- No new toast.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 97 passed, 0 failed (763 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 98 passed, 0 failed (772 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

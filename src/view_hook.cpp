@@ -163,6 +163,13 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
       },
       [&](int eye) { return CopyEye(eye); });
   ViewSetup_WriteOrigin(view, kBlob, g_loc.fields, origin);
+  if (r.painted_dual) {
+    VkEyePair pair;
+    if (VkEye_TakePair(&pair) && !VkEye_WorldsDiffer(pair)) {
+      r.painted_dual = false;
+      r.reason = "identical_eyes";
+    }
+  }
   g_have_eyes = r.painted_dual;
   XrHostNoteDualPaint(r.painted_dual);
   g_frame.did_frame = true;

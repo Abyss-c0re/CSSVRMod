@@ -75,6 +75,14 @@ inline bool VkEye_Ready(const VkEyePair& p) {
   return true;
 }
 
+/// Same pixels twice is one world view. Pose IPD on that pair is heresy.
+inline bool VkEye_WorldsDiffer(const VkEyePair& p) {
+  if (!VkEye_Ready(p)) return false;
+  const auto& l = p.eye[0].px;
+  const auto& r = p.eye[1].px;
+  return std::memcmp(l.data(), r.data(), l.size()) != 0;
+}
+
 /// Live: copy last Vulkan color RT into eye slot. False if no RT / copy miss.
 bool VkCaptureEye(int eye);
 bool VkEye_TakePair(VkEyePair* out);

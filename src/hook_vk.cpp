@@ -700,7 +700,7 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
   const VkResult pr = real(queue, info);
   // After present: never wait. Harvest a finished GPU copy, kick the next if XR is hungry.
   VkEyePair dual{};
-  const bool have_dual = TakePairImpl(&dual);
+  const bool have_dual = TakePairImpl(&dual) && VkEye_WorldsDiffer(dual);
   if (have_dual && XrWanted() && !MailboxFull()) {
     EnsureXrWorker();
     PushXrDual(dual);
