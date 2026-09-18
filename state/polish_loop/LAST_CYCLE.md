@@ -1,25 +1,25 @@
-# Cycle 6 — 2026-09-18
+# Cycle 7 — 2026-09-18
 
 ## Focus
 
-`hmd-drives-viewangles` — look around is VR.
+`engine-setviewangles-selftest` — movement/bullets follow look only after a real Get/Set pair.
 
 ## Did
 
-- `look.hpp`: HMD overrides game view; invalid HMD keeps game; snap-on-fire still beats HMD.
-- `CViewSetup` angles (+0x4c) written for both eye paints (shared orientation).
-- Cache HMD from `xrLocateSpace(VIEW in STAGE)` — not controller yaw.
-- No guessed `SetViewAngles` vtable.
+- `ViewAnglesSane` + `ViewAnglesRoundtripOk` (write probe, read back, restore).
+- Live probe: slots 19/20 only if `dladdr` says `engine.so` **and** the roundtrip works.
+- `EngineSetViewAngles` no-ops unless `angles_ok`.
+- RenderView hook writes cyclopean HMD look to the engine after that gate.
 
 ## Did not
 
-- Drive `IVEngineClient` viewangles (movement/bullets still game view).
-- Claim stereo or HMD smoke from offline green.
+- Guess a vtable index without a roundtrip.
+- Claim HMD look or stereo from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 45 passed, 0 failed (342 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 46 passed, 0 failed (350 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`engine-setviewangles-selftest` — write look into the engine only after a GetViewAngles self-test.
+`live-xr-input-proven` — movement / fire from XR in-game (CreateMove / ClientCmd still stubs).

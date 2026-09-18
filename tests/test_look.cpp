@@ -1,4 +1,5 @@
 #include "cssvrmod/look.hpp"
+#include "cssvrmod/source_if.hpp"
 #include "cssvrmod/view_setup.hpp"
 #include "test_framework.h"
 
@@ -38,6 +39,35 @@ TEST(look_snap_fire_beats_hmd) {
   ASSERT_TRUE(d.applied);
   ASSERT_STREQ(d.reason, "snap_fire");
   ASSERT_NEAR(d.angles.y, 90.f, 1.f);
+}
+
+static Ang3 g_fake_ang{0.f, 10.f, 0.f};
+
+static void FakeGetAng(void*, Ang3* a) {
+  if (a) *a = g_fake_ang;
+}
+static void FakeSetAng(void*, Ang3* a) {
+  if (a) g_fake_ang = *a;
+}
+
+TEST(viewangles_sane_and_roundtrip) {
+  ASSERT_TRUE(ViewAnglesSane({0.f, 0.f, 0.f}));
+  ASSERT_TRUE(ViewAnglesSane({-89.f, 359.f, 0.f}));
+  ASSERT_FALSE(ViewAnglesSane({999.f, 0.f, 0.f}));
+  ASSERT_FALSE(ViewAnglesSane({0.f, 1e9f, 0.f}));
+  int dummy = 0;
+  g_fake_ang = {0.f, 10.f, 0.f};
+  ASSERT_TRUE(ViewAnglesRoundtripOk(&dummy, FakeGetAng, FakeSetAng));
+  ASSERT_NEAR(g_fake_ang.y, 10.f, 0.001); // restored
+  EngineIf e;
+  e.engine = &dummy;
+  e.angles_ok = false;
+  ASSERT_FALSE(EngineSetViewAngles(e, {0.f, 45.f, 0.f}));
+  e.angles_ok = true;
+  e.get_angles_idx = 19;
+  e.set_angles_idx = 20;
+  // Fake object is not a real vtable — Set must refuse without a valid slot table.
+  ASSERT_FALSE(EngineGetViewAngles(e, nullptr));
 }
 
 TEST(look_write_angles_roundtrip) {

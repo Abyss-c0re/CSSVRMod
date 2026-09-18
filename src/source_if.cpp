@@ -1,6 +1,7 @@
 #include "cssvrmod/source_if.hpp"
 #include <dlfcn.h>
 #include <cstdio>
+#include <cstring>
 
 namespace cssvr {
 
@@ -71,7 +72,25 @@ bool ProbeLiveEngine(EngineIf& out) {
   }
   if (!ProbeEngineFromFactories(eng, cli, out)) return false;
   out.screen_ok = ScreenSelfTest(out.engine, &out.screen_w, &out.screen_h);
-  out.reason = out.screen_ok ? "probed_screen_ok" : "probed_no_screen";
+  if (out.engine) {
+    auto** vt = *reinterpret_cast<ViewAngFn**>(out.engine);
+    // 2013/CSS64 layout that already matches GetScreenSize=5 / ClientCmd=7.
+    constexpr int kGet = 19, kSet = 20;
+    if (vt && vt[kGet] && vt[kSet]) {
+      Dl_info gi{}, si{};
+      const bool in_eng = dladdr(reinterpret_cast<void*>(vt[kGet]), &gi) && gi.dli_fname &&
+                          std::strstr(gi.dli_fname, "engine.so") &&
+                          dladdr(reinterpret_cast<void*>(vt[kSet]), &si) && si.dli_fname &&
+                          std::strstr(si.dli_fname, "engine.so");
+      if (in_eng && ViewAnglesRoundtripOk(out.engine, vt[kGet], vt[kSet])) {
+        out.angles_ok = true;
+        out.get_angles_idx = kGet;
+        out.set_angles_idx = kSet;
+      }
+    }
+  }
+  if (out.angles_ok) out.reason = "probed_angles_ok";
+  else out.reason = out.screen_ok ? "probed_screen_ok" : "probed_no_screen";
   return true;
 }
 
@@ -81,6 +100,24 @@ bool EngineClientCmd(const EngineIf& e, const char* cmd) {
   auto** vt = *reinterpret_cast<ClientCmdFn**>(e.engine);
   if (!vt || !vt[7]) return false;
   vt[7](e.engine, cmd);
+  return true;
+}
+
+bool EngineGetViewAngles(const EngineIf& e, Ang3* out) {
+  if (!e.engine || !e.angles_ok || !out || e.get_angles_idx < 0) return false;
+  auto** vt = *reinterpret_cast<ViewAngFn**>(e.engine);
+  if (!vt || !vt[e.get_angles_idx]) return false;
+  vt[e.get_angles_idx](e.engine, out);
+  return ViewAnglesSane(*out);
+}
+
+bool EngineSetViewAngles(const EngineIf& e, const Ang3& a) {
+  if (!e.engine || !e.angles_ok || e.set_angles_idx < 0) return false;
+  if (!ViewAnglesSane(a)) return false;
+  auto** vt = *reinterpret_cast<ViewAngFn**>(e.engine);
+  if (!vt || !vt[e.set_angles_idx]) return false;
+  Ang3 tmp = a;
+  vt[e.set_angles_idx](e.engine, &tmp);
   return true;
 }
 

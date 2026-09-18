@@ -36,6 +36,11 @@ HMD writes `CViewSetup` angles for both paints (shared orientation). VIEW-in-STA
 
 Stopped caching controller yaw as HMD when VIEW locate misses. Look stays game view until a real headset pose exists. Mutex on the HMD cache (XR thread vs RenderView).
 
+## 2026-09-18 cycle 7
+
+`SetViewAngles` gated on Get+Set roundtrip and `engine.so` dladdr (19/20 only if that passes). Offline 46/46. Not HMD-proven.
+
+
 
 
 

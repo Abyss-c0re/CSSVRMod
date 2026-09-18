@@ -3,6 +3,7 @@
 #include "cssvrmod/dual_paint.hpp"
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/look.hpp"
+#include "cssvrmod/source_if.hpp"
 #include "cssvrmod/vk_eye.hpp"
 #include "xr_host.hpp"
 
@@ -23,6 +24,7 @@ using RenderViewFn = void (*)(void*, void*, int, int);
 
 RenderViewLoc g_loc;
 RenderViewFn g_orig = nullptr;
+EngineIf g_eng;
 bool g_in = false;
 bool g_did_frame = false;
 GLuint g_eye[2] = {0, 0};
@@ -102,6 +104,7 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
   if (look.applied) {
     angles = look.angles;
     ViewSetup_WriteAngles(view, kBlob, g_loc.fields, angles);
+    EngineSetViewAngles(g_eng, look.angles);
   }
   g_in = true;
   StereoViewIn in;
@@ -170,6 +173,9 @@ void ViewHookTryInstall() {
        (unsigned long long)g_loc.fn_rva, (int)g_loc.slot_rva.size(), patched,
        g_loc.fields.origin_off);
   if (!patched) g_orig = nullptr;
+  ProbeLiveEngine(g_eng);
+  Logf("engine angles_ok=%d get=%d set=%d %s", g_eng.angles_ok ? 1 : 0, g_eng.get_angles_idx,
+       g_eng.set_angles_idx, g_eng.reason);
 }
 
 void ViewHookOnSwap() { g_did_frame = false; }
