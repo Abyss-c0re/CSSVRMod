@@ -29,6 +29,7 @@
 - [x] Highlight the VISION title while the laser is on it (cycle 30). Menu chrome is enough.
 - [x] Seed CSSVR_LEFT_HANDED from launch.cfg in Start + spawn (cycle 31). Env wins.
 - [x] Persist desktop window size (cycle 32). `--set width/height`; spawn `-w`/`-h`.
+- [x] `--print` shows persisted `-w`/`-h` + argv (cycle 33). CSS-missing still prints planned size.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.

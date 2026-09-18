@@ -132,6 +132,37 @@ TEST(launch_plan_default_gl_flag) {
   ASSERT_TRUE(has_vk);
 }
 
+TEST(launch_print_spawn_wh) {
+  CssInstall inst;
+  inst.found = true;
+  inst.root = "/tmp";
+  inst.launcher = "/tmp/cstrike.sh";
+  inst.linux64 = true;
+  LaunchOpts o;
+  o.hook_so.clear();
+  o.win_w = 1280;
+  o.win_h = 720;
+  auto plan = PlanSpawn(inst, o);
+  int w = 0, h = 0;
+  ASSERT_TRUE(SpawnArgvWinSize(plan, &w, &h));
+  ASSERT_EQ(w, 1280);
+  ASSERT_EQ(h, 720);
+  const std::string line = FormatSpawnWh(plan, 1920, 1080);
+  ASSERT_TRUE(line.find("-w 1280") != std::string::npos);
+  ASSERT_TRUE(line.find("-h 720") != std::string::npos);
+  const std::string argv = FormatSpawnArgv(plan);
+  ASSERT_TRUE(argv.find("-w 1280") != std::string::npos);
+  ASSERT_TRUE(argv.find("-h 720") != std::string::npos);
+  ASSERT_TRUE(argv.find("+mat_setvideomode 1280 720") != std::string::npos);
+  // CSS missing: --print still shows planned (persisted) size, not a blank line.
+  SpawnPlan miss;
+  miss.reason = "css_not_found";
+  ASSERT_FALSE(SpawnArgvWinSize(miss, &w, &h));
+  ASSERT_STREQ(FormatSpawnWh(miss, 1600, 900).c_str(), "-w 1600 -h 900");
+  ASSERT_TRUE(FormatSpawnArgv(miss).empty());
+  ASSERT_STREQ(FormatSpawnWh(1920, 1080).c_str(), "-w 1920 -h 1080");
+}
+
 TEST(launch_hook_required_when_set) {
   CssInstall inst;
   inst.found = true;

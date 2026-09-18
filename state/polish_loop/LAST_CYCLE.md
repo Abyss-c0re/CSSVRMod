@@ -1,23 +1,23 @@
-# Cycle 32 — 2026-09-18
+# Cycle 33 — 2026-09-18
 
 ## Focus
 
-`settings-win-size` — desktop `-w`/`-h` were hardcoded 1920×1080.
+`print-spawn-wh` — `--print` hid the persisted desktop `-w`/`-h`.
 
 ## Did
 
-- Persist `width`/`height` in launch.cfg (`--set width 1280`). Clamp 640–3840 × 480–2160.
-- Spawn and `--width`/`--height` apply the knobs. Still framed (no force `-noborder`).
+- `--print` writes `cssvr: spawn -w N -h N` from argv (exec truth) or planned opts if CSS is missing.
+- Also dumps space-joined argv so `+mat_setvideomode` is auditable without spawn.
 
 ## Did not
 
 - HMD walk (user-gated). Dual-origin remains P0 but in-game.
-- Menu chrome / toasts.
+- Menu chrome / toasts. No force `-noborder`.
 
 ## Tests
 
-`cssvrmod_tests` — 85 passed, 0 failed (649 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 86 passed, 0 failed (661 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`dual-renderview-ipd-origin` — still HMD-gated. Do not add `menu3d-*` or another toast. Prefer a non-menu offline gap or wait.
+`print-spawn-chrome` — `--print` should say framed vs `-noborder`. Never queue `dual-renderview-ipd-origin`.

@@ -147,6 +147,12 @@ int main(int argc, char** argv) {
                plan.ok ? 1 : 0, plan.backend, plan.reason, plan.exe.c_str(),
                plan.ld_preload.c_str(), plan.sdl_videodriver.c_str(),
                plan.xr_runtime_json.c_str(), cssvr::DetectCssExtraLibDir().c_str());
+  {
+    const std::string wh = cssvr::FormatSpawnWh(plan, opts.win_w, opts.win_h);
+    std::fprintf(stdout, "cssvr: spawn %s\n", wh.c_str());
+    if (print_only && !plan.argv.empty())
+      std::fprintf(stdout, "cssvr: argv %s\n", cssvr::FormatSpawnArgv(plan).c_str());
+  }
   if (print_only || !plan.ok) return plan.ok ? 0 : 1;
   setenv("CSSVR_NOBORDER", opts.noborder ? "1" : "0", 1);
   {

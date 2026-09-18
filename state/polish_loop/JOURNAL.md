@@ -176,6 +176,10 @@ Start script + spawn seed CSSVR_LEFT_HANDED from launch.cfg. Offline 85/85. Not 
 
 Persist desktop window width/height in launch.cfg; spawn uses them. Offline 85/85. Not HMD-proven.
 
+## 2026-09-18 cycle 33
+
+`--print` now shows persisted `-w`/`-h` (argv or planned opts) plus the spawn argv. Offline 86/86. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

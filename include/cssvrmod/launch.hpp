@@ -1,6 +1,8 @@
 #pragma once
 // Find Counter-Strike: Source and build an honest spawn plan (no Steam theater).
 #include "backend.hpp"
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 #include <vector>
 
@@ -53,5 +55,45 @@ std::string DetectCssExtraLibDir();
 
 /// Pure: never skip spawn unless hook path is empty (tests).
 inline bool SpawnNeedsHook(const LaunchOpts& o) { return !o.hook_so.empty(); }
+
+/// Pull -w/-h from spawn argv (what exec will see). False if either flag is missing.
+inline bool SpawnArgvWinSize(const SpawnPlan& p, int* w, int* h) {
+  if (!w || !h) return false;
+  bool got_w = false, got_h = false;
+  for (size_t i = 0; i + 1 < p.argv.size(); ++i) {
+    if (p.argv[i] == "-w") {
+      *w = std::atoi(p.argv[i + 1].c_str());
+      got_w = true;
+    } else if (p.argv[i] == "-h") {
+      *h = std::atoi(p.argv[i + 1].c_str());
+      got_h = true;
+    }
+  }
+  return got_w && got_h;
+}
+
+/// One --print line: "-w 1280 -h 720".
+inline std::string FormatSpawnWh(int w, int h) {
+  char buf[48];
+  std::snprintf(buf, sizeof(buf), "-w %d -h %d", w, h);
+  return buf;
+}
+
+/// Prefer argv (exec truth). Fall back to planned opts when CSS is missing.
+inline std::string FormatSpawnWh(const SpawnPlan& p, int fallback_w, int fallback_h) {
+  int w = fallback_w, h = fallback_h;
+  SpawnArgvWinSize(p, &w, &h);
+  return FormatSpawnWh(w, h);
+}
+
+/// Space-joined argv for --print (no spawn).
+inline std::string FormatSpawnArgv(const SpawnPlan& p) {
+  std::string out;
+  for (size_t i = 0; i < p.argv.size(); ++i) {
+    if (i) out += ' ';
+    out += p.argv[i];
+  }
+  return out;
+}
 
 } // namespace cssvr
