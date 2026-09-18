@@ -13,6 +13,7 @@ add_library(cssvrmod_core STATIC
   src/launch.cpp
   src/source_if.cpp
   src/calib.cpp
+  src/usercmd.cpp
 )
 target_include_directories(cssvrmod_core PUBLIC
   ${CSSVR_ROOT}/include
@@ -35,6 +36,7 @@ add_executable(cssvrmod_tests
   tests/test_view_hook.cpp
   tests/test_vk_eye.cpp
   tests/test_look.cpp
+  tests/test_usercmd.cpp
 )
 target_include_directories(cssvrmod_tests PRIVATE
   ${CSSVR_ROOT}/include
@@ -79,6 +81,7 @@ if(CSSVR_BUILD_HOOK AND NOT WIN32)
       src/togl_adapter.cpp
       src/xr_host.cpp
       src/view_hook.cpp
+      src/create_move.cpp
     )
     target_include_directories(cssvrmod_hook PRIVATE
       ${CSSVR_ROOT}/include

@@ -14,7 +14,8 @@
 
 - [x] World-locked 3D Vision panel (HL2VR/Cube class) — menu button toggle, stick rows (cycle 3).
 - [ ] Standalone desktop settings host (still Cube + this 3D panel).
-- [ ] Live XR input → movement / look / fire proven in-game (not only offline InputMap).
+- [x] `CUserCmd` overlay + CreateMove hook (RTTI/xmm0 self-test, cycle 8). Analog stick writes forwardmove.
+- [ ] Live XR input proven in-game (HMD). Offline green ≠ controls smoke.
 
 ## P2 — world law
 

@@ -3,6 +3,7 @@
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/tick.hpp"
+#include "cssvrmod/usercmd.hpp"
 #include "cssvrmod/view_hook.hpp"
 #include "cssvrmod/weapons.hpp"
 #include "xr_host.hpp"
@@ -271,10 +272,12 @@ void ApplyClientCmd(const UserCmdOverlay& cmd, const UserCmdOverlay& prev) {
   edge(kInJump, "+jump", "-jump");
   edge(kInReload, "+reload", "-reload");
   edge(kInUse, "+use", "-use");
-  edge(kInForward, "+forward", "-forward");
-  edge(kInBack, "+back", "-back");
-  edge(kInMoveLeft, "+moveleft", "-moveleft");
-  edge(kInMoveRight, "+moveright", "-moveright");
+  if (!UserCmd_HookLive()) {
+    edge(kInForward, "+forward", "-forward");
+    edge(kInBack, "+back", "-back");
+    edge(kInMoveLeft, "+moveleft", "-moveleft");
+    edge(kInMoveRight, "+moveright", "-moveright");
+  }
   edge(kInScore, "+showscores", "-showscores");
 }
 
@@ -290,6 +293,7 @@ void Once() {
   Logf("dump_dir=%s xr=%d", g_dump_dir.c_str(), g_want_xr ? 1 : 0);
   ProbeLiveEngine(g_eng);
   ViewHookTryInstall();
+  UserCmd_HookLive();
   g_wep = FindWeapon("weapon_knife");
   if (g_want_xr) {
     g_xr_ok = XrHostInit();
@@ -332,6 +336,7 @@ void HookOnSwap() {
     tin.melee = g_mcfg;
     tin.current_view = xr.hmd.ang;
     TickOut tout = Tick(tin, g_leftWall, g_rightWall, &g_nextMelee);
+    UserCmd_NoteOverlay(tout.cmd);
     ApplyClientCmd(tout.cmd, g_prevCmd);
     g_prevCmd = tout.cmd;
     PushSdl(tout.sdl);

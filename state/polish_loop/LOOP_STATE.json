@@ -1,11 +1,11 @@
 {
-  "cycle": 7,
+  "cycle": 8,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T07:40:00Z",
-  "last_focus": "engine-setviewangles-selftest",
-  "next_focus": "live-xr-input-proven",
-  "last_commit": "34516f5",
+  "started_at": "2026-09-18T07:53:00Z",
+  "last_focus": "live-xr-input-proven",
+  "next_focus": "ienginetrace-live",
+  "last_commit": "",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }

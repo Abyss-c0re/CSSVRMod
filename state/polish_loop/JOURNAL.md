@@ -44,6 +44,11 @@ Stopped caching controller yaw as HMD when VIEW locate misses. Look stays game v
 
 Angles probe is process-wide one-shot. hook_gl + view_hook + hook_vk each had their own EngineIf and would yank yaw to 33.5° three times at start.
 
+## 2026-09-18 cycle 8
+
+Analog XR → `CUserCmd` via `IClientMode::CreateMove` (RTTI + xmm0/rsi self-test, slot 22). Overlay from InputMap. Offline 50/50. Not in-game proven.
+
+
 
 
 

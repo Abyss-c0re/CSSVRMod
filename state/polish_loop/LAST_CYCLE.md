@@ -1,25 +1,25 @@
-# Cycle 7 — 2026-09-18
+# Cycle 8 — 2026-09-18
 
 ## Focus
 
-`engine-setviewangles-selftest` — movement/bullets follow look only after a real Get/Set pair.
+`live-xr-input-proven` — analog stick into `CUserCmd`, not only `+forward`.
 
 ## Did
 
-- `ViewAnglesSane` + `ViewAnglesRoundtripOk` (write probe, read back, restore).
-- Live probe: slots 19/20 only if `dladdr` says `engine.so` **and** the roundtrip works.
-- `EngineSetViewAngles` no-ops unless `angles_ok`.
-- RenderView hook writes cyclopean HMD look to the engine after that gate.
+- `usercmd.hpp`: detect vptr vs no-vptr via sane viewangles; apply forward/side/up/buttons.
+- Locate `ClientModeShared::CreateMove` by RTTI + `xmm0` dt + `rsi` cmd (slot 22 on this CSS).
+- Vtable hook applies the last `InputMap` overlay. Movement `ClientCmd` skipped if hooked.
+- Offline locator ran on live `client.so`.
 
 ## Did not
 
-- Guess a vtable index without a roundtrip.
-- Claim HMD look or stereo from offline green.
+- Claim in-game XR controls from offline green.
+- Hook `IEngineTrace` (next).
 
 ## Tests
 
-`cssvrmod_tests` — 46 passed, 0 failed (350 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 50 passed, 0 failed (366 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`live-xr-input-proven` — movement / fire from XR in-game (CreateMove / ClientCmd still stubs).
+`ienginetrace-live` — last-free hull on live hands.

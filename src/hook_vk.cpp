@@ -3,6 +3,7 @@
 #include "xr_host.hpp"
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/source_if.hpp"
+#include "cssvrmod/usercmd.hpp"
 #include "cssvrmod/vk_eye.hpp"
 #include "cssvrmod/weapons.hpp"
 #include <vulkan/vulkan.h>
@@ -240,6 +241,7 @@ void* XrWorker(void*) {
       if (XrHostPollInput(&xr)) {
         GunPose gun = GunFromHand(xr.right, WeaponOffset{});
         UserCmdOverlay cmd = InputMap(xr, gun, InputConfig{}, 0.011f);
+        UserCmd_NoteOverlay(cmd);
         if (g_eng.screen_ok || ProbeLiveEngine(g_eng)) {
           auto edge = [&](int bit, const char* plus, const char* minus) {
             const bool now = (cmd.buttons & bit) != 0;
