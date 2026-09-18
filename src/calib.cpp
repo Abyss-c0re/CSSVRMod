@@ -48,13 +48,11 @@ void ApplyEnv(Calib* c) {
 } // namespace
 
 const char* CalibPath() {
-  if (g_path.empty()) {
-    if (const char* e = std::getenv("CSSVR_CALIB")) {
-      g_path = e;
-    } else {
-      g_path = Home() + "/.config/gvrmod/cssvr_calib.cfg";
-    }
+  if (const char* e = std::getenv("CSSVR_CALIB")) {
+    g_path = e;
+    return g_path.c_str();
   }
+  if (g_path.empty()) g_path = Home() + "/.config/gvrmod/cssvr_calib.cfg";
   return g_path.c_str();
 }
 

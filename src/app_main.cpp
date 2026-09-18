@@ -1,4 +1,5 @@
 #include "cssvrmod/launch.hpp"
+#include "cssvrmod/settings.hpp"
 #include "cssvrmod/weapons.hpp"
 #include <cstdio>
 #include <cstdlib>
@@ -11,6 +12,9 @@ static void Usage() {
   std::fprintf(stdout,
                "CSSVRMod — Counter-Strike: Source VR (OpenXR)\n"
                "usage: CSSVR [--map de_dust2] [--hook PATH] [--find] [--print]\n"
+               "  --settings print Vision + launch prefs (no spawn)\n"
+               "  --set K V  write a knob (eyescale, scalefactor, backend, map, …)\n"
+               "  --play     spawn after --set (default --set only writes)\n"
                "  --find     locate CSS and print install (no spawn)\n"
                "  --print    print spawn plan and exit\n"
                "  --map MAP  +map after launch\n"
@@ -64,7 +68,11 @@ static int Spawn(const cssvr::SpawnPlan& p) {
 
 int main(int argc, char** argv) {
   bool find_only = false, print_only = false, no_hook = false;
+  bool settings_only = false, did_set = false, play = false;
+  bool cli_backend = false, cli_map = false;
   cssvr::LaunchOpts opts;
+  cssvr::Settings set;
+  cssvr::Settings_Load(&set);
   opts.hook_so = SiblingHook();
   if (opts.hook_so.empty() || access(opts.hook_so.c_str(), R_OK) != 0)
     opts.hook_so = cssvr::DefaultHookSearchPath();
@@ -77,12 +85,30 @@ int main(int argc, char** argv) {
     if (std::strcmp(argv[i], "--find") == 0) find_only = true;
     else if (std::strcmp(argv[i], "--print") == 0) print_only = true;
     else if (std::strcmp(argv[i], "--no-hook") == 0) no_hook = true;
-    else if (std::strcmp(argv[i], "--map") == 0 && i + 1 < argc) opts.map = argv[++i];
-    else if (std::strcmp(argv[i], "--hook") == 0 && i + 1 < argc) opts.hook_so = argv[++i];
-    else if (std::strcmp(argv[i], "--gl") == 0) opts.backend = cssvr::Backend::Gl;
-    else if (std::strcmp(argv[i], "--dx9") == 0) opts.backend = cssvr::Backend::Dx9;
-    else if (std::strcmp(argv[i], "--vk") == 0) opts.backend = cssvr::Backend::Vk;
-    else if (std::strcmp(argv[i], "--noborder") == 0) opts.noborder = true;
+    else if (std::strcmp(argv[i], "--settings") == 0) settings_only = true;
+    else if (std::strcmp(argv[i], "--play") == 0) play = true;
+    else if (std::strcmp(argv[i], "--set") == 0 && i + 2 < argc) {
+      const char* k = argv[++i];
+      const char* v = argv[++i];
+      if (!cssvr::Settings_ApplyKey(&set, k, v)) {
+        std::fprintf(stderr, "cssvr: unknown setting %s\n", k);
+        return 1;
+      }
+      did_set = true;
+    } else if (std::strcmp(argv[i], "--map") == 0 && i + 1 < argc) {
+      opts.map = argv[++i];
+      cli_map = true;
+    } else if (std::strcmp(argv[i], "--hook") == 0 && i + 1 < argc) opts.hook_so = argv[++i];
+    else if (std::strcmp(argv[i], "--gl") == 0) {
+      opts.backend = cssvr::Backend::Gl;
+      cli_backend = true;
+    } else if (std::strcmp(argv[i], "--dx9") == 0) {
+      opts.backend = cssvr::Backend::Dx9;
+      cli_backend = true;
+    } else if (std::strcmp(argv[i], "--vk") == 0) {
+      opts.backend = cssvr::Backend::Vk;
+      cli_backend = true;
+    } else if (std::strcmp(argv[i], "--noborder") == 0) opts.noborder = true;
     else {
       std::fprintf(stderr, "cssvr: unknown arg %s\n", argv[i]);
       Usage();
@@ -90,6 +116,14 @@ int main(int argc, char** argv) {
     }
   }
   if (no_hook) opts.hook_so.clear();
+  if (!cli_backend) opts.backend = set.backend;
+  if (!cli_map && !set.map.empty() && set.map != "-") opts.map = set.map;
+  if (set.noborder) opts.noborder = true;
+  if (did_set) cssvr::Settings_Save(set);
+  if (settings_only || (did_set && !play && !find_only && !print_only)) {
+    std::fputs(cssvr::Settings_Format(set).c_str(), stdout);
+    return 0;
+  }
 
   cssvr::CssInstall inst = cssvr::FindCssInstall();
   std::fprintf(stdout, "cssvr: css found=%d root=%s reason=%s linux64=%d weapons=%d\n",

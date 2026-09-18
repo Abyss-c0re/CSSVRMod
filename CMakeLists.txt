@@ -14,6 +14,7 @@ add_library(cssvrmod_core STATIC
   src/source_if.cpp
   src/calib.cpp
   src/usercmd.cpp
+  src/settings.cpp
 )
 target_include_directories(cssvrmod_core PUBLIC
   ${CSSVR_ROOT}/include
@@ -38,6 +39,7 @@ add_executable(cssvrmod_tests
   tests/test_look.cpp
   tests/test_usercmd.cpp
   tests/test_engine_trace.cpp
+  tests/test_settings.cpp
 )
 target_include_directories(cssvrmod_tests PRIVATE
   ${CSSVR_ROOT}/include

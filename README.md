@@ -22,9 +22,13 @@ cmake --build build -j"$(nproc)"
 
 # play (or pick CSSVRMod in CubeUI)
 ./scripts/CSSVR.sh --map de_dust2
+
+# desktop settings host (Vision knobs + backend/map)
+./install/CSSVR --settings
+./install/CSSVR --set eyescale 0.20
 ```
 
-Video calibration: `~/.config/gvrmod/cssvr_calib.cfg` (same knobs as vrmod Vision). Reloads live.
+Video calibration: `~/.config/gvrmod/cssvr_calib.cfg` (same knobs as vrmod Vision). Reloads live. `CSSVR --set` writes that file.
 
 Headset + CSS walk is **manual**. Offline green is not an HMD claim.
 

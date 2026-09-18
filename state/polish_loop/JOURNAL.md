@@ -68,6 +68,11 @@ Melee hull sweep + pose-delta velocity. Tick hits only if the swing ray reports 
 
 Stopped forcing `weapon_knife` every tick. Without a live weapon query that ran a knife hull while holding a gun. Fist sweep only on melee_intent.
 
+## 2026-09-18 cycle 11
+
+Standalone settings host: `CSSVR --settings` / `--set`. Vision + backend/map persist. Offline 60/60. Not HMD-proven.
+
+
 
 
 

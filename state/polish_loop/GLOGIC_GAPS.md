@@ -13,7 +13,8 @@
 ## P1 — product shell
 
 - [x] World-locked 3D Vision panel (HL2VR/Cube class) — menu button toggle, stick rows (cycle 3).
-- [ ] Standalone desktop settings host (still Cube + this 3D panel).
+- [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
+- [ ] Optional GTK/Qt window (CLI host is enough to persist knobs).
 - [x] `CUserCmd` overlay + CreateMove hook (RTTI/xmm0 self-test, cycle 8). Analog stick writes forwardmove.
 - [ ] Live XR input proven in-game (HMD). Offline green ≠ controls smoke.
 
