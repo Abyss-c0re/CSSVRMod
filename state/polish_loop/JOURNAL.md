@@ -32,6 +32,10 @@ Vulkan per-eye capture: last color RT / acquired swap image after each paint. Tw
 
 HMD writes `CViewSetup` angles for both paints (shared orientation). VIEW-in-STAGE locate, not stick/controller look. Engine `SetViewAngles` still open. Offline 45/45. Not HMD-proven.
 
+## 2026-09-18 cycle 6 follow
+
+Stopped caching controller yaw as HMD when VIEW locate misses. Look stays game view until a real headset pose exists. Mutex on the HMD cache (XR thread vs RenderView).
+
 
 
 
