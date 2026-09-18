@@ -80,6 +80,10 @@ Standalone settings host: `CSSVR --settings` / `--set`. Vision + backend/map per
 
 3D Vision panel now rasters EYE/SCALE/H/V/DONE plus values. Offline 61/61. Not HMD-proven.
 
+## 2026-09-18 cycle 13
+
+Honest no-HMD toast: one-shot desktop notify + toast file when OpenXR has no headset/runtime. Offline 64/64. Not HMD-proven.
+
 
 
 

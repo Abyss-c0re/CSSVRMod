@@ -1,24 +1,25 @@
-# Cycle 12 — 2026-09-18
+# Cycle 13 — 2026-09-18
 
 ## Focus
 
-`menu3d-readable-labels` — 3D Vision panel was color bars.
+`honest-no-hmd-toast` — Cube toasts no-HMD; CSSVRMod only logged.
 
 ## Did
 
-- 5×7 glyphs + `Menu3d_RowLabel` / `RowValue` (EYE / SCALE / H / V / DONE).
-- Raster draws VISION title and values on panels tall enough for text (live 1024×576).
-- Tiny 64×48 test still only checks layout blocks.
+- Pure `Toast_*` law: one-shot on `no_hmd` / runtime fail; never abort VR; silent-fail audit.
+- `Toast_FireDesktop` writes `/tmp/cssvrmod.toast` and `notify-send` (skip with `CSSVR_TOAST=0`).
+- `XrHostInit` / GL bind fail fire the toast once.
 
 ## Did not
 
 - HMD walk (user-gated).
 - Claim stereo from offline green.
+- Desktop framebuffer banner (next).
 
 ## Tests
 
-`cssvrmod_tests` — 61 passed, 0 failed (413 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 64 passed, 0 failed (446 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`honest-no-hmd-toast` — Cube toasts no-HMD; CSSVRMod only logs.
+`desktop-xr-status-banner` — stamp XR / NO HMD on the CSS present so it is visible without notify-send.

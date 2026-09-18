@@ -3,6 +3,7 @@
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/menu3d.hpp"
 #include "cssvrmod/stereo_view.hpp"
+#include "cssvrmod/toast.hpp"
 #include "openxr_paths.hpp"
 
 #include <cmath>
@@ -109,6 +110,16 @@ void Log(const char* fmt, ...) {
   va_end(ap);
   std::fputc('\n', f);
   std::fclose(f);
+}
+
+bool g_toast_shown = false;
+
+void HonestToastIfNeeded(const char* reason) {
+  const ToastDecision d = Toast_Decide(reason, g_toast_shown);
+  if (!d.should_toast) return;
+  g_toast_shown = true;
+  Log("cssvr toast %s %s", d.label, d.copy);
+  Toast_FireDesktop(d.copy);
 }
 
 bool LoadFn(XrInstance inst, const char* name, PFN_xrVoidFunction* out) {
@@ -490,9 +501,18 @@ bool UploadMenuSwapchain() {
 bool XrHostInit() {
   if (g_info.session) return true;
   Log("cssvr xr init begin");
-  if (!LoadLoader()) return false;
-  if (!g_inst && !CreateInst()) return false;
-  if (!g_sess && !CreateSess()) return false;
+  if (!LoadLoader()) {
+    HonestToastIfNeeded(g_info.reason);
+    return false;
+  }
+  if (!g_inst && !CreateInst()) {
+    HonestToastIfNeeded(g_info.reason);
+    return false;
+  }
+  if (!g_sess && !CreateSess()) {
+    HonestToastIfNeeded(g_info.reason);
+    return false;
+  }
   SetupInput();
   {
     const Calib c = CalibLive();
@@ -518,6 +538,7 @@ void XrHostShutdown() {
   g_sess = XR_NULL_HANDLE;
   g_info = XrHostInfo{};
   g_info.reason = "shutdown";
+  g_toast_shown = false;
 }
 
 static Pose g_hmd_cache{};
@@ -803,6 +824,7 @@ bool XrHostSubmitPixels(const unsigned char* px, int w, int h, bool bgra) {
       Log("cssvr xr gl fail %s", g_info.reason);
       g_xr_fail_logged = true;
     }
+    HonestToastIfNeeded(g_info.reason);
     return false;
   }
   static int init_fails = 0;
