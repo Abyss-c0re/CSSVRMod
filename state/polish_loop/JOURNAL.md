@@ -308,6 +308,10 @@ Hook no longer NEEDs `libopenxr_loader`. Steam PV cannot resolve that .so (runti
 
 Hook no longer NEEDs libSM/libICE. FindX11 pulled session libs PV cannot resolve. Link X11+Xext only. Offline 117/117. Not HMD-proven. Restart CSS from the menu.
 
+## 2026-09-18 cycle 69
+
+Preload host `libjsoncpp.so.27` before dlopen of the Khronos loader. Loader has no RPATH; PV lacks jsoncpp on the search path. Offline 118/118. Not HMD-proven. Restart CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

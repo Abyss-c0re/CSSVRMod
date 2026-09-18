@@ -60,6 +60,7 @@
 - [x] autoexec `plugin_load` (cycle 64). Steam Cloud wiped App 240 LaunchOptions; autoexec is the durable hook load.
 - [x] Hook delay-loads OpenXR (cycle 67). Steam PV has the runtime under overrides/openxr, not `libopenxr_loader.so.1`. A DT_NEEDED blocked plugin_load / LD_PRELOAD. Search `/run/host/usr/lib`.
 - [x] Hook does not NEEDED libSM/libICE (cycle 68). `X11_LIBRARIES` pulled session libs PV cannot resolve. Link X11 + Xext only (already mapped in CSS).
+- [x] Preload host `libjsoncpp.so.27` before dlopen of the Khronos loader (cycle 69). Loader has no RPATH; PV cache/overrides lack jsoncpp. Sibling + `/run/host`.
 - [x] Desktop settings host: `CSSVR --settings` / `--set` (cycle 11). Cube Start still launches the game.
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.

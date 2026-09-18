@@ -25,6 +25,24 @@ TEST(xr_loader_searches_soname_then_pv_host) {
   ASSERT_FALSE(XrLoader_IsPvHostPath(nullptr));
 }
 
+TEST(xr_loader_preloads_jsoncpp_sibling) {
+  ASSERT_STREQ(XrLoader_DepSoname(), "libjsoncpp.so.27");
+  int n = 0;
+  const char* const* d = XrLoader_DepCandidates(&n);
+  ASSERT_TRUE(n >= 2);
+  ASSERT_STREQ(d[0], "libjsoncpp.so.27");
+  bool pv = false;
+  for (int i = 0; i < n; ++i)
+    if (d[i] && std::strstr(d[i], "/run/host/") && std::strstr(d[i], "jsoncpp")) pv = true;
+  ASSERT_TRUE(pv);
+  char sib[128];
+  ASSERT_TRUE(XrLoader_SiblingDep("/run/host/usr/lib/libopenxr_loader.so.1", sib, 128));
+  ASSERT_STREQ(sib, "/run/host/usr/lib/libjsoncpp.so.27");
+  ASSERT_FALSE(XrLoader_SiblingDep("libopenxr_loader.so.1", sib, 128));
+  ASSERT_FALSE(XrLoader_SiblingDep(nullptr, sib, 128));
+  ASSERT_FALSE(XrLoader_SiblingDep("/run/host/usr/lib/libopenxr_loader.so.1", sib, 8));
+}
+
 TEST(xr_session_ok_only_when_running) {
   ASSERT_EQ((int)XrSession_FromState(kXrStateUnknown, false, false), (int)XrSessionPhase::none);
   ASSERT_STREQ(XrSession_Reason(XrSessionPhase::none), "no_session");

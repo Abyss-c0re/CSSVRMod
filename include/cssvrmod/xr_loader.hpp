@@ -33,4 +33,34 @@ inline bool XrLoader_HasPvHostCandidate() {
   return false;
 }
 
+/// Host loader NEEDs this. Steam PV has it only under /run/host, not cache.
+inline const char* XrLoader_DepSoname() { return "libjsoncpp.so.27"; }
+
+inline const char* const* XrLoader_DepCandidates(int* n) {
+  static const char* k[] = {
+      "libjsoncpp.so.27",
+      "/run/host/usr/lib/libjsoncpp.so.27",
+      "/run/host/usr/lib64/libjsoncpp.so.27",
+      "/usr/lib/libjsoncpp.so.27",
+      "/usr/lib64/libjsoncpp.so.27",
+  };
+  if (n) *n = static_cast<int>(sizeof(k) / sizeof(k[0]));
+  return k;
+}
+
+/// Same directory as an absolute loader path. Sonames have no sibling.
+inline bool XrLoader_SiblingDep(const char* loader, char* out, int n) {
+  if (!loader || !out || n < 8) return false;
+  out[0] = 0;
+  const char* slash = std::strrchr(loader, '/');
+  if (!slash || slash == loader) return false;
+  const char* dep = XrLoader_DepSoname();
+  const int dir_n = static_cast<int>(slash + 1 - loader);
+  const int dep_n = static_cast<int>(std::strlen(dep));
+  if (dir_n + dep_n + 1 > n) return false;
+  std::memcpy(out, loader, static_cast<size_t>(dir_n));
+  std::memcpy(out + dir_n, dep, static_cast<size_t>(dep_n) + 1);
+  return true;
+}
+
 } // namespace cssvr

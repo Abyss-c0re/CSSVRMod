@@ -135,11 +135,22 @@ bool LoadFn(XrInstance inst, const char* name, PFN_xrVoidFunction* out) {
 
 #define LOAD(inst, fn) LoadFn(inst, #fn, reinterpret_cast<PFN_xrVoidFunction*>(&fn))
 
+void PreloadLoaderDeps(const char* loader) {
+  int n = 0;
+  const char* const* dep = XrLoader_DepCandidates(&n);
+  for (int i = 0; i < n; ++i) dlopen(dep[i], RTLD_NOW | RTLD_GLOBAL);
+  char sib[512];
+  if (XrLoader_SiblingDep(loader, sib, (int)sizeof(sib))) dlopen(sib, RTLD_NOW | RTLD_GLOBAL);
+}
+
 bool LoadLoader() {
   if (g_loader) return true;
   int n = 0;
   const char* const* cand = XrLoader_Candidates(&n);
-  for (int i = 0; i < n && !g_loader; ++i) g_loader = dlopen(cand[i], RTLD_NOW | RTLD_LOCAL);
+  for (int i = 0; i < n && !g_loader; ++i) {
+    PreloadLoaderDeps(cand[i]);
+    g_loader = dlopen(cand[i], RTLD_NOW | RTLD_LOCAL);
+  }
   if (!g_loader) {
     g_info.reason = "no_loader";
     return false;
