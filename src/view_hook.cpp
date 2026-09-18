@@ -50,7 +50,12 @@ bool CopyEye(int eye) {
   GLint vp[4] = {};
   glGetIntegerv(GL_VIEWPORT, vp);
   const int w = vp[2], h = vp[3];
-  if (w < 8 || h < 8) return false;
+  if (w < 8 || h < 8) {
+    static int miss = 0;
+    if (miss++ < 3)
+      Logf("copyeye miss: GL viewport %dx%d (vulkan present has no GL backbuffer)", w, h);
+    return false;
+  }
   if (!g_eye[eye] || g_eyeW != w || g_eyeH != h) {
     if (g_eye[eye]) glDeleteTextures(1, &g_eye[eye]);
     glGenTextures(1, &g_eye[eye]);

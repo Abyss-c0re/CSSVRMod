@@ -16,4 +16,8 @@ Compared Steam HL2VR (658920): dual-eye VR res, 3D world menus; 2D plane is thei
 
 Hooked `CViewRender::RenderView` via string-xref locator + vtable swap (no guessed index). Dual paint sets `painted_dual` only after two captures. Offline 38/38. Not HMD-proven stereo.
 
+## 2026-09-18 cycle 4 follow
+
+Live path is Vulkan. `CopyEye` is GL and will miss. Next focus is VK per-eye capture, not viewangles yet.
+
 

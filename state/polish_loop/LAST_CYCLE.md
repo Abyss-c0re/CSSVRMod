@@ -24,4 +24,4 @@
 
 ## Next
 
-`hmd-drives-viewangles` — look around is VR. In-game dual-paint walk is still open.
+`vulkan-eye-capture` — live CSS is `-vulkan`; GL `CopyEye` cannot see that present. Dual paint stays gated until VK (or a real GL path) captures each eye.
