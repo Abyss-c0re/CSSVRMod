@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T15:01:00Z",
   "last_focus": "persist-win-prefer-larger",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "",
+  "last_commit": "28702f4",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
