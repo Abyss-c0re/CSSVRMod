@@ -714,6 +714,7 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
   }
   if ((g_presents % 300) == 0)
     Log("present=%d xr_ok=%d xr_fail=%d dumps=%d", g_presents, g_xr_ok, g_xr_fail, g_dumps);
+  ViewHookOnSwap(); // next CViewRender may dual-paint again
   return pr;
 }
 

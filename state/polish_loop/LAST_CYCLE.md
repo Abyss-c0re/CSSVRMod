@@ -1,14 +1,14 @@
-# Cycle 44 — 2026-09-18
+# Cycle 45 — 2026-09-18
 
 ## Focus
 
-`hook-retry-until-client-mapped` — first VK present can run before client.so is mapped.
+`vk-present-clears-dual-gate` — ViewHookOnSwap ran only on GL swap.
 
 ## Did
 
-- `HookInstall_Transient("no_client_base")` — retry, do not toast (splash is not a miss).
-- Locate client.so once; retry ClientBase + patch on later presents.
-- CreateMove same. WrapPresent / GL swap no longer one-shot.
+- `DualPaintFrameGate` — one dual attempt per present; clear on swap.
+- `WrapPresent` calls `ViewHookOnSwap` so the next CViewRender may dual-paint again.
+- Tiny views still do not consume the gate.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 96 passed, 0 failed (760 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 97 passed, 0 failed (763 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

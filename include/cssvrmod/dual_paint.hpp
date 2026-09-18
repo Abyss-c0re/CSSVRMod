@@ -62,6 +62,21 @@ inline const char* DualCapture_MissCopy() {
   return "Dual paint captured fewer than 2 eyes — staying MONO. Check the RT copy.";
 }
 
+/// One dual attempt per present. VK must clear this on vkQueuePresentKHR.
+struct DualPaintFrameGate {
+  bool did_frame = false;
+};
+
+inline bool DualPaint_BeginFrame(DualPaintFrameGate* g) {
+  if (!g || g->did_frame) return false;
+  g->did_frame = true;
+  return true;
+}
+
+inline void DualPaint_OnPresent(DualPaintFrameGate* g) {
+  if (g) g->did_frame = false;
+}
+
 inline DualCaptureToast DualCapture_ToastDecide(const DualCaptureToastIn& in) {
   DualCaptureToast t;
   t.abort_vr = false;

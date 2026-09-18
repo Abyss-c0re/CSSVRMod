@@ -31,7 +31,7 @@ bool g_rv_permanent = false;
 int g_rv_tries = 0;
 EngineIf g_eng;
 bool g_in = false;
-bool g_did_frame = false;
+DualPaintFrameGate g_frame;
 GLuint g_eye[2] = {0, 0};
 int g_eyeW = 0, g_eyeH = 0;
 bool g_have_eyes = false;
@@ -123,7 +123,7 @@ bool CopyEye(int eye) {
 
 void HookedRenderView(void* self, void* view, int clear, int draw) {
   if (!g_orig) return;
-  if (g_in || !view || g_did_frame) {
+  if (g_in || !view || g_frame.did_frame) {
     g_orig(self, view, clear, draw);
     return;
   }
@@ -165,7 +165,7 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
   ViewSetup_WriteOrigin(view, kBlob, g_loc.fields, origin);
   g_have_eyes = r.painted_dual;
   XrHostNoteDualPaint(r.painted_dual);
-  g_did_frame = true;
+  g_frame.did_frame = true;
   g_in = false;
   static int n = 0;
   if (n++ < 4 || (n % 300) == 0)
@@ -227,7 +227,7 @@ void ViewHookTryInstall() {
        g_eng.set_angles_idx, g_eng.reason);
 }
 
-void ViewHookOnSwap() { g_did_frame = false; }
+void ViewHookOnSwap() { DualPaint_OnPresent(&g_frame); }
 
 bool ViewHookTakeEyes(unsigned* l, unsigned* r, int* w, int* h) {
   if (!g_have_eyes || !g_eye[0] || !g_eye[1]) return false;

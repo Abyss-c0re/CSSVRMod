@@ -30,6 +30,15 @@ TEST(view_setup_roundtrip_origin) {
   ASSERT_NEAR(fov, 87.5f, 0.0001);
 }
 
+TEST(dual_paint_gate_needs_present) {
+  DualPaintFrameGate g;
+  ASSERT_TRUE(DualPaint_BeginFrame(&g));
+  ASSERT_FALSE(DualPaint_BeginFrame(&g));
+  DualPaint_OnPresent(&g);
+  ASSERT_TRUE(DualPaint_BeginFrame(&g));
+  DualPaint_OnPresent(nullptr);
+}
+
 TEST(dual_paint_requires_two_captures) {
   StereoViewIn in;
   in.origin = {0.f, 0.f, 64.f};

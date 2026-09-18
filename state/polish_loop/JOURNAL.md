@@ -228,6 +228,10 @@ ProbeLiveEngine opens engine.so/client.so via Module_SoHandle. Dropped dlopen(nu
 
 Retry RenderView/CreateMove until client.so is mapped. First present can be splash; no_client_base is not a toast. Offline 96/96. Not HMD-proven.
 
+## 2026-09-18 cycle 45
+
+VK present now clears the dual-paint frame gate (ViewHookOnSwap was GL-only). Dual paint can run every frame, not once. Offline 97/97. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.
