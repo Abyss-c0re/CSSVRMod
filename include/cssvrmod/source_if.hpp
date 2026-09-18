@@ -65,6 +65,10 @@ bool ProbeLiveEngine(EngineIf& out);
 /// ClientCmd if GetScreenSize(index 5) self-test passed. Never call blindly.
 bool EngineClientCmd(const EngineIf& e, const char* cmd);
 
+/// Hook installs a console filter so `cssvr_start` never reaches the engine unknown-cmd path.
+using EngineCmdFilter = bool (*)(const char* cmd);
+void EngineSetCmdFilter(EngineCmdFilter f);
+
 /// Get/Set viewangles only after angles_ok self-test.
 bool EngineGetViewAngles(const EngineIf& e, Ang3* out);
 bool EngineSetViewAngles(const EngineIf& e, const Ang3& a);

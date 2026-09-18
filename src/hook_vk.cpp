@@ -2,6 +2,7 @@
 // Intercept vkQueuePresentKHR and dump the presented swapchain image.
 #include "xr_host.hpp"
 #include "cssvrmod/banner.hpp"
+#include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/collision.hpp"
 #include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/input.hpp"
@@ -15,10 +16,14 @@
 #include <vulkan/vulkan.h>
 
 #include <cstdarg>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <dlfcn.h>
+#include <fstream>
+#include <sys/mman.h>
+#include <unistd.h>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -164,11 +169,7 @@ int g_xr_fail = 0;
 EngineIf g_eng{};
 UserCmdOverlay g_prev_cmd{};
 
-bool XrWanted() {
-  const char* e = std::getenv("CSSVR_XR");
-  if (!e || !e[0]) return true;
-  return !(e[0] == '0' && e[1] == 0);
-}
+bool XrWanted() { return CssvrWantXr(); }
 
 struct XrMailbox {
   std::mutex mu;
@@ -1015,3 +1016,41 @@ __attribute__((constructor)) static void vk_ctor() {
   g_createDevice = (PFN_vkCreateDevice)VulkanSym("vkCreateDevice");
   Log("vulkan intercept ready gipa=%p", (void*)g_gipa);
 }
+
+namespace cssvr {
+void VkLateAttachPresent() {
+  void* vk = dlopen("libvulkan.so.1", RTLD_NOLOAD);
+  if (!vk) vk = dlopen("libvulkan.so.1", RTLD_NOW);
+  void* real = vk ? dlsym(vk, "vkQueuePresentKHR") : nullptr;
+  void* wrap = (void*)&vkQueuePresentKHR;
+  if (!real || real == wrap) {
+    Log("late attach: present already ours or missing");
+    return;
+  }
+  std::ifstream maps("/proc/self/maps");
+  std::string line;
+  int hits = 0;
+  long page = sysconf(_SC_PAGESIZE);
+  if (page < 4096) page = 4096;
+  while (std::getline(maps, line)) {
+    if (line.find("shaderapivk") == std::string::npos && line.find("libvulkan") == std::string::npos)
+      continue;
+    if (line.find("w") == std::string::npos) continue;
+    unsigned long a = 0, b = 0;
+    if (std::sscanf(line.c_str(), "%lx-%lx", &a, &b) != 2 || b <= a) continue;
+    auto* p = reinterpret_cast<unsigned char*>(a);
+    const size_t n = (size_t)(b - a);
+    uintptr_t pg = (uintptr_t)p & ~((uintptr_t)page - 1);
+    if (mprotect((void*)pg, (size_t)((uintptr_t)p + n - pg), PROT_READ | PROT_WRITE | PROT_EXEC) != 0)
+      continue;
+    for (size_t i = 0; i + sizeof(void*) <= n; i += sizeof(void*)) {
+      void** slot = reinterpret_cast<void**>(p + i);
+      if (*slot == real) {
+        *slot = wrap;
+        hits++;
+      }
+    }
+  }
+  Log("late attach present patches=%d", hits);
+}
+} // namespace cssvr

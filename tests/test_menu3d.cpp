@@ -231,8 +231,9 @@ TEST(menu3d_labels_and_values) {
   ASSERT_STREQ(Menu3d_RowLabel(0), "EYE");
   ASSERT_STREQ(Menu3d_RowLabel(1), "SCALE");
   ASSERT_STREQ(Menu3d_RowLabel(4), "HAND");
-  ASSERT_STREQ(Menu3d_RowLabel(5), "DONE");
-  ASSERT_EQ(kMenuRows, 6);
+  ASSERT_STREQ(Menu3d_RowLabel(5), "VR");
+  ASSERT_STREQ(Menu3d_RowLabel(6), "DONE");
+  ASSERT_EQ(kMenuRows, 7);
   Menu3d m;
   m.calib.eyescale = 0.20f;
   char val[16];

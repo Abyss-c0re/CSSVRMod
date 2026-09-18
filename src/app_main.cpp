@@ -26,6 +26,7 @@ static void Usage() {
                "  --width N  desktop window width (--set width N; resize persists)\n"
                "  --height N desktop window height (resize persists to launch.cfg)\n"
                "  --no-hook  spawn CSS without VR hook (debug)\n"
+               "  --install  copy hook + plugin into the CSS game dir\n"
                "%s",
                cssvr::FormatHelpEnv().c_str());
 }
@@ -77,7 +78,7 @@ static int Spawn(const cssvr::SpawnPlan& p) {
 }
 
 int main(int argc, char** argv) {
-  bool find_only = false, print_only = false, no_hook = false;
+  bool find_only = false, print_only = false, no_hook = false, do_install = false;
   bool settings_only = false, did_set = false, play = false;
   bool cli_backend = false, cli_map = false, cli_w = false, cli_h = false;
   cssvr::LaunchOpts opts;
@@ -92,7 +93,8 @@ int main(int argc, char** argv) {
       Usage();
       return 0;
     }
-    if (std::strcmp(argv[i], "--find") == 0) find_only = true;
+    if (std::strcmp(argv[i], "--install") == 0) do_install = true;
+    else if (std::strcmp(argv[i], "--find") == 0) find_only = true;
     else if (std::strcmp(argv[i], "--print") == 0) print_only = true;
     else if (std::strcmp(argv[i], "--no-hook") == 0) no_hook = true;
     else if (std::strcmp(argv[i], "--settings") == 0) settings_only = true;
@@ -150,6 +152,26 @@ int main(int argc, char** argv) {
                inst.found ? 1 : 0, inst.root.c_str(), inst.reason, inst.linux64 ? 1 : 0,
                cssvr::WeaponCount());
   if (find_only) return inst.found ? 0 : 1;
+  if (do_install) {
+    std::string hook = SiblingHook();
+    if (hook.empty() || access(hook.c_str(), R_OK) != 0) hook = cssvr::DefaultHookSearchPath();
+    std::string plug = hook;
+    auto sl = plug.find_last_of('/');
+    if (sl != std::string::npos) plug.resize(sl);
+    plug += "/cssvrmod_plugin.so";
+    auto ip = cssvr::PlanInstall(inst, hook, plug);
+    std::fprintf(stdout, "cssvr: install ok=%d reason=%s hook=%s plugin=%s\n", ip.ok ? 1 : 0,
+                 ip.reason, ip.hook_dst.c_str(), ip.plugin_dst.c_str());
+    if (!ip.ok || !cssvr::InstallToGame(ip)) {
+      std::fprintf(stderr, "cssvr: install failed\n");
+      return 1;
+    }
+    std::fprintf(stdout, "cssvr: wrote %s\n", ip.steam_txt.c_str());
+    std::fprintf(stdout, "cssvr: steam launch options:\n  %s\n",
+                 cssvr::FormatSteamLaunch(ip.hook_dst).c_str());
+    std::fprintf(stdout, "cssvr: then in console: cssvr_start   (or plugin_load addons/cssvrmod/cssvrmod_plugin)\n");
+    return 0;
+  }
 
   cssvr::SpawnPlan plan = cssvr::PlanSpawn(inst, opts);
   std::fprintf(stdout,

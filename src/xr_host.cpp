@@ -1,5 +1,6 @@
 #include "xr_host.hpp"
 #include "cssvrmod/calib.hpp"
+#include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/menu3d.hpp"
 #include "cssvrmod/settings.hpp"
@@ -809,6 +810,8 @@ bool XrHostPollInput(XrSample* out) {
   pose(0, &out->left);
   pose(1, &out->right);
   SyncMenuHandedness();
+  g_menu3d.xr_on = CssvrWantXr();
+  if (CssvrTakeMenuPulse()) g_menu3d.visible = !g_menu3d.visible;
   Vec3 hand{}, dir{};
   const bool have_hand = LocateAimHand(&hand, &dir);
   if (g_menu3d.visible) FaceMenuToHmd();
@@ -831,7 +834,9 @@ bool XrHostPollInput(XrSample* out) {
       const int row = laser.hit ? laser.row : g_menu3d.focus;
       const int dir = (out->stick_rx > 0.4f) ? 1 : (out->stick_rx < -0.4f) ? -1 : 1;
       if (Menu3d_ApplyClick(&g_menu3d, row, dir)) {
-        if (row == (int)MenuRow::Hand) {
+        if (row == (int)MenuRow::Toggle) {
+          CssvrSetEnabled(g_menu3d.xr_on);
+        } else if (row == (int)MenuRow::Hand) {
           setenv("CSSVR_LEFT_HANDED", g_menu3d.left_handed ? "1" : "0", 1);
           Settings s;
           Settings_Load(&s);

@@ -1,4 +1,5 @@
 #include "cssvrmod/banner.hpp"
+#include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/launch.hpp"
@@ -317,7 +318,7 @@ void Once() {
   g_status = "init";
   Log("cssvr hook init");
   EnsureDumpDir();
-  g_want_xr = EnvOn("CSSVR_XR", false);
+  g_want_xr = CssvrWantXr();
   Logf("dump_dir=%s xr=%d", g_dump_dir.c_str(), g_want_xr ? 1 : 0);
   ProbeLiveEngine(g_eng);
   ViewHookTryInstall();
@@ -338,6 +339,7 @@ void Once() {
 
 void HookOnLoad() {
   EnsureReals();
+  EngineSetCmdFilter(&CssvrHandleEngineCmd);
   Log("cssvr hook loaded");
 }
 

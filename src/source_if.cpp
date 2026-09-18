@@ -3,9 +3,41 @@
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/module_base.hpp"
 #include "cssvrmod/toast.hpp"
-#include <dlfcn.h>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <dlfcn.h>
+#include <sys/mman.h>
+#include <unistd.h>
+
+namespace {
+cssvr::EngineCmdFilter g_cmd_filter = nullptr;
+using ClientCmdFn = void (*)(void*, const char*);
+ClientCmdFn g_real_cmd = nullptr;
+
+void WrappedClientCmd(void* eng, const char* cmd) {
+  if (g_cmd_filter && cmd && g_cmd_filter(cmd)) return;
+  if (g_real_cmd) g_real_cmd(eng, cmd);
+}
+
+bool ProtectSlot(void* p, bool wr) {
+  long page = sysconf(_SC_PAGESIZE);
+  if (page < 4096) page = 4096;
+  uintptr_t pg = (uintptr_t)p & ~((uintptr_t)page - 1);
+  int prot = wr ? (PROT_READ | PROT_WRITE) : (PROT_READ | PROT_EXEC);
+  return mprotect((void*)pg, (size_t)page, prot) == 0;
+}
+
+void InstallCmdWrap(void* engine) {
+  if (g_real_cmd || !engine) return;
+  auto** vt = *reinterpret_cast<ClientCmdFn**>(engine);
+  if (!vt || !vt[7]) return;
+  g_real_cmd = vt[7];
+  ProtectSlot(&vt[7], true);
+  vt[7] = &WrappedClientCmd;
+  ProtectSlot(&vt[7], false);
+}
+} // namespace
 
 namespace cssvr {
 
@@ -200,12 +232,20 @@ bool ProbeLiveEngine(EngineIf& out) {
   if (out.trace_ok) out.reason = "probed_trace_ok";
   else if (out.angles_ok) out.reason = "probed_angles_ok";
   else out.reason = out.screen_ok ? "probed_screen_ok" : "probed_no_screen";
+  if (out.engine) InstallCmdWrap(out.engine);
   return true;
 }
 
+void EngineSetCmdFilter(EngineCmdFilter f) { g_cmd_filter = f; }
+
 bool EngineClientCmd(const EngineIf& e, const char* cmd) {
   if (!e.engine || !e.screen_ok || !cmd) return false;
-  using ClientCmdFn = void (*)(void*, const char*);
+  InstallCmdWrap(e.engine);
+  if (g_cmd_filter && g_cmd_filter(cmd)) return true;
+  if (g_real_cmd) {
+    g_real_cmd(e.engine, cmd);
+    return true;
+  }
   auto** vt = *reinterpret_cast<ClientCmdFn**>(e.engine);
   if (!vt || !vt[7]) return false;
   vt[7](e.engine, cmd);

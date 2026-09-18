@@ -232,4 +232,88 @@ SpawnPlan PlanSpawn(const CssInstall& inst, const LaunchOpts& opts) {
   return p;
 }
 
+std::string FormatSteamLaunch(const std::string& hook_dst) {
+  return "LD_PRELOAD=\"" + hook_dst + "\" CSSVR_XR=0 %command%";
+}
+
+InstallPlan PlanInstall(const CssInstall& inst, const std::string& hook_src,
+                        const std::string& plugin_src) {
+  InstallPlan p;
+  p.hook_src = hook_src;
+  p.plugin_src = plugin_src;
+  if (!inst.found) {
+    p.reason = "no_css";
+    return p;
+  }
+  const std::string bin = inst.linux64 ? (inst.root + "/bin/linux64") : (inst.root + "/bin");
+  p.game_root = inst.root;
+  p.hook_dst = bin + "/libcssvrmod_hook.so";
+  p.plugin_dst = inst.root + "/cstrike/addons/cssvrmod/cssvrmod_plugin.so";
+  p.vdf_dst = inst.root + "/cstrike/addons/cssvrmod.vdf";
+  p.cfg_dst = inst.root + "/cstrike/cfg/cssvrmod.cfg";
+  p.steam_txt = inst.root + "/cssvrmod_LAUNCH.txt";
+  if (hook_src.empty() || !IsFile(hook_src)) {
+    p.reason = "no_hook_src";
+    return p;
+  }
+  p.ok = true;
+  p.reason = "ready";
+  return p;
+}
+
+static bool CopyFile(const std::string& src, const std::string& dst) {
+  std::ifstream in(src, std::ios::binary);
+  if (!in) return false;
+  auto slash = dst.find_last_of('/');
+  if (slash != std::string::npos) {
+    std::string dir = dst.substr(0, slash);
+    std::string acc;
+    for (size_t i = 0; i < dir.size(); ++i) {
+      acc.push_back(dir[i]);
+      if (dir[i] == '/' && acc.size() > 1) mkdir(acc.c_str(), 0755);
+    }
+    mkdir(dir.c_str(), 0755);
+  }
+  std::ofstream out(dst, std::ios::binary | std::ios::trunc);
+  if (!out) return false;
+  out << in.rdbuf();
+  return (bool)out;
+}
+
+bool InstallToGame(const InstallPlan& p) {
+  if (!p.ok) return false;
+  if (!CopyFile(p.hook_src, p.hook_dst)) return false;
+  if (!p.plugin_src.empty() && IsFile(p.plugin_src)) {
+    if (!CopyFile(p.plugin_src, p.plugin_dst)) return false;
+  }
+  {
+    std::ofstream vdf(p.vdf_dst);
+    if (!vdf) return false;
+    vdf << "\"Plugin\"\n{\n    \"file\"    \"addons/cssvrmod/cssvrmod_plugin\"\n}\n";
+  }
+  {
+    std::ofstream cfg(p.cfg_dst);
+    if (!cfg) return false;
+    cfg << "// CSSVRMod — type in the client console after the hook is loaded:\n"
+           "//   cssvr_start     start OpenXR\n"
+           "//   cssvr_stop      stop OpenXR\n"
+           "//   cssvr_menu      toggle the Vision settings panel\n"
+           "//   cssvr           status\n"
+           "//   cssvr_set eyescale 0.20\n"
+           "// First time: plugin_load addons/cssvrmod/cssvrmod_plugin\n"
+           "// Steam launch options (also in cssvrmod_LAUNCH.txt):\n"
+           "//   "
+        << FormatSteamLaunch(p.hook_dst) << "\n";
+  }
+  {
+    std::ofstream st(p.steam_txt);
+    if (!st) return false;
+    st << "Steam → CSS → Properties → Launch options:\n\n"
+       << FormatSteamLaunch(p.hook_dst) << "\n\n"
+       << "Then in console: cssvr_start\n"
+       << "Or: plugin_load addons/cssvrmod/cssvrmod_plugin\n";
+  }
+  return true;
+}
+
 } // namespace cssvr

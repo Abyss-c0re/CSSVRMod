@@ -9,13 +9,13 @@
 
 namespace cssvr {
 
-constexpr int kMenuRows = 6;
+constexpr int kMenuRows = 7;
 constexpr float kMenuW = 1.05f; // metres
-constexpr float kMenuH = 0.68f;
+constexpr float kMenuH = 0.76f;
 constexpr float kMenuZ = -1.25f;
 constexpr float kMenuY = 1.35f;
 
-enum class MenuRow { Eye = 0, Scale = 1, HOff = 2, VOff = 3, Hand = 4, Dismiss = 5 };
+enum class MenuRow { Eye = 0, Scale = 1, HOff = 2, VOff = 3, Hand = 4, Toggle = 5, Dismiss = 6 };
 
 struct Menu3d {
   bool visible = true;
@@ -29,6 +29,7 @@ struct Menu3d {
   bool gripping = false;
   Vec3 grip_off{};
   bool left_handed = false;
+  bool xr_on = false;
 };
 
 // Cube: laser + grip from the primary hand. 0 = left, 1 = right.
@@ -200,6 +201,9 @@ inline bool Menu3d_ApplyClick(Menu3d* m, int row, int dir) {
   case MenuRow::Hand:
     m->left_handed = !m->left_handed;
     break;
+  case MenuRow::Toggle:
+    m->xr_on = !m->xr_on;
+    break;
   case MenuRow::Dismiss:
     m->visible = false;
     break;
@@ -231,6 +235,7 @@ inline const char* Menu3d_RowLabel(int row) {
   case MenuRow::HOff: return "H";
   case MenuRow::VOff: return "V";
   case MenuRow::Hand: return "HAND";
+  case MenuRow::Toggle: return "VR";
   case MenuRow::Dismiss: return "DONE";
   }
   return "";
@@ -246,6 +251,7 @@ inline void Menu3d_RowValue(const Menu3d& m, int row, char* out, int n) {
   case MenuRow::HOff: std::snprintf(out, (size_t)n, "%+.2f", c.hoffset); break;
   case MenuRow::VOff: std::snprintf(out, (size_t)n, "%+.2f", c.voffset); break;
   case MenuRow::Hand: std::snprintf(out, (size_t)n, "%s", m.left_handed ? "L" : "R"); break;
+  case MenuRow::Toggle: std::snprintf(out, (size_t)n, "%s", m.xr_on ? "ON" : "OFF"); break;
   case MenuRow::Dismiss: std::snprintf(out, (size_t)n, "OK"); break;
   }
 }

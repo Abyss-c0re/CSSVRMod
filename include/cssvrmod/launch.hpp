@@ -45,9 +45,26 @@ struct LaunchOpts {
   std::string extra_args;
 };
 
+struct InstallPlan {
+  bool ok = false;
+  std::string game_root;
+  std::string hook_src;
+  std::string hook_dst;
+  std::string plugin_src;
+  std::string plugin_dst;
+  std::string vdf_dst;
+  std::string cfg_dst;
+  std::string steam_txt;
+  const char* reason = "idle";
+};
+
 CssInstall FindCssInstall();
 CssInstall InspectCssRoot(const std::string& root);
 SpawnPlan PlanSpawn(const CssInstall& inst, const LaunchOpts& opts);
+InstallPlan PlanInstall(const CssInstall& inst, const std::string& hook_src,
+                        const std::string& plugin_src);
+bool InstallToGame(const InstallPlan& p);
+std::string FormatSteamLaunch(const std::string& hook_dst);
 std::string DefaultHookSearchPath();
 std::string DetectXrRuntimeJson();
 /// Dir with libcurl-gnutls.so.4 (engine.so NEEDED). Empty if none found.

@@ -44,6 +44,7 @@ add_executable(cssvrmod_tests
   tests/test_toast.cpp
   tests/test_banner.cpp
   tests/test_xr_session.cpp
+  tests/test_console.cpp
 )
 target_include_directories(cssvrmod_tests PRIVATE
   ${CSSVR_ROOT}/include
@@ -89,6 +90,7 @@ if(CSSVR_BUILD_HOOK AND NOT WIN32)
       src/xr_host.cpp
       src/view_hook.cpp
       src/create_move.cpp
+      src/cssvr_ctl.cpp
     )
     target_include_directories(cssvrmod_hook PRIVATE
       ${CSSVR_ROOT}/include
@@ -115,3 +117,12 @@ if(CSSVR_BUILD_HOOK AND NOT WIN32)
     message(WARNING "CSSVRMod: hook skipped (need OpenXR + GL + GLX + X11)")
   endif()
 endif()
+
+add_library(cssvrmod_plugin SHARED src/plugin.cpp)
+target_include_directories(cssvrmod_plugin PRIVATE ${CSSVR_ROOT}/include)
+target_link_libraries(cssvrmod_plugin PRIVATE dl)
+set_target_properties(cssvrmod_plugin PROPERTIES
+  OUTPUT_NAME "cssvrmod_plugin"
+  PREFIX ""
+  LIBRARY_OUTPUT_DIRECTORY "${CSSVR_INSTALL}"
+)
