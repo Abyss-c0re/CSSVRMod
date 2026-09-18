@@ -92,10 +92,11 @@ bool HookCbufAddText(void* cbuf) {
   return true;
 }
 
-// Source 2007 ConCommand (VEngineCvar004). Dispatch is virtual 12.
-class CssvrConCmd {
+// 2007 ConCommand (Cvar004): Dispatch is virtual 12.
+// 2013 (Cvar007): RemoveFlags+GetFlags inserted; Dispatch is virtual 14.
+class CssvrConCmd04 {
  public:
-  virtual ~CssvrConCmd() = default;
+  virtual ~CssvrConCmd04() = default;
   virtual bool IsCommand() { return true; }
   virtual bool IsFlagSet(int f) { return (m_nFlags & f) != 0; }
   virtual void AddFlags(int f) { m_nFlags |= f; }
@@ -110,7 +111,33 @@ class CssvrConCmd {
   virtual void Dispatch(const void*) {
     if (g_cmd_filter && m_pszName) g_cmd_filter(m_pszName);
   }
-  CssvrConCmd* m_pNext = nullptr;
+  CssvrConCmd04* m_pNext = nullptr;
+  bool m_bRegistered = false;
+  const char* m_pszName = "";
+  const char* m_pszHelpString = "";
+  int m_nFlags = 0;
+};
+
+class CssvrConCmd07 {
+ public:
+  virtual ~CssvrConCmd07() = default;
+  virtual bool IsCommand() { return true; }
+  virtual bool IsFlagSet(int f) { return (m_nFlags & f) != 0; }
+  virtual void AddFlags(int f) { m_nFlags |= f; }
+  virtual void RemoveFlags(int f) { m_nFlags &= ~f; }
+  virtual int GetFlags() { return m_nFlags; }
+  virtual const char* GetName() { return m_pszName; }
+  virtual const char* GetHelpText() { return m_pszHelpString; }
+  virtual bool IsRegistered() { return m_bRegistered; }
+  virtual int GetDLLIdentifier() { return 0; }
+  virtual void CreateBase(const char*, const char*, int) {}
+  virtual void Init() {}
+  virtual int AutoCompleteSuggest(const char*, void*) { return 0; }
+  virtual bool CanAutoComplete() { return false; }
+  virtual void Dispatch(const void*) {
+    if (g_cmd_filter && m_pszName) g_cmd_filter(m_pszName);
+  }
+  CssvrConCmd07* m_pNext = nullptr;
   bool m_bRegistered = false;
   const char* m_pszName = "";
   const char* m_pszHelpString = "";
@@ -120,30 +147,44 @@ class CssvrConCmd {
 const char* kCmdNames[] = {"cssvr", "cssvr_start", "cssvr_stop", "cssvr_toggle",
                            "cssvr_menu", "cssvr_set", "cssvr_help", nullptr};
 
-bool RegisterCvarCommands(void* cvar) {
+bool RegisterCvarCommands(void* cvar, const char* ver) {
   if (!cvar) return false;
   using Fn = void* (*)(void*, const char*);
   using Reg = void (*)(void*, void*);
   auto** vt = *reinterpret_cast<void***>(cvar);
-  if (!vt || !vt[cssvr::kCvarFindCommand004] || !vt[cssvr::kCvarRegister004]) return false;
-  if (!SlotInEngine(reinterpret_cast<ClientCmdFn>(vt[cssvr::kCvarFindCommand004]))) return false;
-  void* echo = ((Fn)vt[cssvr::kCvarFindCommand004])(cvar, "echo");
+  if (!vt) return false;
+  const bool v07 = ver && std::strstr(ver, "007");
+  const int find_i = v07 ? 17 : cssvr::kCvarFindCommand004;
+  const int reg_i = v07 ? 9 : cssvr::kCvarRegister004;
+  if (!vt[find_i] || !vt[reg_i]) return false;
+  if (!SlotInEngine(reinterpret_cast<ClientCmdFn>(vt[find_i]))) return false;
+  void* echo = ((Fn)vt[find_i])(cvar, "echo");
+  if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
+    std::fprintf(f, "cssvr icvar ver=%s find=%d echo=%d\n", ver ? ver : "?", find_i, echo ? 1 : 0);
+    std::fclose(f);
+  }
   if (!echo) return false;
   static bool done = false;
   if (done) return true;
   static const char* helps[] = {"CSSVRMod status", "Start OpenXR", "Stop OpenXR", "Toggle OpenXR",
                                 "Vision menu", "cssvr_set key value", "Help", nullptr};
-  static CssvrConCmd cmds[8];
+  static CssvrConCmd04 cmds04[8];
+  static CssvrConCmd07 cmds07[8];
   for (int i = 0; kCmdNames[i]; ++i) {
-    cmds[i].m_pszName = kCmdNames[i];
-    cmds[i].m_pszHelpString = helps[i] ? helps[i] : "";
-    cmds[i].m_nFlags = 0;
-    ((Reg)vt[cssvr::kCvarRegister004])(cvar, &cmds[i]);
+    if (v07) {
+      cmds07[i].m_pszName = kCmdNames[i];
+      cmds07[i].m_pszHelpString = helps[i] ? helps[i] : "";
+      ((Reg)vt[reg_i])(cvar, &cmds07[i]);
+    } else {
+      cmds04[i].m_pszName = kCmdNames[i];
+      cmds04[i].m_pszHelpString = helps[i] ? helps[i] : "";
+      ((Reg)vt[reg_i])(cvar, &cmds04[i]);
+    }
   }
-  void* found = ((Fn)vt[cssvr::kCvarFindCommand004])(cvar, "cssvr_start");
+  void* found = ((Fn)vt[find_i])(cvar, "cssvr_start");
   done = found != nullptr;
   if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
-    std::fprintf(f, "cssvr icvar register cssvr_start=%d\n", found ? 1 : 0);
+    std::fprintf(f, "cssvr icvar register cssvr_start=%d ver=%s\n", found ? 1 : 0, ver ? ver : "?");
     std::fclose(f);
   }
   return done;
@@ -370,7 +411,7 @@ bool ProbeLiveEngine(EngineIf& out) {
   else if (out.angles_ok) out.reason = "probed_angles_ok";
   else out.reason = out.screen_ok ? "probed_screen_ok" : "probed_no_screen";
   if (out.engine) InstallCmdWrap(out.engine);
-  if (out.cvar && cssvr::ICvar_Layout004(out.cvar_ver)) RegisterCvarCommands(out.cvar);
+  if (out.cvar) RegisterCvarCommands(out.cvar, out.cvar_ver);
   return true;
 }
 
