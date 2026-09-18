@@ -1,6 +1,6 @@
 #pragma once
 // gmod dual RenderView law: same angles, origin ± head Right × halfIPD.
-// Pose IPD is legal only after two world paints. Mono frame + pose IPD = heresy.
+// IPD lives in those two rasters. VIEW pose IPD on top is a second plane.
 #include "calib.hpp"
 #include "vec3.hpp"
 
@@ -24,7 +24,7 @@ struct EyeView {
   float aspect = 16.f / 9.f;
   int eye = 0;          // 0 left, 1 right
   float half_ipd = 0.f; // Source inches
-  float pose_x = 0.f;   // VIEW-space metres; 0 unless painted_dual
+  float pose_x = 0.f;   // VIEW-space metres; always 0 on the lens blit
 };
 
 struct StereoViewPlan {
@@ -49,15 +49,13 @@ inline float StereoView_HalfIpdInches(const Calib& raw, float world_scale = kInc
   return c.ipd_m * scale * 0.5f * eye;
 }
 
-/// VIEW-space pose X. Zero on a mono CSS present (cycle 1 heresy gate).
-/// Dual pose uses full ipd_m; eyescale stays off the cameras.
+/// VIEW-space pose X. Always 0: the blit sits on the lenses (cycle 1).
+/// Dual IPD is the two world origins. Pose IPD on those rasters is two planes.
 inline float StereoView_SubmitPoseX(const Calib& raw, int eye, bool painted_dual) {
-  if (!painted_dual) return 0.f;
-  const Calib c = ClampCalib(raw);
-  int e = eye;
-  if (c.swap_eyes) e = 1 - e;
-  const float half_m = c.ipd_m * 0.5f;
-  return (e == 0) ? -half_m : half_m;
+  (void)raw;
+  (void)eye;
+  (void)painted_dual;
+  return 0.f;
 }
 
 /// Two IPD-offset cameras (gmod method). painted_dual must mean two world paints.

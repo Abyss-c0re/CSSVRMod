@@ -77,7 +77,7 @@ TEST(dual_paint_requires_two_captures) {
   ASSERT_TRUE(r1.painted_dual);
   ASSERT_EQ(r1.captures, 2);
   ASSERT_TRUE(r1.left_origin.y > r1.right_origin.y);
-  ASSERT_NEAR(StereoView_SubmitPoseX(in.calib, 0, r1.painted_dual), -0.032f, 0.0001);
+  ASSERT_NEAR(StereoView_SubmitPoseX(in.calib, 0, r1.painted_dual), 0.f, 0.0001);
 }
 
 TEST(locate_renderview_fixture_and_css) {

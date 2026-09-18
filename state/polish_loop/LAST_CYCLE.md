@@ -1,13 +1,13 @@
-# Cycle 51 — 2026-09-18
+# Cycle 52 — 2026-09-18
 
 ## Focus
 
-`dual-ipd-ignores-uv-eyescale` — Vision eyescale crushed world camera sep.
+`dual-pose-ipd-is-second-plane` — world IPD + VIEW pose IPD = two planes.
 
 ## Did
 
-- Dual paint / submit pose use full `ipd_m`. eyescale stays UV-only (cycle 1 / pain point).
-- Live calib `eye=0.13` would have put cameras ~8 mm apart (no stereo even after two paints).
+- `StereoView_SubmitPoseX` is always 0. The blit sits on the lenses (cycle 1).
+- Dual IPD stays in the two world origins only. Pose IPD on those rasters is heresy.
 
 ## Did not
 
@@ -16,7 +16,7 @@
 
 ## Tests
 
-`cssvrmod_tests` — 105 passed, 0 failed (843 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 105 passed, 0 failed (844 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

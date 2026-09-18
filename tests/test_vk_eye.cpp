@@ -71,7 +71,7 @@ TEST(vk_eye_identical_pixels_are_not_dual) {
 }
 
 TEST(vk_eye_ready_does_not_unlock_pose_ipd_alone) {
-  // Storing two CPU frames is not a world paint. Pose IPD still needs painted_dual.
+  // Storing two CPU frames is not a world paint. VIEW pose IPD stays 0 either way.
   Calib c;
   c.ipd_m = 0.064f;
   c.eyescale = 1.f;
@@ -81,5 +81,5 @@ TEST(vk_eye_ready_does_not_unlock_pose_ipd_alone) {
   VkEye_Store(&p, 1, b.data(), 2, 2, false);
   ASSERT_TRUE(VkEye_Ready(p));
   ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, false), 0.f, 0.0001);
-  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, true), -0.032f, 0.0001);
+  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, true), 0.f, 0.0001);
 }

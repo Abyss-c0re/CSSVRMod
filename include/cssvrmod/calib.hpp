@@ -60,7 +60,7 @@ inline EyeBlit CalibEye(const Calib& raw, int eye, bool painted_dual = false) {
   b.v1 = CalibClamp(cy + halfV - panV, 0.f, 1.f);
   if (b.u1 < b.u0 + 0.04f) b.u1 = CalibClamp(b.u0 + 0.04f, 0.f, 1.f);
   if (b.v1 < b.v0 + 0.04f) b.v1 = CalibClamp(b.v0 + 0.04f, 0.f, 1.f);
-  // pose_x stays 0 here. Submit uses StereoView_SubmitPoseX(painted_dual).
+  // pose_x stays 0. Dual IPD is world origin, not a VIEW-space plane.
   b.pose_x = 0.f;
   return b;
 }

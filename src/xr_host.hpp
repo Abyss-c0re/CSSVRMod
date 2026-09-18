@@ -20,7 +20,7 @@ void XrHostShutdown();
 bool XrHostBeginFrame();
 /// Last BeginFrame waited but shouldRender was false (skip, not a submit fail).
 bool XrHostLastFrameSkipped();
-// Submit the CSS present. Pose IPD only if StereoView_SubmitPoseX(painted_dual).
+// Submit the CSS present. Identity VIEW pose; IPD is in the two world paints.
 bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vflip);
 bool XrHostSubmitEyes(unsigned int gl_l, unsigned int gl_r, int src_w, int src_h, bool vflip,
                       bool painted_dual);

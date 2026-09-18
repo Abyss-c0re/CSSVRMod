@@ -85,24 +85,23 @@ TEST(stereo_dual_yaw90_still_along_right) {
   ASSERT_NEAR(p.right.origin.y, expect_r.y, 0.001);
 }
 
-TEST(stereo_pose_x_legal_only_after_dual_paint) {
+TEST(stereo_pose_x_never_on_lens_blit) {
   Calib c;
   c.ipd_m = 0.064f;
   c.eyescale = 1.f;
-  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, true), -0.032f, 0.0001);
-  ASSERT_NEAR(StereoView_SubmitPoseX(c, 1, true), 0.032f, 0.0001);
+  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, true), 0.f, 0.0001);
+  ASSERT_NEAR(StereoView_SubmitPoseX(c, 1, true), 0.f, 0.0001);
   c.swap_eyes = true;
-  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, true), 0.032f, 0.0001);
-  ASSERT_NEAR(StereoView_SubmitPoseX(c, 1, true), -0.032f, 0.0001);
-  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, false), 0.f, 0.0001);
+  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, true), 0.f, 0.0001);
+  ASSERT_NEAR(StereoView_SubmitPoseX(c, 1, false), 0.f, 0.0001);
 }
 
 TEST(stereo_dual_ipd_ignores_uv_eyescale) {
   Calib c;
   c.ipd_m = 0.064f;
   c.eyescale = 0.13f; // live Vision knob — UV only
-  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, true), -0.032f, 0.0001);
-  ASSERT_NEAR(StereoView_SubmitPoseX(c, 1, true), 0.032f, 0.0001);
+  ASSERT_NEAR(StereoView_SubmitPoseX(c, 0, true), 0.f, 0.0001);
+  ASSERT_NEAR(StereoView_SubmitPoseX(c, 1, true), 0.f, 0.0001);
   ASSERT_NEAR(StereoView_HalfIpdInches(c, kInchesPerMeter, true), 0.064f * kInchesPerMeter * 0.5f,
               0.001);
   ASSERT_TRUE(StereoView_HalfIpdInches(c, kInchesPerMeter, false) < 0.3f);
@@ -115,6 +114,8 @@ TEST(stereo_dual_ipd_ignores_uv_eyescale) {
   const float full = 0.064f * kInchesPerMeter * 0.5f;
   ASSERT_NEAR(p.half_ipd, full, 0.001);
   ASSERT_NEAR(p.half_ipd_m, 0.032f, 0.0001);
+  ASSERT_NEAR(p.left.pose_x, 0.f, 0.0001);
+  ASSERT_NEAR(p.right.pose_x, 0.f, 0.0001);
   ASSERT_NEAR(p.left.origin.y - in.origin.y, full, 0.001);
   ASSERT_NEAR(p.right.origin.y - in.origin.y, -full, 0.001);
 }
