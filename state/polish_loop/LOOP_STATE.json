@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T06:33:00Z",
   "last_focus": "dual-renderview-ipd-origin",
   "next_focus": "hook-cviewrender-dual-paint",
-  "last_commit": "d2d9145",
+  "last_commit": "144e6e6",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
