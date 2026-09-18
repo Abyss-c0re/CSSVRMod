@@ -171,6 +171,33 @@ inline bool SdlSonameRewrite(char* buf, size_t n) {
   return hit;
 }
 
+/// Host loader soname is 14 bytes. Same-length rename so a bin/linux64 shim
+/// is not circular. DXVK dlopen("libvulkan.so.1") — not a DT_NEEDED.
+inline const char* Vulkan_ShimSoname() { return "libvulkan.so.1"; }
+inline const char* Vulkan_RealSoname() { return "libvulkan.css1"; }
+
+inline bool VulkanSonameRewrite(char* buf, size_t n) {
+  if (!buf || n < 14) return false;
+  const char* from = Vulkan_ShimSoname();
+  const char* to = Vulkan_RealSoname();
+  bool hit = false;
+  for (size_t i = 0; i + 14 <= n; ++i) {
+    if (std::memcmp(buf + i, from, 14) == 0) {
+      std::memcpy(buf + i, to, 14);
+      hit = true;
+    }
+  }
+  return hit;
+}
+
+/// VulkanSym must open the renamed loader first. libvulkan.so.1 in bin/linux64
+/// is our shim — dlopen of that name would recurse into the hook's GIPA.
+inline const char* const* Vulkan_LoaderCandidates(int* n) {
+  static const char* k[] = {"libvulkan.css1", "libvulkan.so.1", "libvulkan.so"};
+  if (n) *n = 3;
+  return k;
+}
+
 inline bool SteamLaunchHasHook(const char* launch, const char* hook) {
   if (!launch || !hook || !hook[0]) return false;
   if (std::strstr(launch, hook) != nullptr) return true;

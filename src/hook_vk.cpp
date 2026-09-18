@@ -5,6 +5,7 @@
 #include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/collision.hpp"
 #include "cssvrmod/hook_api.hpp"
+#include "cssvrmod/launch.hpp"
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/tick.hpp"
@@ -314,8 +315,12 @@ PFN_vkCreateSwapchainKHR g_createSc = nullptr;
 
 void* VulkanSym(const char* name) {
   static void* lib = nullptr;
-  if (!lib) lib = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL);
-  if (!lib) lib = dlopen("libvulkan.so", RTLD_NOW | RTLD_LOCAL);
+  if (!lib) {
+    int n = 0;
+    const char* const* c = cssvr::Vulkan_LoaderCandidates(&n);
+    for (int i = 0; i < n && !lib; ++i)
+      lib = dlopen(c[i], RTLD_NOW | RTLD_LOCAL);
+  }
   void* p = lib ? dlsym(lib, name) : nullptr;
   if (!p) p = dlsym(RTLD_NEXT, name);
   return p;

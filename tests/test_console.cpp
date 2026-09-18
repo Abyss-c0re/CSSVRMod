@@ -14,6 +14,20 @@ TEST(sdl_soname_rewrite_same_len) {
   ASSERT_TRUE(std::strstr(buf, "libSDL2-css.so.0") != nullptr);
 }
 
+TEST(vulkan_soname_rewrite_and_loader_order) {
+  ASSERT_EQ((int)std::strlen(Vulkan_ShimSoname()), 14);
+  ASSERT_EQ((int)std::strlen(Vulkan_RealSoname()), 14);
+  char buf[32] = "xxlibvulkan.so.1yy";
+  ASSERT_TRUE(VulkanSonameRewrite(buf, sizeof(buf)));
+  ASSERT_TRUE(std::strstr(buf, "libvulkan.css1") != nullptr);
+  ASSERT_TRUE(std::strstr(buf, "libvulkan.so.1") == nullptr);
+  int n = 0;
+  const char* const* c = Vulkan_LoaderCandidates(&n);
+  ASSERT_EQ(n, 3);
+  ASSERT_STREQ(c[0], "libvulkan.css1");
+  ASSERT_STREQ(c[1], "libvulkan.so.1");
+}
+
 TEST(icvar_004_slots) {
   ASSERT_TRUE(ICvar_Layout004("VEngineCvar004"));
   ASSERT_FALSE(ICvar_Layout004("VEngineCvar007"));

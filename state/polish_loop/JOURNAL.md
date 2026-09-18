@@ -360,6 +360,10 @@ Idle hunt. Same Steam CSS `2358263`; still predates shim; no hook in maps. No co
 
 SDL2 shim mapped the hook in live CSS `2370093`. Present/ICvar stayed dead (not LD_PRELOAD). PollEvent one-shots CssvrLateAttach after the first window. Offline 124/124. Not HMD-proven. Restart CSS from the menu.
 
+## 2026-09-19 cycle 82
+
+`bin/linux64/libvulkan.so.1` shim. DXVK dlopen + GIPA present is not the loader export; GOT scan misses. VulkanSym opens libvulkan.css1 first. Offline 125/125. Not HMD-proven. Start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

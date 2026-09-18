@@ -1,11 +1,11 @@
 {
-  "cycle": 81,
+  "cycle": 82,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T21:56:41Z",
-  "last_focus": "sdl-late-attach-present",
+  "started_at": "2026-09-18T22:09:47Z",
+  "last_focus": "vulkan-shim-like-sdl",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "acc59cc",
+  "last_commit": "46fcbb0",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }

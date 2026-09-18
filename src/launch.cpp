@@ -299,6 +299,14 @@ static std::string FindHostSdl2() {
   return {};
 }
 
+static std::string FindHostVulkan() {
+  const char* cands[] = {"/usr/lib/libvulkan.so.1", "/usr/lib64/libvulkan.so.1",
+                         "/usr/lib/x86_64-linux-gnu/libvulkan.so.1", nullptr};
+  for (int i = 0; cands[i]; ++i)
+    if (IsFile(cands[i])) return cands[i];
+  return {};
+}
+
 bool InstallToGame(const InstallPlan& p) {
   if (!p.ok) return false;
   if (!CopyFile(p.hook_src, p.hook_dst)) return false;
@@ -333,6 +341,31 @@ bool InstallToGame(const InstallPlan& p) {
                               "-Wl,-soname,libSDL2-2.0.so.0 >/tmp/cssvr_sdl_shim.log 2>&1";
       if (system(cmd.c_str()) != 0) CopyFile(p.hook_dst, shim);
       chmod(shim.c_str(), 0755);
+    }
+    // DXVK dlopen("libvulkan.so.1"). A GOT scan of the loader export misses
+    // GIPA-resolved present. Never fall back to copying the hook as vulkan.
+    const std::string vkhost = FindHostVulkan();
+    const std::string vkreal = bin + "/" + Vulkan_RealSoname();
+    const std::string vkshim = bin + "/" + Vulkan_ShimSoname();
+    if (!vkhost.empty() && CopyFile(vkhost, vkreal)) {
+      chmod(vkreal.c_str(), 0755);
+      std::ifstream in(vkreal, std::ios::binary);
+      std::string blob((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+      if (VulkanSonameRewrite(blob.data(), blob.size())) {
+        std::ofstream out(vkreal, std::ios::binary | std::ios::trunc);
+        out.write(blob.data(), (std::streamsize)blob.size());
+      }
+      const std::string cfile = "/tmp/cssvr_vk_shim.c";
+      {
+        std::ofstream c(cfile);
+        c << "int cssvr_vk_shim;\n";
+      }
+      const std::string cmd =
+          std::string("cc -shared -fPIC -o \"") + vkshim + "\" \"" + cfile + "\" -L\"" + bin +
+          "\" -lcssvrmod_hook -l:" + Vulkan_RealSoname() + " -Wl,-rpath,'$ORIGIN' -Wl,-soname," +
+          Vulkan_ShimSoname() + " >/tmp/cssvr_vk_shim.log 2>&1";
+      if (system(cmd.c_str()) != 0) unlink(vkshim.c_str());
+      else chmod(vkshim.c_str(), 0755);
     }
   }
   {
