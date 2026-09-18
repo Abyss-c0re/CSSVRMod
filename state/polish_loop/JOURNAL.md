@@ -164,6 +164,10 @@ Title-click resets a grip-moved Vision panel to default STAGE pose. Offline 82/8
 
 HOME glyph on the Vision title when the panel is off default. Offline 83/83. Not HMD-proven.
 
+## 2026-09-18 cycle 30
+
+VISION title lights when the laser is on it. Offline 84/84. Not HMD-proven. Menu chrome is enough.
+
 
 
 

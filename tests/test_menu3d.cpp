@@ -136,6 +136,29 @@ TEST(menu3d_reset_pose) {
   ASSERT_FALSE(Menu3d_TitleHit(mid));
 }
 
+TEST(menu3d_title_hot) {
+  Menu3d m;
+  ASSERT_FALSE(Menu3d_TitleHot(m));
+  const auto title = Menu3d_RayHit({0.f, kMenuY + kMenuH * 0.42f, 0.f}, {0.f, 0.f, -1.f});
+  Menu3d_SetCursor(&m, title);
+  ASSERT_TRUE(Menu3d_TitleHot(m));
+  unsigned char pix[256 * 96 * 4];
+  Menu3d cold;
+  Menu3d_Raster(pix, 256, 96, cold);
+  auto hotbar = [&](const unsigned char* p) {
+    int n = 0;
+    for (int i = 0; i < 256 * 96; ++i)
+      if (p[i * 4 + 0] >= 190 && p[i * 4 + 1] < 60 && p[i * 4 + 2] < 80) n++;
+    return n;
+  };
+  ASSERT_EQ(hotbar(pix), 0);
+  Menu3d_Raster(pix, 256, 96, m);
+  ASSERT_TRUE(hotbar(pix) > 40);
+  const auto mid = Menu3d_RayHit({0.f, kMenuY, 0.f}, {0.f, 0.f, -1.f});
+  Menu3d_SetCursor(&m, mid);
+  ASSERT_FALSE(Menu3d_TitleHot(m));
+}
+
 TEST(menu3d_home_hint) {
   Menu3d m;
   ASSERT_FALSE(Menu3d_OffHome(m));

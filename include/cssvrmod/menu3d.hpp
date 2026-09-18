@@ -160,6 +160,8 @@ inline bool Menu3d_OffHome(const Menu3d& m) {
   return d.LengthSqr() > 0.01f * 0.01f;
 }
 
+inline bool Menu3d_TitleHot(const Menu3d& m) { return m.cursor && m.cv < 0.18f; }
+
 // World-locked default. Grab while the laser is on the quad starts a drag (offset = panel − hand).
 inline bool Menu3d_GripTick(Menu3d* m, bool grab, const Vec3& hand, bool on_quad) {
   if (!m) return false;
@@ -322,7 +324,9 @@ inline void Menu3d_Raster(unsigned char* rgba, int w, int h, const Menu3d& m) {
   if (!rgba || w < 8 || h < 8) return;
   std::memset(rgba, 18, (size_t)w * (size_t)h * 4);
   const int titleH = std::max(20, h / 12);
-  Menu3d_Fill(rgba, w, h, 0, 0, w, titleH, 140, 16, 28);
+  const bool titleHot = Menu3d_TitleHot(m);
+  Menu3d_Fill(rgba, w, h, 0, 0, w, titleH, titleHot ? 200 : 140, titleHot ? 42 : 16,
+              titleHot ? 56 : 28);
   const int scaleT = std::max(1, titleH / 10);
   Menu3d_DrawText(rgba, w, h, 8, (titleH - 7 * scaleT) / 2, scaleT, "VISION", 240, 230, 220);
   if (Menu3d_OffHome(m) && w > 96) {
