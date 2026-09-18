@@ -96,6 +96,10 @@ Desktop MONO label while session_ok and !painted_dual. Not stamped onto dual-eye
 
 CViewRender locate/hook miss toasts once (dual never starts silently). Offline 70/70. Not HMD-proven.
 
+## 2026-09-18 cycle 16 follow
+
+ViewHookTryInstall only ran on GL swap. Live CSS is Vulkan, so the hook and the miss toast never fired. First vkQueuePresentKHR now installs RenderView + CreateMove.
+
 
 
 
