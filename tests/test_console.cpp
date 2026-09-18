@@ -14,6 +14,21 @@ TEST(console_decode_cbuf_jmp) {
   ASSERT_TRUE(t == (void*)(buf + 8 + 0x10));
 }
 
+TEST(console_cbuf_steal_rejects_css_rip_lea) {
+  ASSERT_EQ(EngineCmd_CbufStealBytes(), 12);
+  // Live CSS linux64 Cbuf_AddText @ engine.so+0x4ce720 (slot 106 jmp target).
+  unsigned char css[16] = {0x55, 0x48, 0x8d, 0x0d, 0x8d, 0x72, 0x30, 0x00,
+                           0x48, 0x89, 0xe5, 0x41, 0x56, 0x41, 0x55, 0x4c};
+  ASSERT_FALSE(EngineCmd_CbufStealOk(css, 12));
+  ASSERT_EQ(EngineCmd_CbufInsnLen(css, 16), 1);
+  ASSERT_EQ(EngineCmd_CbufInsnLen(css + 1, 15), 0); // lea rcx,[rip+disp]
+  unsigned char safe[12] = {0x55, 0x48, 0x89, 0xe5, 0x53, 0x48, 0x83, 0xec,
+                            0x20, 0x90, 0x90, 0x90};
+  ASSERT_TRUE(EngineCmd_CbufStealOk(safe, 12));
+  ASSERT_FALSE(EngineCmd_CbufStealOk(safe, 11));
+  ASSERT_FALSE(EngineCmd_CbufStealOk(nullptr, 12));
+}
+
 TEST(console_parse_start_stop_menu) {
   CssvrConsole c;
   ASSERT_TRUE(CssvrParseConsole("cssvr_start", &c));

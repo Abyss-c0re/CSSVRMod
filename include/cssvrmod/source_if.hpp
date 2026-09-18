@@ -116,6 +116,36 @@ inline void* EngineCmd_DecodeCbuf(const unsigned char* p) {
   return nullptr;
 }
 
+/// Inline hook overwrites this many bytes (`movabs rax; jmp rax`).
+inline int EngineCmd_CbufStealBytes() { return 12; }
+
+/// One allowlisted, position-independent insn. 0 = unknown / RIP-relative / truncated.
+/// CSS Cbuf starts `push rbp; lea rcx,[rip+disp]` — that lea must not be stolen.
+inline int EngineCmd_CbufInsnLen(const unsigned char* p, int left) {
+  if (!p || left <= 0) return 0;
+  if (p[0] == 0x90) return 1;                         // nop
+  if (p[0] == 0x55 || p[0] == 0x53) return 1;         // push rbp / rbx
+  if (p[0] == 0x31 && left >= 2 && p[1] == 0xc0) return 2; // xor eax,eax
+  if (p[0] == 0x41 && left >= 2 && p[1] >= 0x54 && p[1] <= 0x57) return 2; // push r12-r15
+  if (left >= 3 && p[0] == 0x48 && p[1] == 0x89 && p[2] == 0xe5) return 3; // mov rbp,rsp
+  if (left >= 4 && p[0] == 0x48 && p[1] == 0x83 && p[2] == 0xec) return 4; // sub rsp,imm8
+  if (left >= 4 && p[0] == 0xf3 && p[1] == 0x0f && p[2] == 0x1e && p[3] == 0xfa) return 4; // endbr64
+  return 0;
+}
+
+/// True only if [p, p+n) is an exact run of relocatable insns. Else the trampoline
+/// splits an insn or relocates a RIP-relative lea — every Cbuf_AddText would crash.
+inline bool EngineCmd_CbufStealOk(const unsigned char* p, int n) {
+  if (!p || n != EngineCmd_CbufStealBytes()) return false;
+  int i = 0;
+  while (i < n) {
+    const int len = EngineCmd_CbufInsnLen(p + i, n - i);
+    if (len <= 0) return false;
+    i += len;
+  }
+  return i == n;
+}
+
 bool EngineCmd_WrapReady();
 
 /// Get/Set viewangles only after angles_ok self-test.

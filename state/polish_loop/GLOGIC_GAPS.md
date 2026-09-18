@@ -56,6 +56,7 @@
 - [x] Console filter wraps ClientCmd_Unrestricted (slot 106, cycle 57). Typed `cssvr_start` never hit restricted ClientCmd (slot 7).
 - [x] VK present probes engine / cmd wrap without waiting on RenderView locate (cycle 58). Retry 106 until engine.so or give up.
 - [x] Console parser strips CR/LF (cycle 59). `cssvr_start\n` was Help, not Start.
+- [x] Cbuf inline steal refuses RIP-relative / split prologue (cycle 78). CSS `Cbuf_AddText` is `push rbp; lea rcx,[rip]`. A 12-byte patch would crash every console line. Vtable wrap stays; typed `cssvr_start` still needs a relocating hook.
 - [x] Find CSS from `/proc/self/exe` + cwd (cycle 60). Hook-in-CSS must not depend on HOME Steam paths.
 - [x] autoexec `plugin_load` (cycle 64). Steam Cloud wiped App 240 LaunchOptions; autoexec is the durable hook load.
 - [x] Hook delay-loads OpenXR (cycle 67). Steam PV has the runtime under overrides/openxr, not `libopenxr_loader.so.1`. A DT_NEEDED blocked plugin_load / LD_PRELOAD. Search `/run/host/usr/lib`.

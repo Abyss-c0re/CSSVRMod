@@ -332,6 +332,22 @@ Idle hunt. Same Steam CSS `2221372`; no hook in maps. 23:00 log lines are host h
 
 Plugin default-search bind allows Linux `RTLD_DEFAULT` (NULL). Then RTLD_NOLOAD soname, then constructed path. Offline 119/119. Not HMD-proven. Restart CSS from the menu.
 
+## 2026-09-18 cycle 75
+
+Idle hunt. Same Steam CSS `2221372`; no hook in maps. Load-path bits from 67–74 already on disk. No code. Not HMD-proven. Next: restart CSS from the menu.
+
+## 2026-09-18 cycle 76
+
+Idle hunt. Same Steam CSS `2221372`; no hook in maps. Log unchanged. No code. Not HMD-proven. Next: restart CSS from the menu.
+
+## 2026-09-19 cycle 77
+
+Idle hunt. Same Steam CSS `2221372`; no hook in maps. LaunchOptions still Cloud-wiped; packed VDF upsert still works. No code. Not HMD-proven. Next: restart CSS from the menu.
+
+## 2026-09-19 cycle 78
+
+Cbuf 12-byte steal refuses CSS RIP-relative lea prologue. Slot 106 jmp target would crash every console line. Offline 121/121. Not HMD-proven. Restart CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

@@ -66,6 +66,7 @@ bool HookCbufAddText(void* cbuf) {
   if (!cbuf || g_cbuf_orig) return g_cbuf_orig != nullptr;
   if (!SlotInEngine(reinterpret_cast<ClientCmdFn>(cbuf))) return false;
   auto* p = static_cast<unsigned char*>(cbuf);
+  if (!cssvr::EngineCmd_CbufStealOk(p, cssvr::EngineCmd_CbufStealBytes())) return false;
   void* tramp = mmap(nullptr, 4096, PROT_READ | PROT_WRITE | PROT_EXEC,
                      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if (tramp == MAP_FAILED) return false;
