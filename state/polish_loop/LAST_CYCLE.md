@@ -1,24 +1,23 @@
-# Cycle 49 — 2026-09-18
+# Cycle 50 — 2026-09-18
 
 ## Focus
 
-`xr-session-ok-only-when-running` — log lied `xr submit fail #N session_ok` on warmup and after STOPPING.
+`maps-elf-base-not-exec` — maps fallback used the RX segment as `client.so` base.
 
 ## Did
 
-- `session_ok` only after `xrBeginSession`. CreateSession is `session_created`.
-- STOPPING / LOSS_PENDING / EXITING / instance-loss update the reason. LOSS toasts no-HMD once.
-- `shouldRender=false` is a skip, not a fail. Warmup / stop do not increment `xr_fail`.
-- Shutdown does not re-arm the no-HMD toast (one-shot per process).
+- First maps line is the ELF load base (vaddr 0). Hook RVAs are ELF vaddrs.
+- CSS `client.so` first PT_LOAD is R; RX is +0x644000. exec+RVA never hits RenderView.
+- Kernel ` (deleted)` suffix still matches and is stripped from the path.
 
 ## Did not
 
-- HMD walk (user-gated). Dual paint still unproven in-game. No renderview/createmove in `/tmp/cssvrmod.log` (CSS not relaunched).
+- HMD walk (user-gated). Dual paint still unproven in-game.
 - Menu / toast / print / help / cfg chrome. No force `-noborder`.
 
 ## Tests
 
-`cssvrmod_tests` — 104 passed, 0 failed (832 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 104 passed, 0 failed (835 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 

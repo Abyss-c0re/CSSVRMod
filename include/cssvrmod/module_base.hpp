@@ -9,10 +9,21 @@
 
 namespace cssvr {
 
+/// Drop kernel " (deleted)" so a replaced client.so still matches.
+inline const char* Maps_PathEnd(const char* path, const char* end) {
+  if (!path || !end || end < path) return path;
+  while (end > path && (end[-1] == ' ' || end[-1] == '\t' || end[-1] == '\r')) --end;
+  const char kDel[] = " (deleted)";
+  const size_t dn = sizeof(kDel) - 1;
+  if ((size_t)(end - path) >= dn && std::memcmp(end - (ptrdiff_t)dn, kDel, dn) == 0)
+    end -= (ptrdiff_t)dn;
+  return end;
+}
+
 /// Basename match. "client.so" must not hit steamclient.so.
 inline bool Maps_LineHasNeedle(const char* path, const char* end, const char* needle) {
   if (!path || !needle || !needle[0] || path >= end) return false;
-  while (end > path && (end[-1] == ' ' || end[-1] == '\t' || end[-1] == '\r')) --end;
+  end = Maps_PathEnd(path, end);
   const size_t n = std::strlen(needle);
   const size_t plen = (size_t)(end - path);
   if (plen < n) return false;
@@ -46,31 +57,27 @@ inline bool Maps_ParseLine(const char* line, const char* needle, uintptr_t* star
   *start = (uintptr_t)s;
   if (exec) *exec = is_exec;
   if (path_out && path_n > 0) {
+    const char* pe = Maps_PathEnd(q, end);
     int i = 0;
-    while (q < end && i + 1 < path_n) path_out[i++] = *q++;
-    while (i > 0 && (path_out[i - 1] == ' ' || path_out[i - 1] == '\t' || path_out[i - 1] == '\r'))
-      --i;
+    while (q < pe && i + 1 < path_n) path_out[i++] = *q++;
     path_out[i] = 0;
   }
   return true;
 }
 
-/// First r-x mapping start whose path contains needle. Else first match. 0 if none.
+/// First mapping start (ELF load base / vaddr 0). Not the RX text segment.
+/// Hook RVAs are ELF vaddrs; exec start + RVA misses by the first PT_LOAD size.
 inline uintptr_t Maps_ModuleBase(const char* maps, const char* needle) {
   if (!maps || !needle || !needle[0]) return 0;
-  uintptr_t fallback = 0;
   const char* p = maps;
   while (*p) {
     uintptr_t start = 0;
     bool exec = false;
-    if (Maps_ParseLine(p, needle, &start, &exec, nullptr, 0)) {
-      if (exec) return start;
-      if (!fallback) fallback = start;
-    }
+    if (Maps_ParseLine(p, needle, &start, &exec, nullptr, 0)) return start;
     while (*p && *p != '\n') ++p;
     if (*p == '\n') ++p;
   }
-  return fallback;
+  return 0;
 }
 
 inline bool Maps_ModulePath(const char* maps, const char* needle, char* out, int n) {
@@ -79,23 +86,17 @@ inline bool Maps_ModulePath(const char* maps, const char* needle, char* out, int
   if (!maps || !needle) return false;
   const char* p = maps;
   char path[512];
-  char saved[512] = {};
   while (*p) {
     uintptr_t start = 0;
     bool exec = false;
     if (Maps_ParseLine(p, needle, &start, &exec, path, (int)sizeof(path)) && path[0] == '/') {
-      if (exec) {
-        std::snprintf(out, (size_t)n, "%s", path);
-        return true;
-      }
-      if (!saved[0]) std::snprintf(saved, sizeof(saved), "%s", path);
+      std::snprintf(out, (size_t)n, "%s", path);
+      return true;
     }
     while (*p && *p != '\n') ++p;
     if (*p == '\n') ++p;
   }
-  if (!saved[0]) return false;
-  std::snprintf(out, (size_t)n, "%s", saved);
-  return true;
+  return false;
 }
 
 inline uintptr_t Module_DladdrBase(void* handle) {
@@ -163,11 +164,8 @@ inline uintptr_t Module_SoBase(const char* short_name, const char* full_path) {
     uintptr_t start = 0;
     bool exec = false;
     if (!Maps_ParseLine(line, short_name, &start, &exec, nullptr, 0)) continue;
-    if (exec) {
-      maps_base = start;
-      break;
-    }
-    if (!maps_base) maps_base = start;
+    maps_base = start; // first mapping = ELF base, not RX
+    break;
   }
   std::fclose(f);
   return maps_base;

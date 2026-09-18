@@ -8,6 +8,7 @@
 - [x] VK present clears the dual-paint frame gate (cycle 45). `ViewHookOnSwap` was GL-only; `g_did_frame` stayed true so dual ran at most once.
 - [x] `client.so` base via full path + `/proc/self/maps` (cycle 42). Short-name `dlopen(NOLOAD)` misses a path-loaded CSS module — hook never attached.
 - [x] Maps basename match (cycle 48). `client.so` must not bind `steamclient.so`.
+- [x] Maps ELF load base, not RX (cycle 50). CSS `client.so` first PT_LOAD is R at vaddr 0; exec+RVA misses the hook. `(deleted)` suffix still matches.
 - [x] `session_ok` only after BeginSession (cycle 49). Warmup / STOPPING / LOSS are not a healthy submit. First-frame fail-while-ok was a lie.
 - [x] `engine.so` / `client.so` factories via `Module_SoHandle` (cycle 43). ProbeLiveEngine no longer `dlopen(nullptr)` (launcher is not engine).
 - [x] Locate/hook miss toasts once (cycle 16). Dual never starting silently is forbidden.
