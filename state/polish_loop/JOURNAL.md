@@ -276,6 +276,10 @@ Retry no_patch. One splash vtable miss no longer permanently kills dual paint. O
 
 `--install` now writes Steam App 240 LaunchOptions so a normal Steam start preloads the hook. Offline 112/112. Not HMD-proven. Steam may revert LaunchOptions if it still holds the old localconfig.
 
+## 2026-09-18 cycle 57
+
+Wrap ClientCmd_Unrestricted (slot 106) so typed `cssvr_start` reaches the filter. Slot 7 stays restricted ClientCmd. Offline 113/113. Not HMD-proven.
+
 ## 2026-09-18 cycle 31 follow
 
 Do not queue dual-RenderView as the next unattended theme. Next is persist window size in launch.cfg.

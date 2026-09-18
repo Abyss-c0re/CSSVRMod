@@ -14,10 +14,18 @@ namespace {
 cssvr::EngineCmdFilter g_cmd_filter = nullptr;
 using ClientCmdFn = void (*)(void*, const char*);
 ClientCmdFn g_real_cmd = nullptr;
+ClientCmdFn g_orig_unrestricted = nullptr;
+bool g_cmd_wrapped = false;
 
-void WrappedClientCmd(void* eng, const char* cmd) {
+void FilterOrOrig(void* eng, const char* cmd, ClientCmdFn orig) {
   if (g_cmd_filter && cmd && g_cmd_filter(cmd)) return;
-  if (g_real_cmd) g_real_cmd(eng, cmd);
+  if (orig) orig(eng, cmd);
+}
+
+void WrappedClientCmd(void* eng, const char* cmd) { FilterOrOrig(eng, cmd, g_real_cmd); }
+
+void WrappedClientCmdUnrestricted(void* eng, const char* cmd) {
+  FilterOrOrig(eng, cmd, g_orig_unrestricted);
 }
 
 bool ProtectSlot(void* p, bool wr) {
@@ -28,14 +36,28 @@ bool ProtectSlot(void* p, bool wr) {
   return mprotect((void*)pg, (size_t)page, prot) == 0;
 }
 
+void PatchCmdSlot(ClientCmdFn* slot, ClientCmdFn wrap, ClientCmdFn* orig) {
+  if (!slot || !*slot || !wrap || !orig || *orig) return;
+  *orig = *slot;
+  ProtectSlot(slot, true);
+  *slot = wrap;
+  ProtectSlot(slot, false);
+}
+
 void InstallCmdWrap(void* engine) {
-  if (g_real_cmd || !engine) return;
+  if (g_cmd_wrapped || !engine) return;
   auto** vt = *reinterpret_cast<ClientCmdFn**>(engine);
-  if (!vt || !vt[7]) return;
-  g_real_cmd = vt[7];
-  ProtectSlot(&vt[7], true);
-  vt[7] = &WrappedClientCmd;
-  ProtectSlot(&vt[7], false);
+  if (!vt) return;
+  PatchCmdSlot(&vt[cssvr::kEngineClientCmdSlot], &WrappedClientCmd, &g_real_cmd);
+  PatchCmdSlot(&vt[cssvr::kEngineClientCmdUnrestrictedSlot], &WrappedClientCmdUnrestricted,
+               &g_orig_unrestricted);
+  if (!g_real_cmd && !g_orig_unrestricted) return;
+  g_cmd_wrapped = true;
+  if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
+    std::fprintf(f, "cssvr cmd wrap slot7=%d slot106=%d\n", g_real_cmd ? 1 : 0,
+                 g_orig_unrestricted ? 1 : 0);
+    std::fclose(f);
+  }
 }
 } // namespace
 
@@ -247,8 +269,8 @@ bool EngineClientCmd(const EngineIf& e, const char* cmd) {
     return true;
   }
   auto** vt = *reinterpret_cast<ClientCmdFn**>(e.engine);
-  if (!vt || !vt[7]) return false;
-  vt[7](e.engine, cmd);
+  if (!vt || !vt[kEngineClientCmdSlot]) return false;
+  vt[kEngineClientCmdSlot](e.engine, cmd);
   return true;
 }
 

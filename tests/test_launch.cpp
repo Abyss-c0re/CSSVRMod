@@ -257,3 +257,16 @@ TEST(source_if_probe_names) {
   ASSERT_TRUE(e.ok);
   ASSERT_FALSE(e.screen_ok); // self-test only on live
 }
+
+TEST(engine_cmd_wraps_unrestricted) {
+  ASSERT_EQ(kEngineClientCmdSlot, 7);
+  ASSERT_EQ(kEngineClientCmdUnrestrictedSlot, 106);
+  ASSERT_TRUE(EngineCmd_ShouldWrapSlot(7));
+  ASSERT_TRUE(EngineCmd_ShouldWrapSlot(106));
+  ASSERT_FALSE(EngineCmd_ShouldWrapSlot(5));
+  ASSERT_FALSE(EngineCmd_ShouldWrapSlot(6));
+  const auto p = EngineCmd_WrapPlan();
+  ASSERT_EQ(p.n, 2);
+  ASSERT_EQ(p.slots[0], 7);
+  ASSERT_EQ(p.slots[1], 106);
+}

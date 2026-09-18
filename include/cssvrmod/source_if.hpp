@@ -69,6 +69,27 @@ bool EngineClientCmd(const EngineIf& e, const char* cmd);
 using EngineCmdFilter = bool (*)(const char* cmd);
 void EngineSetCmdFilter(EngineCmdFilter f);
 
+/// CSS64 CEngineClient: 7 = ClientCmd (restricted). 106 = ClientCmd_Unrestricted
+/// (`mov rdi,rsi; jmp Cbuf_AddText`). Typed console uses 106, not 7.
+constexpr int kEngineClientCmdSlot = 7;
+constexpr int kEngineClientCmdUnrestrictedSlot = 106;
+
+struct EngineCmdWrapPlan {
+  int slots[4]{};
+  int n = 0;
+};
+
+inline EngineCmdWrapPlan EngineCmd_WrapPlan() {
+  EngineCmdWrapPlan p;
+  p.slots[p.n++] = kEngineClientCmdSlot;
+  p.slots[p.n++] = kEngineClientCmdUnrestrictedSlot;
+  return p;
+}
+
+inline bool EngineCmd_ShouldWrapSlot(int slot) {
+  return slot == kEngineClientCmdSlot || slot == kEngineClientCmdUnrestrictedSlot;
+}
+
 /// Get/Set viewangles only after angles_ok self-test.
 bool EngineGetViewAngles(const EngineIf& e, Ang3* out);
 bool EngineSetViewAngles(const EngineIf& e, const Ang3& a);
