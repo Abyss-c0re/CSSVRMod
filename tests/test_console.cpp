@@ -82,6 +82,12 @@ TEST(steam_merge_launch_options) {
   std::string keep = SteamMergeLaunchOptions("PRESSURE_VESSEL_IMPORT_OPENXR_1_RUNTIMES=1 %command%", hook);
   ASSERT_TRUE(SteamLaunchHasHook(keep.c_str(), hook));
   ASSERT_TRUE(keep.find("PRESSURE_VESSEL_IMPORT_OPENXR_1_RUNTIMES=1") != std::string::npos);
+  // Symlink spelling: do not stack a second LD_PRELOAD.
+  const char* alt = "/home/u/.local/share/Steam/steamapps/common/Counter-Strike Source/bin/linux64/libcssvrmod_hook.so";
+  const char* via_steam =
+      "LD_PRELOAD=\"/home/u/.steam/steam/steamapps/common/Counter-Strike Source/bin/linux64/libcssvrmod_hook.so\" CSSVR_XR=0 %command%";
+  ASSERT_TRUE(SteamLaunchHasHook(via_steam, alt));
+  ASSERT_TRUE(SteamMergeLaunchOptions(via_steam, alt) == via_steam);
 }
 
 TEST(steam_upsert_app_240_launch_options) {

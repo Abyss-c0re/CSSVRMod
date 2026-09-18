@@ -312,6 +312,18 @@ Hook no longer NEEDs libSM/libICE. FindX11 pulled session libs PV cannot resolve
 
 Preload host `libjsoncpp.so.27` before dlopen of the Khronos loader. Loader has no RPATH; PV lacks jsoncpp on the search path. Offline 118/118. Not HMD-proven. Restart CSS from the menu.
 
+## 2026-09-18 cycle 70
+
+Idle hunt. Live Steam CSS `2221372` still predates autoexec; no hook in maps. Hook NEEDED/jsoncpp deps resolve in this PV. No code. Not HMD-proven. Next: restart CSS from the menu.
+
+## 2026-09-18 cycle 71
+
+Idle hunt. Same Steam CSS `2221372`; no hook in maps. VDF `addons/*.vdf` / `plugin_load` map-block confirmed in engine.so. No code. Not HMD-proven. Next: restart CSS from the menu.
+
+## 2026-09-18 cycle 72
+
+Steam LaunchOptions hook match uses basename. `.steam/steam` vs `.local/share/Steam` no longer stacks a second LD_PRELOAD. Offline 118/118. Not HMD-proven. Restart CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

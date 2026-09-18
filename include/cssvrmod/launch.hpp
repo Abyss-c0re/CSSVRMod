@@ -153,8 +153,15 @@ inline const char* FormatSpawnChrome(const SpawnPlan& p, bool fallback_noborder)
   return FormatSpawnChrome(SpawnArgvHasNoborder(p));
 }
 
+/// True if LaunchOptions already preload this hook. `.steam/steam` and
+/// `.local/share/Steam` are the same file — match the basename so re-install
+/// does not prepend a second LD_PRELOAD.
 inline bool SteamLaunchHasHook(const char* launch, const char* hook) {
-  return launch && hook && hook[0] && std::strstr(launch, hook) != nullptr;
+  if (!launch || !hook || !hook[0]) return false;
+  if (std::strstr(launch, hook) != nullptr) return true;
+  const char* base = std::strrchr(hook, '/');
+  base = base ? base + 1 : hook;
+  return base[0] && std::strstr(launch, base) != nullptr;
 }
 
 /// Keep the user's extras. Prepend LD_PRELOAD + CSSVR_XR=0 when the hook is missing.
