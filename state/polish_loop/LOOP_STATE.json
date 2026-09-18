@@ -5,7 +5,7 @@
   "started_at": "2026-09-18T09:49:00Z",
   "last_focus": "renderview-locate-miss-toast",
   "next_focus": "incomplete-dual-capture-toast",
-  "last_commit": "e693851",
+  "last_commit": "e9f3216",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
