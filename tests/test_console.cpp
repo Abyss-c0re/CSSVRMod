@@ -35,6 +35,21 @@ TEST(icvar_004_slots) {
   ASSERT_EQ(kCvarFindCommand004, 14);
 }
 
+TEST(icvar_fn_in_vstdlib) {
+  ASSERT_TRUE(ICvar_FnInModule("/opt/css/bin/linux64/libvstdlib.so"));
+  ASSERT_TRUE(ICvar_FnInModule("/opt/css/bin/linux64/engine.so"));
+  ASSERT_TRUE(ICvar_FnInModule("libvstdlib.so"));
+  ASSERT_FALSE(ICvar_FnInModule("/opt/css/cstrike/bin/linux64/client.so"));
+  ASSERT_FALSE(ICvar_FnInModule("/opt/css/bin/linux64/libtier0.so"));
+  ASSERT_FALSE(ICvar_FnInModule(nullptr));
+  ASSERT_FALSE(ICvar_FnInModule(""));
+  char p[128];
+  ASSERT_TRUE(ICvar_VstdlibBesideEngine("/opt/css/bin/linux64/engine.so", p, 128));
+  ASSERT_STREQ(p, "/opt/css/bin/linux64/libvstdlib.so");
+  ASSERT_FALSE(ICvar_VstdlibBesideEngine("engine.so", p, 128));
+  ASSERT_FALSE(ICvar_VstdlibBesideEngine(nullptr, p, 128));
+}
+
 TEST(icvar_dispatch_line_keeps_set_args) {
   unsigned char blob[520] = {};
   int argc = 3, argv0 = 10; // "cssvr_set "

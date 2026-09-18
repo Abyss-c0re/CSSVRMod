@@ -269,8 +269,26 @@ TEST(source_if_probe_names) {
   ASSERT_STREQ(e.engine_ver, "VEngineClient014");
   ASSERT_STREQ(e.client_ver, "VClient017");
   ASSERT_STREQ(e.trace_ver, "EngineTraceClient003");
+  ASSERT_TRUE(e.cvar == nullptr); // CSS engine.so has VCvarQuery001, not ICvar
   ASSERT_TRUE(e.ok);
   ASSERT_FALSE(e.screen_ok); // self-test only on live
+}
+
+static void* CvarOnlyFactory(const char* name, int* rc) {
+  static int dummy = 2;
+  if (name && std::strcmp(name, "VEngineCvar004") == 0) {
+    if (rc) *rc = 0;
+    return &dummy;
+  }
+  if (rc) *rc = 1;
+  return nullptr;
+}
+
+TEST(source_if_probe_cvar_from_vstdlib) {
+  EngineIf e;
+  ASSERT_TRUE(ProbeEngineFromFactories(FakeFactory, FakeFactory, e, CvarOnlyFactory));
+  ASSERT_STREQ(e.cvar_ver, "VEngineCvar004");
+  ASSERT_TRUE(e.cvar != nullptr);
 }
 
 TEST(engine_cmd_wraps_unrestricted) {

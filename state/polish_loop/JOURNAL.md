@@ -376,6 +376,14 @@ Idle hunt. CSS not running. Parallel `8d34b00` ICvar 004+007. CSS only has 004. 
 
 ICvar Dispatch rebuilds `name args` from CCommand. `cssvr_set eyescale 0.20` was a no-op. Offline 126/126. Not HMD-proven. Start CSS from the menu.
 
+## 2026-09-19 cycle 86
+
+Idle hunt. CSS not running. No icvar register line (new hook never mapped). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 87
+
+ICvar factory is libvstdlib.so. CSS engine CreateInterface is VCvarQuery001, not VEngineCvar004. Offline 128/128. Not HMD-proven. Start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

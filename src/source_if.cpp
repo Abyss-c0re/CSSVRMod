@@ -161,7 +161,16 @@ bool RegisterCvarCommands(void* cvar, const char* ver) {
   const int find_i = v07 ? 17 : cssvr::kCvarFindCommand004;
   const int reg_i = v07 ? 9 : cssvr::kCvarRegister004;
   if (!vt[find_i] || !vt[reg_i]) return false;
-  if (!SlotInEngine(reinterpret_cast<ClientCmdFn>(vt[find_i]))) return false;
+  Dl_info info{};
+  const bool named = dladdr(vt[find_i], &info) != 0;
+  if (!named || !cssvr::ICvar_FnInModule(info.dli_fname)) {
+    if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
+      std::fprintf(f, "cssvr icvar skip module=%s\n",
+                   named && info.dli_fname ? info.dli_fname : "?");
+      std::fclose(f);
+    }
+    return false;
+  }
   void* echo = ((Fn)vt[find_i])(cvar, "echo");
   if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
     std::fprintf(f, "cssvr icvar ver=%s find=%d echo=%d\n", ver ? ver : "?", find_i, echo ? 1 : 0);
@@ -283,7 +292,7 @@ static bool ScreenSelfTest(void* engine, int* w, int* h) {
 }
 
 bool ProbeEngineFromFactories(CreateInterfaceFn engineFn, CreateInterfaceFn clientFn,
-                              EngineIf& out) {
+                              EngineIf& out, CreateInterfaceFn vstdlibFn) {
   out = EngineIf{};
   if (!engineFn) {
     out.reason = "no_engine_factory";
@@ -292,6 +301,7 @@ bool ProbeEngineFromFactories(CreateInterfaceFn engineFn, CreateInterfaceFn clie
   out.engine = ProbeNamed(engineFn, kEngineNames, &out.engine_ver);
   out.trace = ProbeNamed(engineFn, kTraceNames, &out.trace_ver);
   out.cvar = ProbeNamed(engineFn, kCvarNames, &out.cvar_ver);
+  if (!out.cvar && vstdlibFn) out.cvar = ProbeNamed(vstdlibFn, kCvarNames, &out.cvar_ver);
   if (clientFn) out.client = ProbeNamed(clientFn, kClientNames, &out.client_ver);
   if (!out.engine) {
     out.reason = "no_vengineclient";
@@ -310,13 +320,20 @@ bool ProbeLiveEngine(EngineIf& out) {
   const CssInstall inst = FindCssInstall();
   void* e = Module_SoHandle("engine.so", inst.found ? inst.engine_so.c_str() : nullptr);
   void* c = Module_SoHandle("client.so", inst.found ? inst.client_so.c_str() : nullptr);
+  char vst_path[512]{};
+  const char* vst_full = nullptr;
+  if (inst.found && ICvar_VstdlibBesideEngine(inst.engine_so.c_str(), vst_path, (int)sizeof(vst_path)))
+    vst_full = vst_path;
+  void* v = Module_SoHandle("libvstdlib.so", vst_full);
   if (e) eng = reinterpret_cast<CreateInterfaceFn>(dlsym(e, "CreateInterface"));
   if (c) cli = reinterpret_cast<CreateInterfaceFn>(dlsym(c, "CreateInterface"));
+  CreateInterfaceFn vst = nullptr;
+  if (v) vst = reinterpret_cast<CreateInterfaceFn>(dlsym(v, "CreateInterface"));
   if (!eng) {
     out.reason = "no_createinterface";
     return false;
   }
-  if (!ProbeEngineFromFactories(eng, cli, out)) return false;
+  if (!ProbeEngineFromFactories(eng, cli, out, vst)) return false;
   out.screen_ok = ScreenSelfTest(out.engine, &out.screen_w, &out.screen_h);
   static bool ang_toast = false;
   auto note_angles_toast = [&](bool have_engine, bool selftest_ok) {

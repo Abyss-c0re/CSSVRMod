@@ -60,9 +60,9 @@ inline bool ViewAnglesRoundtripOk(void* obj, ViewAngFn get, ViewAngFn set) {
 void* ProbeNamed(CreateInterfaceFn fn, const char* const* names, const char** used);
 
 bool ProbeEngineFromFactories(CreateInterfaceFn engineFn, CreateInterfaceFn clientFn,
-                              EngineIf& out);
+                              EngineIf& out, CreateInterfaceFn vstdlibFn = nullptr);
 
-/// Live process: dlsym CreateInterface from already-loaded engine/client.
+/// Live process: dlsym CreateInterface from already-loaded engine/client/vstdlib.
 bool ProbeLiveEngine(EngineIf& out);
 
 /// ClientCmd if GetScreenSize(index 5) self-test passed. Never call blindly.
@@ -156,6 +156,26 @@ constexpr int kCvarFindCommand004 = 14;
 
 inline bool ICvar_Layout004(const char* ver) {
   return ver && std::strstr(ver, "004");
+}
+
+/// CSS ICvar is CCvar in libvstdlib.so. engine.so only exposes VCvarQuery001.
+inline bool ICvar_FnInModule(const char* fname) {
+  if (!fname || !fname[0]) return false;
+  const char* slash = std::strrchr(fname, '/');
+  const char* base = slash ? slash + 1 : fname;
+  return std::strcmp(base, "libvstdlib.so") == 0 || std::strcmp(base, "engine.so") == 0;
+}
+
+/// Sibling of engine.so in bin/linux64. Empty if engine path has no slash.
+inline bool ICvar_VstdlibBesideEngine(const char* engine_so, char* out, int n) {
+  if (!out || n < 16 || !engine_so || !engine_so[0]) return false;
+  const char* slash = std::strrchr(engine_so, '/');
+  if (!slash) return false;
+  const int dir_n = (int)(slash - engine_so + 1);
+  if (dir_n + 14 > n) return false;
+  std::memcpy(out, engine_so, (size_t)dir_n);
+  std::snprintf(out + dir_n, (size_t)(n - dir_n), "libvstdlib.so");
+  return true;
 }
 
 /// Rebuild `name args` from a Source CCommand (argc + argv0size + ArgS[512]).

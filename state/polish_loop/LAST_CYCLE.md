@@ -1,24 +1,25 @@
-# Cycle 85 — 2026-09-19
+# Cycle 87 — 2026-09-19
 
 ## Focus
 
-`icvar-dispatch-args` — ICvar Dispatch must keep `cssvr_set` key/value.
+`icvar-vstdlib-factory` — CSS ICvar is CCvar in libvstdlib.so.
 
 ## Did
 
-- Recovered cycle 84 idle. Tip `8d34b00`. CSS is not running. Log unchanged since 01:27.
-- `8d34b00` registered `cssvr_set` but Dispatch passed only `m_pszName`. `ICvar_DispatchLine` rebuilds `name` + CCommand ArgS (argc/argv0size). Insane blobs fall back to the verb so `cssvr_start` still fires. Copied rebuilt hook into CSS `bin/linux64`.
-- Dual paint stays HMD-gated. Did not invent print/help/menu/toast/cfg chrome.
+- Offline probe: `engine.so` CreateInterface(`VEngineCvar004`) is null (it has `VCvarQuery001`). `libvstdlib.so` returns CCvar.
+- Probe ICvar from vstdlib after the engine factory. FindCommand/Register may live in libvstdlib.so — `SlotInEngine` would skip them.
+- Offline 128/128.
 
 ## Did not
 
 - HMD walk. Stereo unproven.
 - Queue `dual-renderview-ipd-origin`.
+- Invent print/help/menu/toast/cfg chrome.
 
 ## Tests
 
-`cssvrmod_tests` — 126 passed, 0 failed (989 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` 128 passed (1004/1004)
 
 ## Next
 
-`idle-no-shell-ladder` — start CSS from the menu so `8d34b00`+Dispatch can log `icvar ver=` / `register cssvr_start=`. With SteamVR on, type `cssvr_start`. Dual paint stays HMD-gated.
+`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. With SteamVR on, type `cssvr_start`. Dual paint stays HMD-gated.
