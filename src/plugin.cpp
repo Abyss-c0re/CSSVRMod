@@ -88,7 +88,9 @@ Plugin g_plugin;
 } // namespace
 
 extern "C" void* CreateInterface(const char* name, int* ret) {
-  if (name && std::strstr(name, "ISERVERPLUGINCALLBACKS")) {
+  if (name && (std::strcmp(name, "ISERVERPLUGINCALLBACKS003") == 0 ||
+               std::strcmp(name, "ISERVERPLUGINCALLBACKS002") == 0 ||
+               std::strstr(name, "ISERVERPLUGINCALLBACKS"))) {
     if (ret) *ret = 0;
     return &g_plugin;
   }

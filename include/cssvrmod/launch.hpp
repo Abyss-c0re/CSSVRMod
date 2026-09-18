@@ -156,6 +156,21 @@ inline const char* FormatSpawnChrome(const SpawnPlan& p, bool fallback_noborder)
 /// True if LaunchOptions already preload this hook. `.steam/steam` and
 /// `.local/share/Steam` are the same file — match the basename so re-install
 /// does not prepend a second LD_PRELOAD.
+/// Host SDL2 soname is 16 bytes. Same-length rename so a game-dir copy is not circular.
+inline bool SdlSonameRewrite(char* buf, size_t n) {
+  if (!buf || n < 16) return false;
+  const char* from = "libSDL2-2.0.so.0";
+  const char* to = "libSDL2-css.so.0";
+  bool hit = false;
+  for (size_t i = 0; i + 16 <= n; ++i) {
+    if (std::memcmp(buf + i, from, 16) == 0) {
+      std::memcpy(buf + i, to, 16);
+      hit = true;
+    }
+  }
+  return hit;
+}
+
 inline bool SteamLaunchHasHook(const char* launch, const char* hook) {
   if (!launch || !hook || !hook[0]) return false;
   if (std::strstr(launch, hook) != nullptr) return true;

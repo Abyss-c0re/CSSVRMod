@@ -8,6 +8,19 @@
 
 using namespace cssvr;
 
+TEST(sdl_soname_rewrite_same_len) {
+  char buf[32] = "xxlibSDL2-2.0.so.0yy";
+  ASSERT_TRUE(SdlSonameRewrite(buf, sizeof(buf)));
+  ASSERT_TRUE(std::strstr(buf, "libSDL2-css.so.0") != nullptr);
+}
+
+TEST(icvar_004_slots) {
+  ASSERT_TRUE(ICvar_Layout004("VEngineCvar004"));
+  ASSERT_FALSE(ICvar_Layout004("VEngineCvar007"));
+  ASSERT_EQ(kCvarRegister004, 6);
+  ASSERT_EQ(kCvarFindCommand004, 14);
+}
+
 TEST(console_decode_cbuf_jmp) {
   unsigned char buf[16] = {0x48, 0x89, 0xf7, 0xe9, 0x10, 0x00, 0x00, 0x00};
   void* t = EngineCmd_DecodeCbuf(buf);

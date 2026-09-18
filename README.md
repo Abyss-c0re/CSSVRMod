@@ -14,18 +14,19 @@ cmake --build build -j"$(nproc)"
 ./scripts/CSSVR.sh --map de_dust2
 ```
 
-To launch CSS **normally** (Steam) and turn VR on from the console:
+To launch CSS **from Steam** and turn VR on in the console:
 
 ```bash
 ./install/CSSVR --install
-# Steam → CSS → Launch options: paste the line it prints (LD_PRELOAD + CSSVR_XR=0)
-# In game: ~  then
+```
+
+That copies the hook into `bin/linux64/` as the SDL2 the game already loads (Steam Cloud wipes LaunchOptions). **Quit CSS from the menu and start it again.** Then:
+
+```
 cssvr_start
 cssvr_menu
 cssvr_stop
 ```
-
-`plugin_load addons/cssvrmod/cssvrmod_plugin` late-attaches the hook if you forgot LD_PRELOAD.
 
 Needs a Steam install of CSS (app 240) and an OpenXR runtime (WiVRn, Monado, SteamVR). `./scripts/CSSVR.sh --find` prints the game path.
 

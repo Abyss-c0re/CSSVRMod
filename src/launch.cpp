@@ -243,7 +243,8 @@ SpawnPlan PlanSpawn(const CssInstall& inst, const LaunchOpts& opts) {
 }
 
 std::string FormatSteamLaunch(const std::string& hook_dst) {
-  return "LD_PRELOAD=\"" + hook_dst + "\" CSSVR_XR=0 %command%";
+  return "LD_PRELOAD=\"" + hook_dst +
+         "\" CSSVR_XR=0 -insecure %command%";
 }
 
 InstallPlan PlanInstall(const CssInstall& inst, const std::string& hook_src,
@@ -290,11 +291,49 @@ static bool CopyFile(const std::string& src, const std::string& dst) {
   return (bool)out;
 }
 
+static std::string FindHostSdl2() {
+  const char* cands[] = {"/usr/lib/libSDL2-2.0.so.0", "/usr/lib64/libSDL2-2.0.so.0",
+                         "/usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0", nullptr};
+  for (int i = 0; cands[i]; ++i)
+    if (IsFile(cands[i])) return cands[i];
+  return {};
+}
+
 bool InstallToGame(const InstallPlan& p) {
   if (!p.ok) return false;
   if (!CopyFile(p.hook_src, p.hook_dst)) return false;
+  chmod(p.hook_dst.c_str(), 0755);
   if (!p.plugin_src.empty() && IsFile(p.plugin_src)) {
     if (!CopyFile(p.plugin_src, p.plugin_dst)) return false;
+    chmod(p.plugin_dst.c_str(), 0755);
+  }
+  // Steam Cloud wipes LaunchOptions. CSS looks up libSDL2-2.0.so.0 in bin/linux64 first.
+  {
+    auto slash = p.hook_dst.find_last_of('/');
+    const std::string bin = slash == std::string::npos ? std::string(".") : p.hook_dst.substr(0, slash);
+    const std::string host = FindHostSdl2();
+    const std::string real = bin + "/libSDL2-css.so.0";
+    const std::string shim = bin + "/libSDL2-2.0.so.0";
+    if (!host.empty() && CopyFile(host, real)) {
+      chmod(real.c_str(), 0755);
+      std::ifstream in(real, std::ios::binary);
+      std::string blob((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+      if (SdlSonameRewrite(blob.data(), blob.size())) {
+        std::ofstream out(real, std::ios::binary | std::ios::trunc);
+        out.write(blob.data(), (std::streamsize)blob.size());
+      }
+      const std::string src = "int cssvr_sdl_shim;";
+      const std::string cfile = "/tmp/cssvr_sdl_shim.c";
+      {
+        std::ofstream c(cfile);
+        c << src;
+      }
+      const std::string cmd = "cc -shared -fPIC -o \"" + shim + "\" \"" + cfile + "\" -L\"" + bin +
+                              "\" -lcssvrmod_hook -l:libSDL2-css.so.0 -Wl,-rpath,'$ORIGIN' "
+                              "-Wl,-soname,libSDL2-2.0.so.0 >/tmp/cssvr_sdl_shim.log 2>&1";
+      if (system(cmd.c_str()) != 0) CopyFile(p.hook_dst, shim);
+      chmod(shim.c_str(), 0755);
+    }
   }
   {
     std::ofstream vdf(p.vdf_dst);

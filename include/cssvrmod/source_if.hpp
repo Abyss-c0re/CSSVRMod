@@ -19,6 +19,7 @@ struct EngineIf {
   const char* engine_ver = "";
   const char* client_ver = "";
   const char* trace_ver = "";
+  const char* cvar_ver = "";
   bool screen_ok = false; // GetScreenSize self-test
   int screen_w = 0, screen_h = 0;
   bool angles_ok = false; // Get/SetViewAngles roundtrip
@@ -147,6 +148,14 @@ inline bool EngineCmd_CbufStealOk(const unsigned char* p, int n) {
 }
 
 bool EngineCmd_WrapReady();
+
+/// VEngineCvar004: IAppSystem(5) + Allocate + Register = 6. FindCommand = 14.
+constexpr int kCvarRegister004 = 6;
+constexpr int kCvarFindCommand004 = 14;
+
+inline bool ICvar_Layout004(const char* ver) {
+  return ver && std::strstr(ver, "004");
+}
 
 /// Get/Set viewangles only after angles_ok self-test.
 bool EngineGetViewAngles(const EngineIf& e, Ang3* out);

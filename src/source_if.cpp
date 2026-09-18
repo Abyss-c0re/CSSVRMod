@@ -92,6 +92,63 @@ bool HookCbufAddText(void* cbuf) {
   return true;
 }
 
+// Source 2007 ConCommand (VEngineCvar004). Dispatch is virtual 12.
+class CssvrConCmd {
+ public:
+  virtual ~CssvrConCmd() = default;
+  virtual bool IsCommand() { return true; }
+  virtual bool IsFlagSet(int f) { return (m_nFlags & f) != 0; }
+  virtual void AddFlags(int f) { m_nFlags |= f; }
+  virtual const char* GetName() { return m_pszName; }
+  virtual const char* GetHelpText() { return m_pszHelpString; }
+  virtual bool IsRegistered() { return m_bRegistered; }
+  virtual int GetDLLIdentifier() { return 0; }
+  virtual void CreateBase(const char*, const char*, int) {}
+  virtual void Init() {}
+  virtual int AutoCompleteSuggest(const char*, void*) { return 0; }
+  virtual bool CanAutoComplete() { return false; }
+  virtual void Dispatch(const void*) {
+    if (g_cmd_filter && m_pszName) g_cmd_filter(m_pszName);
+  }
+  CssvrConCmd* m_pNext = nullptr;
+  bool m_bRegistered = false;
+  const char* m_pszName = "";
+  const char* m_pszHelpString = "";
+  int m_nFlags = 0;
+};
+
+const char* kCmdNames[] = {"cssvr", "cssvr_start", "cssvr_stop", "cssvr_toggle",
+                           "cssvr_menu", "cssvr_set", "cssvr_help", nullptr};
+
+bool RegisterCvarCommands(void* cvar) {
+  if (!cvar) return false;
+  using Fn = void* (*)(void*, const char*);
+  using Reg = void (*)(void*, void*);
+  auto** vt = *reinterpret_cast<void***>(cvar);
+  if (!vt || !vt[cssvr::kCvarFindCommand004] || !vt[cssvr::kCvarRegister004]) return false;
+  if (!SlotInEngine(reinterpret_cast<ClientCmdFn>(vt[cssvr::kCvarFindCommand004]))) return false;
+  void* echo = ((Fn)vt[cssvr::kCvarFindCommand004])(cvar, "echo");
+  if (!echo) return false;
+  static bool done = false;
+  if (done) return true;
+  static const char* helps[] = {"CSSVRMod status", "Start OpenXR", "Stop OpenXR", "Toggle OpenXR",
+                                "Vision menu", "cssvr_set key value", "Help", nullptr};
+  static CssvrConCmd cmds[8];
+  for (int i = 0; kCmdNames[i]; ++i) {
+    cmds[i].m_pszName = kCmdNames[i];
+    cmds[i].m_pszHelpString = helps[i] ? helps[i] : "";
+    cmds[i].m_nFlags = 0;
+    ((Reg)vt[cssvr::kCvarRegister004])(cvar, &cmds[i]);
+  }
+  void* found = ((Fn)vt[cssvr::kCvarFindCommand004])(cvar, "cssvr_start");
+  done = found != nullptr;
+  if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
+    std::fprintf(f, "cssvr icvar register cssvr_start=%d\n", found ? 1 : 0);
+    std::fclose(f);
+  }
+  return done;
+}
+
 void InstallCmdWrap(void* engine) {
   if (g_cmd_wrapped || !engine) return;
   auto** vt = *reinterpret_cast<ClientCmdFn**>(engine);
@@ -189,7 +246,7 @@ bool ProbeEngineFromFactories(CreateInterfaceFn engineFn, CreateInterfaceFn clie
   }
   out.engine = ProbeNamed(engineFn, kEngineNames, &out.engine_ver);
   out.trace = ProbeNamed(engineFn, kTraceNames, &out.trace_ver);
-  out.cvar = ProbeNamed(engineFn, kCvarNames, nullptr);
+  out.cvar = ProbeNamed(engineFn, kCvarNames, &out.cvar_ver);
   if (clientFn) out.client = ProbeNamed(clientFn, kClientNames, &out.client_ver);
   if (!out.engine) {
     out.reason = "no_vengineclient";
@@ -313,6 +370,7 @@ bool ProbeLiveEngine(EngineIf& out) {
   else if (out.angles_ok) out.reason = "probed_angles_ok";
   else out.reason = out.screen_ok ? "probed_screen_ok" : "probed_no_screen";
   if (out.engine) InstallCmdWrap(out.engine);
+  if (out.cvar && cssvr::ICvar_Layout004(out.cvar_ver)) RegisterCvarCommands(out.cvar);
   return true;
 }
 

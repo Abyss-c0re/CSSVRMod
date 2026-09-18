@@ -85,7 +85,8 @@ void* SymIn(void* lib, const char* name, void* self) {
 
 void EnsureSdl() {
   if (g_create && g_set_border && g_set_fs && g_set_resz) return;
-  void* sdl = OpenLib("libSDL2-2.0.so.0");
+  void* sdl = OpenLib("libSDL2-css.so.0");
+  if (!sdl) sdl = OpenLib("libSDL2-2.0.so.0");
   if (!sdl) sdl = OpenLib("libSDL2.so");
   if (!g_create) {
     g_create = (CreateWinFn)SymIn(sdl, "SDL_CreateWindow", (void*)SDL_CreateWindow);
