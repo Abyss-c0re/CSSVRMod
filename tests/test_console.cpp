@@ -51,3 +51,37 @@ TEST(install_plan_paths) {
   ASSERT_TRUE(steam.find("LD_PRELOAD=") != std::string::npos);
   ASSERT_TRUE(steam.find("CSSVR_XR=0") != std::string::npos);
 }
+
+TEST(steam_merge_launch_options) {
+  const char* hook = "/opt/css/bin/linux64/libcssvrmod_hook.so";
+  ASSERT_FALSE(SteamLaunchHasHook("", hook));
+  std::string empty = SteamMergeLaunchOptions("", hook);
+  ASSERT_TRUE(SteamLaunchHasHook(empty.c_str(), hook));
+  ASSERT_TRUE(empty.find("CSSVR_XR=0") != std::string::npos);
+  ASSERT_TRUE(empty.find("%command%") != std::string::npos);
+  std::string again = SteamMergeLaunchOptions(empty, hook);
+  ASSERT_TRUE(again == empty);
+  std::string keep = SteamMergeLaunchOptions("PRESSURE_VESSEL_IMPORT_OPENXR_1_RUNTIMES=1 %command%", hook);
+  ASSERT_TRUE(SteamLaunchHasHook(keep.c_str(), hook));
+  ASSERT_TRUE(keep.find("PRESSURE_VESSEL_IMPORT_OPENXR_1_RUNTIMES=1") != std::string::npos);
+}
+
+TEST(steam_upsert_app_240_launch_options) {
+  const char* hook = "/opt/css/bin/linux64/libcssvrmod_hook.so";
+  std::string vdf =
+      "\"Software\"\n{\n\t\"Valve\"\n\t{\n\t\t\"Steam\"\n\t\t{\n\t\t\t\"apps\"\n\t\t\t{\n"
+      "\t\t\t\t\"240\"\t\t\"deadbeef\"\n"
+      "\t\t\t\t\"240\"\n\t\t\t\t{\n\t\t\t\t\t\"LastPlayed\"\t\t\"1\"\n"
+      "\t\t\t\t\t\"Playtime\"\t\t\"2\"\n\t\t\t\t}\n"
+      "\t\t\t\t\"4000\"\n\t\t\t\t{\n\t\t\t\t\t\"LaunchOptions\"\t\t\"keep-me\"\n\t\t\t\t}\n"
+      "\t\t\t}\n\t\t}\n\t}\n}\n";
+  ASSERT_TRUE(SteamUpsertAppLaunchOptions(&vdf, "240", hook));
+  ASSERT_TRUE(vdf.find("deadbeef") != std::string::npos);
+  ASSERT_TRUE(vdf.find("keep-me") != std::string::npos);
+  ASSERT_TRUE(SteamLaunchHasHook(vdf.c_str(), hook));
+  ASSERT_FALSE(SteamUpsertAppLaunchOptions(&vdf, "240", hook));
+  std::string other = vdf;
+  ASSERT_TRUE(SteamUpsertAppLaunchOptions(&other, "4000", hook));
+  ASSERT_TRUE(SteamLaunchHasHook(other.c_str(), hook));
+  ASSERT_TRUE(other.find("keep-me") != std::string::npos);
+}

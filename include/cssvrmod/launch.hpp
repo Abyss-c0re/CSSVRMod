@@ -3,6 +3,7 @@
 #include "backend.hpp"
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -65,6 +66,8 @@ InstallPlan PlanInstall(const CssInstall& inst, const std::string& hook_src,
                         const std::string& plugin_src);
 bool InstallToGame(const InstallPlan& p);
 std::string FormatSteamLaunch(const std::string& hook_dst);
+/// Best-effort: write App 240 LaunchOptions so Steam actually preloads the hook.
+int InstallSteamLaunchOptions(const std::string& hook_dst);
 std::string DefaultHookSearchPath();
 std::string DetectXrRuntimeJson();
 /// Dir with libcurl-gnutls.so.4 (engine.so NEEDED). Empty if none found.
@@ -127,6 +130,155 @@ inline const char* FormatSpawnChrome(bool noborder) { return noborder ? "-nobord
 inline const char* FormatSpawnChrome(const SpawnPlan& p, bool fallback_noborder) {
   if (p.argv.empty()) return FormatSpawnChrome(fallback_noborder);
   return FormatSpawnChrome(SpawnArgvHasNoborder(p));
+}
+
+inline bool SteamLaunchHasHook(const char* launch, const char* hook) {
+  return launch && hook && hook[0] && std::strstr(launch, hook) != nullptr;
+}
+
+/// Keep the user's extras. Prepend LD_PRELOAD + CSSVR_XR=0 when the hook is missing.
+inline std::string SteamMergeLaunchOptions(const std::string& existing, const std::string& hook_dst) {
+  if (hook_dst.empty()) return existing;
+  if (SteamLaunchHasHook(existing.c_str(), hook_dst.c_str())) return existing;
+  const std::string ours = FormatSteamLaunch(hook_dst);
+  if (existing.empty()) return ours;
+  if (existing.find("%command%") != std::string::npos)
+    return "LD_PRELOAD=\"" + hook_dst + "\" CSSVR_XR=0 " + existing;
+  return "LD_PRELOAD=\"" + hook_dst + "\" CSSVR_XR=0 " + existing + " %command%";
+}
+
+inline std::string VdfEscape(const std::string& s) {
+  std::string o;
+  o.reserve(s.size() + 8);
+  for (char c : s) {
+    if (c == '\\' || c == '"') o.push_back('\\');
+    o.push_back(c);
+  }
+  return o;
+}
+
+inline bool VdfParseQuoted(const std::string& s, size_t* i, std::string* out) {
+  if (!i) return false;
+  size_t p = *i;
+  while (p < s.size() && (s[p] == ' ' || s[p] == '\t' || s[p] == '\r' || s[p] == '\n')) ++p;
+  if (p >= s.size() || s[p] != '"') return false;
+  ++p;
+  std::string v;
+  while (p < s.size()) {
+    if (s[p] == '\\' && p + 1 < s.size()) {
+      v.push_back(s[p + 1]);
+      p += 2;
+      continue;
+    }
+    if (s[p] == '"') {
+      *i = p + 1;
+      if (out) *out = std::move(v);
+      return true;
+    }
+    v.push_back(s[p++]);
+  }
+  return false;
+}
+
+inline bool VdfMatchBrace(const std::string& s, size_t open, size_t* close) {
+  if (open >= s.size() || s[open] != '{' || !close) return false;
+  int depth = 0;
+  for (size_t i = open; i < s.size(); ++i) {
+    if (s[i] == '"') {
+      size_t q = i;
+      std::string dummy;
+      if (!VdfParseQuoted(s, &q, &dummy)) return false;
+      i = q - 1;
+      continue;
+    }
+    if (s[i] == '{') ++depth;
+    else if (s[i] == '}') {
+      --depth;
+      if (depth == 0) {
+        *close = i;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/// First `"appid" { ... }` object (skips `"appid" "hex"` blobs).
+inline bool VdfFindAppObject(const std::string& s, const char* appid, size_t from, size_t* open,
+                             size_t* close) {
+  if (!appid || !appid[0] || !open || !close) return false;
+  const std::string key = std::string("\"") + appid + "\"";
+  size_t pos = from;
+  while ((pos = s.find(key, pos)) != std::string::npos) {
+    size_t p = pos + key.size();
+    while (p < s.size() && (s[p] == ' ' || s[p] == '\t' || s[p] == '\r' || s[p] == '\n')) ++p;
+    if (p < s.size() && s[p] == '{') {
+      size_t end = 0;
+      if (!VdfMatchBrace(s, p, &end)) return false;
+      *open = p;
+      *close = end;
+      return true;
+    }
+    pos = p;
+  }
+  return false;
+}
+
+/// Insert or replace Software/Valve/Steam/apps/<appid> LaunchOptions. First object only.
+inline bool SteamUpsertAppLaunchOptions(std::string* vdf, const char* appid,
+                                        const std::string& hook_dst) {
+  if (!vdf || !appid || hook_dst.empty()) return false;
+  size_t open = 0, close = 0;
+  if (!VdfFindAppObject(*vdf, appid, 0, &open, &close)) return false;
+  std::string existing;
+  size_t key_at = std::string::npos, val_a = 0, val_b = 0;
+  size_t i = open + 1;
+  int depth = 1;
+  while (i < close) {
+    if ((*vdf)[i] == '"') {
+      size_t ks = i;
+      std::string k;
+      if (!VdfParseQuoted(*vdf, &i, &k)) break;
+      while (i < close && ((*vdf)[i] == ' ' || (*vdf)[i] == '\t')) ++i;
+      if (i < close && (*vdf)[i] == '{') {
+        size_t end = 0;
+        if (!VdfMatchBrace(*vdf, i, &end)) break;
+        i = end + 1;
+        continue;
+      }
+      size_t vs = i;
+      std::string val;
+      if (!VdfParseQuoted(*vdf, &i, &val)) break;
+      if (depth == 1 && k == "LaunchOptions") {
+        key_at = ks;
+        val_a = vs;
+        val_b = i;
+        existing = val;
+        break;
+      }
+      continue;
+    }
+    if ((*vdf)[i] == '{') ++depth;
+    else if ((*vdf)[i] == '}') --depth;
+    ++i;
+  }
+  const std::string merged = SteamMergeLaunchOptions(existing, hook_dst);
+  if (key_at != std::string::npos && existing == merged) return false;
+  const std::string quoted = "\"" + VdfEscape(merged) + "\"";
+  if (key_at != std::string::npos) {
+    vdf->replace(val_a, val_b - val_a, quoted);
+    return true;
+  }
+  std::string indent = "\t\t\t\t\t\t";
+  const size_t nl = vdf->find('\n', open);
+  if (nl != std::string::npos && nl < close) {
+    size_t t = nl + 1;
+    while (t < close && (*vdf)[t] == '\t') ++t;
+    if (t > nl + 1) indent = vdf->substr(nl + 1, t - (nl + 1));
+  }
+  const std::string line = indent + "\"LaunchOptions\"\t\t" + quoted + "\n";
+  vdf->insert(close, line);
+  return true;
 }
 
 } // namespace cssvr

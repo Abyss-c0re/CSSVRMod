@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <dirent.h>
 #include <fstream>
+#include <set>
 #include <sstream>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -313,7 +314,62 @@ bool InstallToGame(const InstallPlan& p) {
        << "Then in console: cssvr_start\n"
        << "Or: plugin_load addons/cssvrmod/cssvrmod_plugin\n";
   }
+  InstallSteamLaunchOptions(p.hook_dst);
   return true;
+}
+
+static void CollectSteamLocalConfigs(std::vector<std::string>* out) {
+  if (!out) return;
+  const std::string home = Home();
+  const std::string roots[] = {
+      home + "/.local/share/Steam/userdata",
+      home + "/.steam/steam/userdata",
+  };
+  std::set<std::string> seen;
+  for (const auto& root : roots) {
+    DIR* d = opendir(root.c_str());
+    if (!d) continue;
+    while (dirent* e = readdir(d)) {
+      if (e->d_name[0] == '.') continue;
+      if (std::strcmp(e->d_name, "anonymous") == 0) continue;
+      std::string p = root + "/" + e->d_name + "/config/localconfig.vdf";
+      if (!IsFile(p)) continue;
+      char real[4096];
+      if (realpath(p.c_str(), real)) p = real;
+      if (seen.insert(p).second) out->push_back(p);
+    }
+    closedir(d);
+  }
+}
+
+int InstallSteamLaunchOptions(const std::string& hook_dst) {
+  if (hook_dst.empty() || !IsFile(hook_dst)) return 0;
+  std::vector<std::string> files;
+  CollectSteamLocalConfigs(&files);
+  int n = 0;
+  for (const auto& path : files) {
+    std::ifstream in(path);
+    if (!in) continue;
+    std::stringstream buf;
+    buf << in.rdbuf();
+    in.close();
+    std::string vdf = buf.str();
+    if (vdf.empty()) continue;
+    if (!SteamUpsertAppLaunchOptions(&vdf, "240", hook_dst)) continue;
+    const std::string tmp = path + ".cssvr.tmp";
+    {
+      std::ofstream out(tmp, std::ios::binary | std::ios::trunc);
+      if (!out) continue;
+      out << vdf;
+      if (!out) continue;
+    }
+    if (rename(tmp.c_str(), path.c_str()) != 0) {
+      unlink(tmp.c_str());
+      continue;
+    }
+    n++;
+  }
+  return n;
 }
 
 } // namespace cssvr
