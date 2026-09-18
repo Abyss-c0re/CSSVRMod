@@ -114,6 +114,28 @@ TEST(menu3d_grip_moves_panel) {
   ASSERT_TRUE(c.pos.z <= -0.29f);
 }
 
+TEST(menu3d_reset_pose) {
+  Menu3d m;
+  m.pos = {1.f, 2.f, -2.f};
+  m.yaw = 0.7f;
+  m.gripping = true;
+  m.grip_off = {1.f, 0.f, 0.f};
+  Menu3d_ResetPose(&m);
+  ASSERT_NEAR(m.pos.x, 0.f, 0.001);
+  ASSERT_NEAR(m.pos.y, kMenuY, 0.001);
+  ASSERT_NEAR(m.pos.z, kMenuZ, 0.001);
+  ASSERT_NEAR(m.yaw, 0.f, 0.001);
+  ASSERT_FALSE(m.gripping);
+
+  const auto title = Menu3d_RayHit({0.f, kMenuY + kMenuH * 0.42f, 0.f}, {0.f, 0.f, -1.f});
+  ASSERT_TRUE(title.on_quad);
+  ASSERT_FALSE(title.hit);
+  ASSERT_TRUE(Menu3d_TitleHit(title));
+  const auto mid = Menu3d_RayHit({0.f, kMenuY, 0.f}, {0.f, 0.f, -1.f});
+  ASSERT_TRUE(mid.hit);
+  ASSERT_FALSE(Menu3d_TitleHit(mid));
+}
+
 TEST(menu3d_primary_hand) {
   ASSERT_EQ(Menu3d_PrimaryHand(false), 1);
   ASSERT_EQ(Menu3d_PrimaryHand(true), 0);

@@ -156,6 +156,10 @@ Menu laser/grip/trigger follow primary hand (`left_handed` / CSSVR_LEFT_HANDED).
 
 Vision HAND row toggles L/R and persists (env + launch.cfg). Offline 81/81. Not HMD-proven.
 
+## 2026-09-18 cycle 28
+
+Title-click resets a grip-moved Vision panel to default STAGE pose. Offline 82/82. Not HMD-proven.
+
 
 
 

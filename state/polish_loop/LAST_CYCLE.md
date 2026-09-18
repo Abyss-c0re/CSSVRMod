@@ -1,23 +1,24 @@
-# Cycle 27 — 2026-09-18
+# Cycle 28 — 2026-09-18
 
 ## Focus
 
-`menu3d-hand-row` — handedness was CLI-only (`--set` / env).
+`menu3d-reset-pose` — a grip-moved Vision panel had no way home.
 
 ## Did
 
-- Vision panel HAND row toggles L/R. Click writes `CSSVR_LEFT_HANDED` + launch.cfg so the next poll does not revert it.
+- `Menu3d_ResetPose` snaps STAGE pos + yaw back to default.
+- Trigger on the VISION title (not a row) resets. Stick-focus click still applies a row on a miss.
 
 ## Did not
 
 - HMD walk (user-gated).
-- A way to snap a dragged panel back (next).
-- Claim live hand-row UX from offline green.
+- A HOME glyph on the title when moved (next).
+- Claim live reset UX from offline green.
 
 ## Tests
 
-`cssvrmod_tests` — 81 passed, 0 failed (608 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 82 passed, 0 failed (618 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`menu3d-reset-pose` — snap the world-locked panel back to default STAGE pose after a grip-drag.
+`menu3d-home-hint` — show HOME on the title when the panel is off default so the reset target is readable.

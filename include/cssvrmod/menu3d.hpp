@@ -141,6 +141,20 @@ inline void Menu3d_ClampPos(Vec3* p) {
   p->z = Clamp(p->z, -5.f, -0.3f);
 }
 
+inline Vec3 Menu3d_DefaultPos() { return {0.f, kMenuY, kMenuZ}; }
+
+inline bool Menu3d_TitleHit(const Menu3dLaserHit& h) {
+  return h.on_quad && h.row < 0 && h.v < 0.18f;
+}
+
+inline void Menu3d_ResetPose(Menu3d* m) {
+  if (!m) return;
+  m->pos = Menu3d_DefaultPos();
+  m->yaw = 0.f;
+  m->gripping = false;
+  m->grip_off = {};
+}
+
 // World-locked default. Grab while the laser is on the quad starts a drag (offset = panel − hand).
 inline bool Menu3d_GripTick(Menu3d* m, bool grab, const Vec3& hand, bool on_quad) {
   if (!m) return false;
