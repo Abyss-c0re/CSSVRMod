@@ -2,6 +2,7 @@
 #include "cssvrmod/calib.hpp"
 #include "cssvrmod/dual_paint.hpp"
 #include "cssvrmod/launch.hpp"
+#include "cssvrmod/vk_eye.hpp"
 #include "xr_host.hpp"
 
 #define GL_GLEXT_PROTOTYPES 1
@@ -47,15 +48,11 @@ bool ProtectWrite(void* p, bool wr) {
 }
 
 bool CopyEye(int eye) {
+  if (VkCaptureEye(eye)) return true;
   GLint vp[4] = {};
   glGetIntegerv(GL_VIEWPORT, vp);
   const int w = vp[2], h = vp[3];
-  if (w < 8 || h < 8) {
-    static int miss = 0;
-    if (miss++ < 3)
-      Logf("copyeye miss: GL viewport %dx%d (vulkan present has no GL backbuffer)", w, h);
-    return false;
-  }
+  if (w < 8 || h < 8) return false;
   if (!g_eye[eye] || g_eyeW != w || g_eyeH != h) {
     if (g_eye[eye]) glDeleteTextures(1, &g_eye[eye]);
     glGenTextures(1, &g_eye[eye]);

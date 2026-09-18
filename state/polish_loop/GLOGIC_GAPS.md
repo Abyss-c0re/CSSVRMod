@@ -4,8 +4,8 @@
 
 - [x] Dual-origin law: cyclopean ± head-right × halfIPD; pose IPD gated on `painted_dual` (cycle 2).
 - [x] Locate + vtable-hook `CViewRender::RenderView` via string xref (cycle 4). `painted_dual` only after two captures.
-- [ ] Dual paint proven in-game (HMD). Offline green ≠ stereo.
-- [ ] **Vulkan present:** live CSS is `-vulkan`. `CopyEye` uses `glCopyTexSubImage2D` and will miss the frame. Need a VK readback of each eye (or force a GL present path that actually paints). Until then `painted_dual` stays false — heresy gate holds.
+- [x] Vulkan per-eye capture: last color RT (or acquired swap image) copied after each paint (cycle 5). `painted_dual` still requires two successful copies.
+- [ ] Dual paint proven in-game (HMD). Offline green ≠ stereo. Layout miss on a given RT stays gated.
 - [x] Same-frame submit must use **identity VIEW pose** (cycle 1). Pose IPD on a mono frame = two planes + black.
 - [ ] HMD orientation writes game viewangles (look around is VR).
 

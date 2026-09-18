@@ -3,6 +3,7 @@
 #include "xr_host.hpp"
 #include "cssvrmod/input.hpp"
 #include "cssvrmod/source_if.hpp"
+#include "cssvrmod/vk_eye.hpp"
 #include "cssvrmod/weapons.hpp"
 #include <vulkan/vulkan.h>
 
@@ -20,6 +21,14 @@
 #include <sys/stat.h>
 #include <unordered_map>
 #include <vector>
+
+static bool (*g_capture_eye_fn)(int) = nullptr;
+static bool (*g_take_pair_fn)(cssvr::VkEyePair*) = nullptr;
+
+namespace cssvr {
+bool VkCaptureEye(int eye) { return g_capture_eye_fn ? g_capture_eye_fn(eye) : false; }
+bool VkEye_TakePair(VkEyePair* out) { return g_take_pair_fn ? g_take_pair_fn(out) : false; }
+} // namespace cssvr
 
 namespace {
 using namespace cssvr;
@@ -86,6 +95,11 @@ struct DevFns {
   PFN_vkWaitForFences waitFences = nullptr;
   PFN_vkResetFences resetFences = nullptr;
   PFN_vkGetPhysicalDeviceMemoryProperties memProps = nullptr;
+  PFN_vkCreateImage createImg = nullptr;
+  PFN_vkCreateImageView createView = nullptr;
+  PFN_vkCreateFramebuffer createFb = nullptr;
+  PFN_vkCmdBeginRenderPass beginRp = nullptr;
+  PFN_vkAcquireNextImageKHR acquire = nullptr;
 };
 
 struct SwapState {
@@ -110,11 +124,30 @@ struct DeviceState {
   bool copy_inflight = false;
   uint32_t copy_w = 0, copy_h = 0;
   VkFormat copy_fmt = VK_FORMAT_UNDEFINED;
+  VkBuffer eye_stage = VK_NULL_HANDLE;
+  VkDeviceMemory eye_mem = VK_NULL_HANDLE;
+  VkDeviceSize eye_bytes = 0;
+  VkCommandBuffer eye_cmd = VK_NULL_HANDLE;
+  VkFence eye_fence = VK_NULL_HANDLE;
 };
 
 std::mutex g_mu;
 std::unordered_map<VkDevice, DeviceState> g_devs;
 std::unordered_map<VkSwapchainKHR, SwapState> g_scs;
+std::unordered_map<VkImage, std::pair<uint32_t, uint32_t>> g_img_sz;
+std::unordered_map<VkImage, VkFormat> g_img_fmt;
+std::unordered_map<VkImageView, VkImage> g_views;
+struct FbColor {
+  VkImage img = VK_NULL_HANDLE;
+  uint32_t w = 0, h = 0;
+  VkFormat fmt = VK_FORMAT_UNDEFINED;
+  VkDevice dev = VK_NULL_HANDLE;
+};
+std::unordered_map<VkFramebuffer, FbColor> g_fbs;
+FbColor g_last_rt{};
+VkSwapchainKHR g_cur_sc = VK_NULL_HANDLE;
+uint32_t g_cur_idx = 0;
+VkEyePair g_vk_eyes{};
 int g_presents = 0;
 int g_dumps = 0;
 int g_xr_ok = 0;
@@ -132,8 +165,10 @@ struct XrMailbox {
   std::mutex mu;
   std::condition_variable cv;
   std::vector<unsigned char> rgba;
+  std::vector<unsigned char> rgba_r;
   int w = 0, h = 0;
   bool bgra = false;
+  bool dual = false;
   bool have = false;
   bool stop = false;
 };
@@ -145,9 +180,24 @@ void PushXrFrame(const unsigned char* rgba, int w, int h, bool bgra) {
   std::lock_guard<std::mutex> lk(g_mb.mu);
   // Latest-wins. Never queue — a backlog is what made the game hitch.
   g_mb.rgba.assign(rgba, rgba + (size_t)w * (size_t)h * 4);
+  g_mb.rgba_r.clear();
   g_mb.w = w;
   g_mb.h = h;
   g_mb.bgra = bgra;
+  g_mb.dual = false;
+  g_mb.have = true;
+  g_mb.cv.notify_one();
+}
+
+void PushXrDual(const VkEyePair& p) {
+  if (!VkEye_Ready(p)) return;
+  std::lock_guard<std::mutex> lk(g_mb.mu);
+  g_mb.rgba = p.eye[0].px;
+  g_mb.rgba_r = p.eye[1].px;
+  g_mb.w = p.eye[0].w;
+  g_mb.h = p.eye[0].h;
+  g_mb.bgra = p.eye[0].bgra;
+  g_mb.dual = true;
   g_mb.have = true;
   g_mb.cv.notify_one();
 }
@@ -160,9 +210,10 @@ bool MailboxFull() {
 void* XrWorker(void*) {
   Log("xr worker start");
   while (true) {
-    std::vector<unsigned char> frame;
+    std::vector<unsigned char> frame, frame_r;
     int w = 0, h = 0;
     bool bgra = false;
+    bool dual = false;
     {
       std::unique_lock<std::mutex> lk(g_mb.mu);
       g_mb.cv.wait_for(lk, std::chrono::milliseconds(50),
@@ -170,12 +221,18 @@ void* XrWorker(void*) {
       if (g_mb.stop) break;
       if (!g_mb.have) continue;
       frame.swap(g_mb.rgba);
+      frame_r.swap(g_mb.rgba_r);
       w = g_mb.w;
       h = g_mb.h;
       bgra = g_mb.bgra;
+      dual = g_mb.dual;
       g_mb.have = false;
+      g_mb.dual = false;
     }
-    if (XrHostSubmitPixels(frame.data(), w, h, bgra)) {
+    const bool ok = (dual && !frame_r.empty())
+                        ? XrHostSubmitEyePixels(frame.data(), frame_r.data(), w, h, bgra, true)
+                        : XrHostSubmitPixels(frame.data(), w, h, bgra);
+    if (ok) {
       g_xr_ok++;
       if (g_xr_ok == 1 || (g_xr_ok % 300) == 0)
         Log("xr submit #%d %ux%u %s", g_xr_ok, w, h, XrHostStatus().reason);
@@ -279,6 +336,11 @@ void FillDevFns(VkDevice dev, DeviceState& ds) {
   L(vkDestroyFence, destroyFence);
   L(vkWaitForFences, waitFences);
   L(vkResetFences, resetFences);
+  L(vkCreateImage, createImg);
+  L(vkCreateImageView, createView);
+  L(vkCreateFramebuffer, createFb);
+  L(vkCmdBeginRenderPass, beginRp);
+  L(vkAcquireNextImageKHR, acquire);
 #undef L
   if (!ds.fn.memProps && g_gipa) {
     // instance-level; try device first then instance
@@ -368,6 +430,143 @@ void HarvestCopy(DeviceState* ds, VkDevice dev, bool want_ppm) {
   ds->fn.unmap(dev, ds->stage_mem);
 }
 
+bool EnsureEyeStage(DeviceState* ds, VkDevice dev, VkDeviceSize bytes) {
+  if (ds->eye_stage && ds->eye_bytes >= bytes && ds->eye_cmd && ds->eye_fence) return true;
+  if (!ds->fn.createFence || !ds->fn.createBuf) return false;
+  if (ds->eye_stage) {
+    ds->fn.destroyBuf(dev, ds->eye_stage, nullptr);
+    ds->eye_stage = VK_NULL_HANDLE;
+  }
+  if (ds->eye_mem) {
+    ds->fn.freeMem(dev, ds->eye_mem, nullptr);
+    ds->eye_mem = VK_NULL_HANDLE;
+  }
+  VkBufferCreateInfo bi{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
+  bi.size = bytes;
+  bi.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+  if (ds->fn.createBuf(dev, &bi, nullptr, &ds->eye_stage) != VK_SUCCESS) return false;
+  VkMemoryRequirements req{};
+  ds->fn.bufReq(dev, ds->eye_stage, &req);
+  uint32_t memIdx = FindHostMem(ds->phys, ds->fn.memProps, req.memoryTypeBits);
+  if (memIdx == UINT32_MAX) return false;
+  VkMemoryAllocateInfo ai{VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
+  ai.allocationSize = req.size;
+  ai.memoryTypeIndex = memIdx;
+  if (ds->fn.allocMem(dev, &ai, nullptr, &ds->eye_mem) != VK_SUCCESS) return false;
+  ds->fn.bindBuf(dev, ds->eye_stage, ds->eye_mem, 0);
+  ds->eye_bytes = bytes;
+  if (!ds->pool) {
+    VkCommandPoolCreateInfo pci{VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
+    pci.queueFamilyIndex = ds->gfx_family;
+    pci.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    if (ds->fn.createPool(dev, &pci, nullptr, &ds->pool) != VK_SUCCESS) return false;
+  }
+  if (!ds->eye_cmd) {
+    VkCommandBufferAllocateInfo cai{VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};
+    cai.commandPool = ds->pool;
+    cai.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    cai.commandBufferCount = 1;
+    ds->fn.allocCmd(dev, &cai, &ds->eye_cmd);
+  }
+  if (!ds->eye_fence) {
+    VkFenceCreateInfo fi{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
+    ds->fn.createFence(dev, &fi, nullptr, &ds->eye_fence);
+  }
+  return ds->eye_stage && ds->eye_cmd && ds->eye_fence;
+}
+
+bool CopyImageToEye(int eye, VkDevice dev, DeviceState* ds, VkImage img, uint32_t w, uint32_t h,
+                    VkFormat fmt) {
+  if (!ds || !ds->queue || !img || w < 8 || h < 8) return false;
+  const VkDeviceSize bytes = (VkDeviceSize)w * h * 4;
+  if (!EnsureEyeStage(ds, dev, bytes)) return false;
+  VkCommandBufferBeginInfo cbi{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
+  cbi.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+  if (ds->fn.beginCmd(ds->eye_cmd, &cbi) != VK_SUCCESS) return false;
+  VkImageMemoryBarrier bar{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
+  bar.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+  bar.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+  bar.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+  bar.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+  bar.image = img;
+  bar.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1};
+  ds->fn.barrier(ds->eye_cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+                 VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &bar);
+  VkBufferImageCopy copy{};
+  copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1};
+  copy.imageExtent = {w, h, 1};
+  ds->fn.copy(ds->eye_cmd, img, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, ds->eye_stage, 1, &copy);
+  bar.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+  bar.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+  bar.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+  bar.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+  ds->fn.barrier(ds->eye_cmd, VK_PIPELINE_STAGE_TRANSFER_BIT,
+                 VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0, nullptr, 0, nullptr, 1,
+                 &bar);
+  if (ds->fn.endCmd(ds->eye_cmd) != VK_SUCCESS) return false;
+  ds->fn.resetFences(dev, 1, &ds->eye_fence);
+  VkSubmitInfo si{VK_STRUCTURE_TYPE_SUBMIT_INFO};
+  si.commandBufferCount = 1;
+  si.pCommandBuffers = &ds->eye_cmd;
+  if (ds->fn.submit(ds->queue, 1, &si, ds->eye_fence) != VK_SUCCESS) return false;
+  // Render thread between eyes — must finish before the next paint overwrites the RT.
+  // Not the present thread. Timeout keeps a miss honest (painted_dual stays false).
+  if (ds->fn.waitFences(dev, 1, &ds->eye_fence, VK_TRUE, 8ull * 1000ull * 1000ull) != VK_SUCCESS)
+    return false;
+  void* mapped = nullptr;
+  if (ds->fn.map(dev, ds->eye_mem, 0, bytes, 0, &mapped) != VK_SUCCESS || !mapped) return false;
+  const bool ok =
+      VkEye_Store(&g_vk_eyes, eye, static_cast<const unsigned char*>(mapped), (int)w, (int)h,
+                  FormatIsBgra(fmt));
+  ds->fn.unmap(dev, ds->eye_mem);
+  return ok;
+}
+
+bool CaptureEyeImpl(int eye) {
+  FbColor rt{};
+  VkDevice dev = VK_NULL_HANDLE;
+  DeviceState* ds = nullptr;
+  {
+    std::lock_guard<std::mutex> lk(g_mu);
+    rt = g_last_rt;
+    if ((!rt.img || rt.w < 8) && g_cur_sc) {
+      auto sit = g_scs.find(g_cur_sc);
+      if (sit != g_scs.end() && g_cur_idx < sit->second.images.size()) {
+        rt.img = sit->second.images[g_cur_idx];
+        rt.w = sit->second.w;
+        rt.h = sit->second.h;
+        rt.fmt = sit->second.format;
+        rt.dev = sit->second.device;
+      }
+    }
+    if (!rt.img || !rt.dev) return false;
+    auto dit = g_devs.find(rt.dev);
+    if (dit == g_devs.end()) return false;
+    ds = &dit->second;
+    dev = rt.dev;
+  }
+  const bool ok = CopyImageToEye(eye, dev, ds, rt.img, rt.w, rt.h, rt.fmt);
+  static int n = 0;
+  if (!ok && n++ < 4) Log("vk capture eye=%d miss img=%p %ux%u", eye, (void*)rt.img, rt.w, rt.h);
+  return ok;
+}
+
+bool TakePairImpl(VkEyePair* out) {
+  if (!out) return false;
+  std::lock_guard<std::mutex> lk(g_mu);
+  if (!VkEye_Ready(g_vk_eyes)) return false;
+  *out = g_vk_eyes;
+  return true;
+}
+
+struct CaptureReg {
+  CaptureReg() {
+    g_capture_eye_fn = CaptureEyeImpl;
+    g_take_pair_fn = TakePairImpl;
+  }
+};
+CaptureReg g_cap_reg;
+
 void DumpSwapchain(VkQueue queue, VkSwapchainKHR sc, uint32_t idx, bool want_ppm) {
   DeviceState* ds = nullptr;
   SwapState* ss = nullptr;
@@ -437,9 +636,16 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
   if (!real) return VK_ERROR_UNKNOWN;
   const VkResult pr = real(queue, info);
   // After present: never wait. Harvest a finished GPU copy, kick the next if XR is hungry.
+  VkEyePair dual{};
+  const bool have_dual = TakePairImpl(&dual);
+  if (have_dual && XrWanted() && !MailboxFull()) {
+    EnsureXrWorker();
+    PushXrDual(dual);
+  }
   if (info && info->swapchainCount) {
     const bool want_ppm = g_dumps < 2;
-    DumpSwapchain(queue, info->pSwapchains[0], info->pImageIndices[0], want_ppm);
+    if (!have_dual) DumpSwapchain(queue, info->pSwapchains[0], info->pImageIndices[0], want_ppm);
+    else if (want_ppm) DumpSwapchain(queue, info->pSwapchains[0], info->pImageIndices[0], true);
   }
   if ((g_presents % 300) == 0)
     Log("present=%d xr_ok=%d xr_fail=%d dumps=%d", g_presents, g_xr_ok, g_xr_fail, g_dumps);
@@ -517,6 +723,111 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapCreateDevice(VkPhysicalDevice phys,
   return rc;
 }
 
+VKAPI_ATTR VkResult VKAPI_CALL WrapCreateImage(VkDevice device, const VkImageCreateInfo* ci,
+                                               const VkAllocationCallbacks* a, VkImage* out) {
+  PFN_vkCreateImage real = nullptr;
+  {
+    std::lock_guard<std::mutex> lk(g_mu);
+    auto it = g_devs.find(device);
+    if (it != g_devs.end()) real = it->second.fn.createImg;
+  }
+  if (!real) real = (PFN_vkCreateImage)VulkanSym("vkCreateImage");
+  if (!real) return VK_ERROR_UNKNOWN;
+  const VkResult rc = real(device, ci, a, out);
+  if (rc == VK_SUCCESS && out && ci && ci->imageType == VK_IMAGE_TYPE_2D &&
+      (ci->usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)) {
+    std::lock_guard<std::mutex> lk(g_mu);
+    g_img_sz[*out] = {ci->extent.width, ci->extent.height};
+    g_img_fmt[*out] = ci->format;
+  }
+  return rc;
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL WrapCreateImageView(VkDevice device, const VkImageViewCreateInfo* ci,
+                                                   const VkAllocationCallbacks* a, VkImageView* out) {
+  PFN_vkCreateImageView real = nullptr;
+  {
+    std::lock_guard<std::mutex> lk(g_mu);
+    auto it = g_devs.find(device);
+    if (it != g_devs.end()) real = it->second.fn.createView;
+  }
+  if (!real) real = (PFN_vkCreateImageView)VulkanSym("vkCreateImageView");
+  if (!real) return VK_ERROR_UNKNOWN;
+  const VkResult rc = real(device, ci, a, out);
+  if (rc == VK_SUCCESS && out && ci) {
+    std::lock_guard<std::mutex> lk(g_mu);
+    g_views[*out] = ci->image;
+  }
+  return rc;
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL WrapCreateFramebuffer(VkDevice device,
+                                                     const VkFramebufferCreateInfo* ci,
+                                                     const VkAllocationCallbacks* a,
+                                                     VkFramebuffer* out) {
+  PFN_vkCreateFramebuffer real = nullptr;
+  {
+    std::lock_guard<std::mutex> lk(g_mu);
+    auto it = g_devs.find(device);
+    if (it != g_devs.end()) real = it->second.fn.createFb;
+  }
+  if (!real) real = (PFN_vkCreateFramebuffer)VulkanSym("vkCreateFramebuffer");
+  if (!real) return VK_ERROR_UNKNOWN;
+  const VkResult rc = real(device, ci, a, out);
+  if (rc == VK_SUCCESS && out && ci && ci->attachmentCount && ci->pAttachments) {
+    std::lock_guard<std::mutex> lk(g_mu);
+    FbColor fb;
+    fb.dev = device;
+    fb.w = ci->width;
+    fb.h = ci->height;
+    auto vit = g_views.find(ci->pAttachments[0]);
+    if (vit != g_views.end()) {
+      fb.img = vit->second;
+      auto fit = g_img_fmt.find(fb.img);
+      if (fit != g_img_fmt.end()) fb.fmt = fit->second;
+    }
+    g_fbs[*out] = fb;
+  }
+  return rc;
+}
+
+VKAPI_ATTR void VKAPI_CALL WrapBeginRenderPass(VkCommandBuffer cmd,
+                                               const VkRenderPassBeginInfo* info,
+                                               VkSubpassContents contents) {
+  PFN_vkCmdBeginRenderPass real = nullptr;
+  {
+    std::lock_guard<std::mutex> lk(g_mu);
+    if (info) {
+      auto it = g_fbs.find(info->framebuffer);
+      if (it != g_fbs.end() && it->second.w >= 640 && it->second.h >= 400 && it->second.img)
+        g_last_rt = it->second;
+    }
+    if (!g_devs.empty()) real = g_devs.begin()->second.fn.beginRp;
+  }
+  if (!real) real = (PFN_vkCmdBeginRenderPass)VulkanSym("vkCmdBeginRenderPass");
+  if (real) real(cmd, info, contents);
+}
+
+VKAPI_ATTR VkResult VKAPI_CALL WrapAcquireNextImage(VkDevice device, VkSwapchainKHR sc,
+                                                    uint64_t timeout, VkSemaphore sem, VkFence fence,
+                                                    uint32_t* idx) {
+  PFN_vkAcquireNextImageKHR real = nullptr;
+  {
+    std::lock_guard<std::mutex> lk(g_mu);
+    auto it = g_devs.find(device);
+    if (it != g_devs.end()) real = it->second.fn.acquire;
+  }
+  if (!real) real = (PFN_vkAcquireNextImageKHR)VulkanSym("vkAcquireNextImageKHR");
+  if (!real) return VK_ERROR_UNKNOWN;
+  const VkResult rc = real(device, sc, timeout, sem, fence, idx);
+  if ((rc == VK_SUCCESS || rc == VK_SUBOPTIMAL_KHR) && idx) {
+    std::lock_guard<std::mutex> lk(g_mu);
+    g_cur_sc = sc;
+    g_cur_idx = *idx;
+  }
+  return rc;
+}
+
 PFN_vkVoidFunction WrapName(const char* name, PFN_vkVoidFunction real) {
   if (!name) return real;
   if (std::strcmp(name, "vkQueuePresentKHR") == 0) {
@@ -531,6 +842,14 @@ PFN_vkVoidFunction WrapName(const char* name, PFN_vkVoidFunction real) {
     if (real) g_createDevice = (PFN_vkCreateDevice)real;
     return (PFN_vkVoidFunction)WrapCreateDevice;
   }
+  if (std::strcmp(name, "vkCreateImage") == 0) return (PFN_vkVoidFunction)WrapCreateImage;
+  if (std::strcmp(name, "vkCreateImageView") == 0) return (PFN_vkVoidFunction)WrapCreateImageView;
+  if (std::strcmp(name, "vkCreateFramebuffer") == 0)
+    return (PFN_vkVoidFunction)WrapCreateFramebuffer;
+  if (std::strcmp(name, "vkCmdBeginRenderPass") == 0)
+    return (PFN_vkVoidFunction)WrapBeginRenderPass;
+  if (std::strcmp(name, "vkAcquireNextImageKHR") == 0)
+    return (PFN_vkVoidFunction)WrapAcquireNextImage;
   return real;
 }
 

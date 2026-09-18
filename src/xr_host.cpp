@@ -711,6 +711,7 @@ Display* g_xr_dpy = nullptr;
 GLXContext g_xr_ctx = nullptr;
 GLXPbuffer g_xr_pbuf = 0;
 GLuint g_upload = 0;
+GLuint g_upload2 = 0;
 int g_upload_w = 0, g_upload_h = 0;
 int g_upload_bgra = -1;
 bool g_xr_fail_logged = false;
@@ -817,6 +818,40 @@ bool XrHostSubmitPixels(const unsigned char* px, int w, int h, bool bgra) {
   }
   // Vulkan copy is top-left; GL/XR blit wants a flip.
   return XrHostSubmitBackbuffer(g_upload, w, h, true);
+}
+
+static GLuint UploadEyeTex(GLuint* slot, const unsigned char* px, int w, int h, GLenum ext) {
+  if (!*slot || g_upload_w != w || g_upload_h != h || g_upload_bgra != (int)(ext == GL_BGRA)) {
+    if (*slot) glDeleteTextures(1, slot);
+    glGenTextures(1, slot);
+    glBindTexture(GL_TEXTURE_2D, *slot);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, ext, GL_UNSIGNED_BYTE, nullptr);
+  }
+  glBindTexture(GL_TEXTURE_2D, *slot);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, ext, GL_UNSIGNED_BYTE, px);
+  return *slot;
+}
+
+bool XrHostSubmitEyePixels(const unsigned char* left, const unsigned char* right, int w, int h,
+                           bool bgra, bool painted_dual) {
+  if (!left || !right || left == right || w < 2 || h < 2) return false;
+  if (!painted_dual) return XrHostSubmitPixels(left, w, h, bgra);
+  if (!EnsureXrGl()) return false;
+  if (!g_info.session && !XrHostInit()) return false;
+  const GLenum ext = bgra ? GL_BGRA : GL_RGBA;
+  const GLuint tl = UploadEyeTex(&g_upload, left, w, h, ext);
+  const GLuint tr = UploadEyeTex(&g_upload2, right, w, h, ext);
+  g_upload_w = w;
+  g_upload_h = h;
+  g_upload_bgra = bgra ? 1 : 0;
+  if (!XrHostBeginFrame()) {
+    XrHostEndFrame();
+    return false;
+  }
+  return XrHostSubmitEyes(tl, tr, w, h, true, true);
 }
 
 bool XrHostSubmitRgba(const unsigned char* rgba, int w, int h) {
