@@ -163,6 +163,31 @@ TEST(launch_print_spawn_wh) {
   ASSERT_STREQ(FormatSpawnWh(1920, 1080).c_str(), "-w 1920 -h 1080");
 }
 
+TEST(launch_print_spawn_chrome) {
+  CssInstall inst;
+  inst.found = true;
+  inst.root = "/tmp";
+  inst.launcher = "/tmp/cstrike.sh";
+  inst.linux64 = true;
+  LaunchOpts o;
+  o.hook_so.clear();
+  auto framed = PlanSpawn(inst, o);
+  ASSERT_FALSE(SpawnArgvHasNoborder(framed));
+  ASSERT_STREQ(FormatSpawnChrome(framed, true), "framed");
+  ASSERT_STREQ(FormatSpawnChrome(false), "framed");
+  o.noborder = true;
+  auto nb = PlanSpawn(inst, o);
+  ASSERT_TRUE(SpawnArgvHasNoborder(nb));
+  ASSERT_STREQ(FormatSpawnChrome(nb, false), "-noborder");
+  ASSERT_STREQ(FormatSpawnChrome(true), "-noborder");
+  // CSS missing: --print still shows planned chrome, not a blank / guessed framed.
+  SpawnPlan miss;
+  miss.reason = "css_not_found";
+  ASSERT_FALSE(SpawnArgvHasNoborder(miss));
+  ASSERT_STREQ(FormatSpawnChrome(miss, false), "framed");
+  ASSERT_STREQ(FormatSpawnChrome(miss, true), "-noborder");
+}
+
 TEST(launch_hook_required_when_set) {
   CssInstall inst;
   inst.found = true;

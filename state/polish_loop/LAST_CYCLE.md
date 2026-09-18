@@ -1,13 +1,13 @@
-# Cycle 33 — 2026-09-18
+# Cycle 34 — 2026-09-18
 
 ## Focus
 
-`print-spawn-wh` — `--print` hid the persisted desktop `-w`/`-h`.
+`print-spawn-chrome` — `--print` hid framed vs `-noborder`.
 
 ## Did
 
-- `--print` writes `cssvr: spawn -w N -h N` from argv (exec truth) or planned opts if CSS is missing.
-- Also dumps space-joined argv so `+mat_setvideomode` is auditable without spawn.
+- `--print` writes `cssvr: spawn chrome framed` or `cssvr: spawn chrome -noborder`.
+- Argv is exec truth; CSS-missing falls back to planned/persisted noborder.
 
 ## Did not
 
@@ -16,8 +16,8 @@
 
 ## Tests
 
-`cssvrmod_tests` — 86 passed, 0 failed (661 asserts). Built `CSSVR` + `cssvrmod_hook`.
+`cssvrmod_tests` — 87 passed, 0 failed (670 asserts). Built `CSSVR` + `cssvrmod_hook`.
 
 ## Next
 
-`print-spawn-chrome` — `--print` should say framed vs `-noborder`. Never queue `dual-renderview-ipd-origin`.
+`persist-resize` — remember a user-resized framed window in launch.cfg. Never queue `dual-renderview-ipd-origin`.

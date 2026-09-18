@@ -150,6 +150,8 @@ int main(int argc, char** argv) {
   {
     const std::string wh = cssvr::FormatSpawnWh(plan, opts.win_w, opts.win_h);
     std::fprintf(stdout, "cssvr: spawn %s\n", wh.c_str());
+    std::fprintf(stdout, "cssvr: spawn chrome %s\n",
+                 cssvr::FormatSpawnChrome(plan, opts.noborder));
     if (print_only && !plan.argv.empty())
       std::fprintf(stdout, "cssvr: argv %s\n", cssvr::FormatSpawnArgv(plan).c_str());
   }

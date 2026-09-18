@@ -96,4 +96,20 @@ inline std::string FormatSpawnArgv(const SpawnPlan& p) {
   return out;
 }
 
+/// Exec truth: -noborder is in argv. Empty argv (CSS missing) is not a hit.
+inline bool SpawnArgvHasNoborder(const SpawnPlan& p) {
+  for (const auto& a : p.argv)
+    if (a == "-noborder") return true;
+  return false;
+}
+
+/// --print chrome: "framed" (default law) or "-noborder" (user opt-in).
+inline const char* FormatSpawnChrome(bool noborder) { return noborder ? "-noborder" : "framed"; }
+
+/// Prefer argv. Empty argv falls back to planned opts (persisted noborder).
+inline const char* FormatSpawnChrome(const SpawnPlan& p, bool fallback_noborder) {
+  if (p.argv.empty()) return FormatSpawnChrome(fallback_noborder);
+  return FormatSpawnChrome(SpawnArgvHasNoborder(p));
+}
+
 } // namespace cssvr
