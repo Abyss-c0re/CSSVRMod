@@ -524,6 +524,47 @@ TEST(tick_melee_vel_is_per_hand) {
   ASSERT_EQ(static_cast<int>(slash.melee.hand), static_cast<int>(Hand::Right));
 }
 
+TEST(tick_floor_does_not_yank_fist) {
+  // Lua processHand drops floor clips; sweep depen used to pull the wrist off the ground.
+  auto floor = [](Vec3 start, Vec3 end, Vec3, Vec3) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    auto solid = [](const Vec3& p) { return p.z < 0.f; };
+    t.start_solid = solid(start);
+    t.all_solid = solid(start) && solid(end);
+    if (t.start_solid) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = start;
+      t.hit_normal = {0, 0, 1};
+      t.fraction = 0.f;
+      return t;
+    }
+    if (start.z >= 0.f && end.z < 0.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = {end.x, end.y, 0.f};
+      t.hit_normal = {0, 0, 1};
+      t.fraction = start.z / (start.z - end.z);
+    }
+    return t;
+  };
+  TickIn in;
+  in.xr.right.valid = true;
+  in.xr.right.pos = {10, 10, 2};
+  in.xr.right.ang = {90, 0, 0}; // pitch 90 → -Z, fist sample below the floor
+  in.trace = floor;
+  WallState L, R;
+  R.last_free = {10, 10, 20};
+  R.has_free = true;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_FALSE(o.right_wall.clipped);
+  ASSERT_NEAR(o.right_resolved.pos.z, 2.f, 0.15);
+  ASSERT_STREQ(o.right_wall.reason, "floor_passthrough");
+}
+
 TEST(tick_empty_primary_is_not_a_gun) {
   // Live hook has no weapon query. Gun 10u hull / 18u barrel used to yank an empty fist.
   auto world = [](Vec3 start, Vec3 end, Vec3 mins, Vec3 maxs) {

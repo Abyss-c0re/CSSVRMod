@@ -59,6 +59,7 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
                               ? AdjustCollisionsBox(hand.pos, hand.ang, melee)
                               : HandCollisionSample(hand.pos, hand.ang);
       *wall = ResolveHandWallSweep(sample, st, in.hand_radius, in.wall_pad, in.trace);
+      *wall = DropFloorCeilingLock(*wall, sample);
       *wall = ApplyWallLockRelease(*wall, st, sample, in.xr.hmd.valid, in.xr.hmd.pos);
       const Vec3 safe = ApplyHandCorrection(sample, wall->pos);
       resolved->pos = WristFromHullSample(hand.pos, sample, safe);

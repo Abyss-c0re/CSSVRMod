@@ -75,6 +75,50 @@ TEST(collision_floor_does_not_lock) {
   ASSERT_FALSE(r.clipped);
 }
 
+TEST(collision_floor_passthrough_when_desired_solid) {
+  auto floor = [](Vec3 start, Vec3 end, Vec3, Vec3) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    auto solid = [](const Vec3& p) { return p.z < 0.f; };
+    t.start_solid = solid(start);
+    t.all_solid = solid(start) && solid(end);
+    if (t.start_solid) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = start;
+      t.hit_normal = {0, 0, 1};
+      t.fraction = 0.f;
+      return t;
+    }
+    if (start.z >= 0.f && end.z < 0.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = {end.x, end.y, 0.f};
+      t.hit_normal = {0, 0, 1};
+      t.fraction = start.z / (start.z - end.z);
+    }
+    return t;
+  };
+  WallState st;
+  st.last_free = {10, 10, 20};
+  st.has_free = true;
+  auto sweep = ResolveHandWallSweep({10, 10, -5}, st, 2.2f, 0.75f, floor);
+  ASSERT_TRUE(sweep.clipped); // Lua sweep still depens at a floor+solid joint
+  auto drop = DropFloorCeilingLock(sweep, {10, 10, -5});
+  ASSERT_FALSE(drop.clipped);
+  ASSERT_NEAR(drop.pos.z, -5.f, 0.01);
+  ASSERT_STREQ(drop.reason, "floor_passthrough");
+
+  WallResolve wall;
+  wall.clipped = true;
+  wall.normal = {-1, 0, 0};
+  wall.pos = {50, 0, 40};
+  auto keep = DropFloorCeilingLock(wall, {80, 0, 40});
+  ASSERT_TRUE(keep.clipped);
+  ASSERT_NEAR(keep.pos.x, 50.f, 0.01);
+}
+
 TEST(collision_weapon_tip_pulls_hand) {
   auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
     TraceHit t;
