@@ -548,6 +548,10 @@ Vision panel freezes stick-turn. Menu owns stick-Y/X; turn used to spin the worl
 
 Stick-turn yaw resets on stop. Worker/GL TurnState used to keep heading across cssvr_stop. Offline 151/151. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 129
+
+Hand vel + last-free reset on stop. Restart used to finite-diff a fake melee swing and yank hands to the old map pose. Offline 153/153. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

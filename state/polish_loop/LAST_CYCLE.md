@@ -1,14 +1,14 @@
-# Cycle 128 — 2026-09-19
+# Cycle 129 — 2026-09-19
 
 ## Focus
 
-`turn-reset-on-stop` — stick-turn yaw must not survive cssvr_stop.
+`pose-session-reset-on-stop` — hand vel and last-free hull must not survive cssvr_stop.
 
 ## Did
 
-- Recovered cycle 127 tip `f462c8b`. CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`.
-- `Turn_Reset` zeros yaw_off + snap latch. VK worker and GL swap call it when XR is off. Overlay clear already zeroed the peek; the live TurnState did not.
-- Test: `input_turn_resets_on_stop`. Offline 151/151.
+- Recovered cycle 128 tip `69f87bc`. CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`.
+- `HandVel_Reset` / `Wall_Reset`. VK worker and GL swap clear them with turn when XR is off. Restart no longer finite-diffs a fake swing or yanks hands to the old map pose.
+- Tests: `melee_hand_vel_resets_on_stop`, `collision_wall_resets_on_stop`. Offline 153/153.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 151 passed, 0 failed (1099/1099 asserts)
+`cssvrmod_tests` 153 passed, 0 failed (1103/1103 asserts)
 
 ## Next
 
