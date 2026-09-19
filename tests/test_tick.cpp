@@ -458,6 +458,55 @@ TEST(tick_gun_hull_blocks_before_wrist) {
   ASSERT_TRUE(o.right_resolved.pos.x < 20.f);
 }
 
+TEST(tick_empty_primary_is_not_a_gun) {
+  // Live hook has no weapon query. Gun 10u hull / 18u barrel used to yank an empty fist.
+  auto world = [](Vec3 start, Vec3 end, Vec3 mins, Vec3 maxs) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    const bool hull = mins.LengthSqr() > 0.01f || maxs.LengthSqr() > 0.01f;
+    auto solid = [](const Vec3& p) { return p.x >= 28.f; };
+    if (hull) {
+      t.start_solid = solid(start);
+      t.all_solid = solid(start) && solid(end);
+      if (t.start_solid) {
+        t.hit = true;
+        t.hit_world = true;
+        t.hit_pos = start;
+        t.hit_normal = {-1, 0, 0};
+        t.fraction = 0.f;
+        return t;
+      }
+      if (start.x < 28.f && end.x >= 28.f) {
+        t.hit = true;
+        t.hit_world = true;
+        t.hit_pos = {28, start.y, start.z};
+        t.hit_normal = {-1, 0, 0};
+        t.fraction = (end.x > start.x) ? (28.f - start.x) / (end.x - start.x) : 0.f;
+      }
+      return t;
+    }
+    if (start.x < 32.f && end.x >= 32.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = (32.f - start.x) / (end.x - start.x);
+      t.hit_pos = {32.f, start.y, start.z};
+    }
+    return t;
+  };
+  TickIn in;
+  in.xr.right.valid = true;
+  in.xr.right.pos = {20, 0, 40};
+  in.xr.right.ang = {0, 0, 0};
+  in.trace = world;
+  WallState L, R;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_FALSE(o.right_wall.clipped);
+  ASSERT_NEAR(o.right_resolved.pos.x, 20.f, 0.1);
+}
+
 TEST(tick_weapon_tip_blocks_muzzle) {
   auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
     TraceHit t;

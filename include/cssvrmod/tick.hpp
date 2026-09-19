@@ -47,11 +47,15 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
 
   if (in.trace) {
     const bool melee = in.wep && in.wep->is_melee;
+    const bool gun = WeaponIsGun(in.wep);
     auto resolve = [&](const Pose& hand, bool primary, WallState& st, WallResolve* wall,
                        Pose* resolved) {
       if (!hand.valid) return;
-      const Vec3 sample = primary ? AdjustCollisionsBox(hand.pos, hand.ang, melee)
-                                  : HandCollisionSample(hand.pos, hand.ang);
+      // Lua processHand is a fist sphere; gun box / barrel only when holdingGun.
+      // Live Tick used to hull an empty primary as an AK (wep is still nullptr).
+      const Vec3 sample = (primary && (gun || melee))
+                              ? AdjustCollisionsBox(hand.pos, hand.ang, melee)
+                              : HandCollisionSample(hand.pos, hand.ang);
       *wall = ResolveHandWallSweep(sample, st, in.hand_radius, in.wall_pad, in.trace);
       *wall = ApplyWallLockRelease(*wall, st, sample, in.xr.hmd.valid, in.xr.hmd.pos);
       const Vec3 safe = ApplyHandCorrection(sample, wall->pos);
@@ -70,7 +74,7 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
   if (in.wep && in.wep->muzzle_len > 0.f) off.muzzle_len = in.wep->muzzle_len;
   // Gun slaves the primary hand (aim.hpp). Left-handed must not keep the AK on the right.
   Pose primary = in.input.left_handed ? o.left_resolved : o.right_resolved;
-  if (in.trace && primary.valid) {
+  if (in.trace && primary.valid && WeaponIsGun(in.wep)) {
     const float tip_len = off.muzzle_len > 0.f ? off.muzzle_len : 18.f;
     const WeaponTipResolve tip =
         ApplyWeaponTip(primary.pos, primary.ang, tip_len, in.wall_pad, in.trace);
