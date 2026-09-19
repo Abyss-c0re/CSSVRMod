@@ -568,6 +568,22 @@ Idle hunt. CSS not running. No icvar register line. ViewAnglesSane / QuatToAng u
 
 Weapon tip pulls the primary hand. Tick hulled the wrist then slaved a barrel through the wall. Offline 155/155. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 134
+
+Idle hunt. CSS not running. No icvar register line. ShouldReleaseWallLock left unwired (no helper-ladder). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 135
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 136
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 137
+
+Wall lock releases when last-free is beyond arm-reach of the HMD. Spawn/teleport used to yank the hand to the old map pose. Nearby walls still clip. Offline 157/157. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

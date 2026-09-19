@@ -1,24 +1,23 @@
-# Cycle 133 — 2026-09-19
+# Cycle 137 — 2026-09-19
 
 ## Focus
 
-`weapon-tip-wall` — barrel tip must not pass through a wall (Lua ApplyWeaponWallToHand).
+`wall-lock-hmd-teleport` — last-free hull used to yank the hand across the map after spawn/teleport.
 
 ## Did
 
-- Recovered cycle 132 (uncommitted idle) tip `9d0144e`. CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`.
-- Tick applies `ApplyWeaponTip` on the primary hand after the last-free hull, then slaves the gun. Wrist pulled back when the muzzle ray hits.
-- Tests: `collision_weapon_tip_pulls_hand`, `tick_weapon_tip_blocks_muzzle`. Offline 155/155.
+- Wired Lua `ShouldReleaseWallLock` into Tick: if the safe sample is >100u from the HMD, drop last-free and keep the tracked pose (one frame of penetration beats a map-width snap). Nearby walls still clip.
+- Offline 157/157. Not HMD-proven.
 
 ## Did not
 
-- HMD walk. Stereo unproven.
+- HMD walk. Stereo unproven. CSS is not running; log still has no `icvar ver=`.
 - Queue `dual-renderview-ipd-origin`.
 - Invent print/help/menu/toast/cfg chrome.
 
 ## Tests
 
-`cssvrmod_tests` 155 passed, 0 failed (1108/1108 asserts)
+`cssvrmod_tests` 157 passed, 0 failed (1125/1125 asserts)
 
 ## Next
 

@@ -101,6 +101,7 @@
 
 - [x] `IEngineTrace::TraceRay` self-test + Tick last-free hull (cycle 9). No write if fraction insane.
 - [x] Weapon tip pulls the primary hand (cycle 133). Tick hulled the wrist then slaved a barrel through the wall. Lua ApplyWeaponWallToHand.
+- [x] Wall lock releases when last-free is >100u from the HMD (cycle 137). Spawn/teleport used to yank the hand to the old map pose.
 - [x] Trace miss toasts once (cycle 19). Missing iface / failed self-test is not silent.
 - [ ] Live wall collision proven in-game (HMD).
 - [x] Melee hull sweep + pose-delta vel in Tick (cycle 10). Start-solid is not a hit.
