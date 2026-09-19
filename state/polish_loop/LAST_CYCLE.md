@@ -1,14 +1,14 @@
-# Cycle 108 — 2026-09-19
+# Cycle 109 — 2026-09-19
 
 ## Focus
 
-`input-stick-right-turns-right` — stick-right increased Source yaw (look left). Cube subtracts.
+`input-turn-accumulates` — stick-turn added one frame of yaw onto HMD look and dropped it.
 
 ## Did
 
-- Recovered cycle 107 tip `9ce03a9`. CSS still not running; log has no `icvar ver=`.
-- InputMap snap/smooth turn now matches gVRMod: +thumbstick decreases yaw.
-- Offline test: stick right → negative yaw; snap left → +30.
+- Recovered cycle 108 tip `6b13a0b`. CSS still not running; log has no `icvar ver=`.
+- `TurnState` persists locomotion yaw; snap latches like Cube. Tick/hooks hold the state.
+- Offline: two seconds of hold → -90 then -180; held snap stays one step.
 
 ## Did not
 
@@ -18,8 +18,8 @@
 
 ## Tests
 
-131 passed / 0 failed (1021 asserts)
+133 passed / 0 failed (1026 asserts)
 
 ## Next
 
-`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. With SteamVR on, type `cssvr_start`. Dual paint stays HMD-gated.
+`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. Game-dir hook was stale vs install/. With SteamVR on, type `cssvr_start`. Dual paint stays HMD-gated.

@@ -37,6 +37,7 @@ bool g_want_xr = false;
 std::string g_dump_dir;
 WallState g_leftWall, g_rightWall;
 HandVelState g_rightVel;
+TurnState g_turn;
 float g_nextMelee = 0.f;
 float g_now = 0.f;
 EngineIf g_eng;
@@ -370,6 +371,7 @@ void HookOnSwap() {
     tin.current_view = xr.hmd.ang;
     tin.trace = EngineMakeTraceFn(g_eng);
     tin.hand_vel = &g_rightVel;
+    tin.turn = &g_turn;
     TickOut tout = Tick(tin, g_leftWall, g_rightWall, &g_nextMelee);
     UserCmd_NoteOverlay(tout.cmd);
     ApplyClientCmd(tout.cmd, g_prevCmd);

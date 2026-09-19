@@ -61,8 +61,35 @@ inline float ApplyDead(float v, float dead) {
   return s * (std::fabs(v) - dead) / (1.f - dead);
 }
 
+/// Persistent locomotion yaw. Stick-turn used to add one frame onto HMD yaw and drop it.
+struct TurnState {
+  float yaw_off = 0.f;
+  bool snap_latched = false;
+};
+
+inline void Input_StickTurn(TurnState* t, float rx, const InputConfig& cfg, float dt) {
+  if (!t) return;
+  if (cfg.snap_turn) {
+    if (rx > 0.7f) {
+      if (!t->snap_latched) {
+        t->yaw_off -= cfg.snap_yaw;
+        t->snap_latched = true;
+      }
+    } else if (rx < -0.7f) {
+      if (!t->snap_latched) {
+        t->yaw_off += cfg.snap_yaw;
+        t->snap_latched = true;
+      }
+    } else {
+      t->snap_latched = false;
+    }
+  } else if (cfg.smooth_turn) {
+    t->yaw_off -= rx * cfg.turn_speed * (dt > 0.f ? dt : 0.011f);
+  }
+}
+
 inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const InputConfig& cfg,
-                               float dt) {
+                               float dt, TurnState* turn = nullptr) {
   UserCmdOverlay o;
   const bool primaryLeft = cfg.left_handed;
   const float fireAxis = primaryLeft ? xr.trigger_l : xr.trigger_r;
@@ -93,12 +120,10 @@ inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const Inp
 
   // Right stick: Source +yaw is left. Cube subtracts on stick-right (look right).
   const float rx = ApplyDead(xr.stick_rx, cfg.stick_dead);
-  if (cfg.snap_turn) {
-    if (rx > 0.7f) o.view_yaw -= cfg.snap_yaw;
-    if (rx < -0.7f) o.view_yaw += cfg.snap_yaw;
-  } else if (cfg.smooth_turn) {
-    o.view_yaw -= rx * cfg.turn_speed * (dt > 0.f ? dt : 0.011f);
-  }
+  TurnState once;
+  TurnState* t = turn ? turn : &once;
+  Input_StickTurn(t, rx, cfg, dt);
+  o.view_yaw += t->yaw_off;
   o.reason = o.look_from_gun ? "aim_gun" : "aim_hmd";
   return o;
 }

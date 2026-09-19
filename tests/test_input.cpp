@@ -59,6 +59,43 @@ TEST(input_stick_right_turns_right) {
   ASSERT_NEAR(snap_l.view_yaw, 30.f, 0.1f);
 }
 
+TEST(input_smooth_turn_accumulates) {
+  XrSample xr;
+  xr.hmd.valid = true;
+  xr.hmd.ang = {0, 0, 0};
+  xr.stick_rx = 1.f;
+  GunPose gun;
+  InputConfig cfg;
+  cfg.smooth_turn = true;
+  cfg.snap_turn = false;
+  cfg.turn_speed = 90.f;
+  TurnState t;
+  auto a = InputMap(xr, gun, cfg, 1.f, &t);
+  auto b = InputMap(xr, gun, cfg, 1.f, &t);
+  ASSERT_NEAR(a.view_yaw, -90.f, 1.f);
+  ASSERT_NEAR(b.view_yaw, -180.f, 1.f);
+}
+
+TEST(input_snap_turn_latches) {
+  XrSample xr;
+  xr.hmd.valid = true;
+  xr.stick_rx = 1.f;
+  GunPose gun;
+  InputConfig cfg;
+  cfg.snap_turn = true;
+  cfg.snap_yaw = 30.f;
+  TurnState t;
+  auto a = InputMap(xr, gun, cfg, 0.01f, &t);
+  auto b = InputMap(xr, gun, cfg, 0.01f, &t);
+  ASSERT_NEAR(a.view_yaw, -30.f, 0.1f);
+  ASSERT_NEAR(b.view_yaw, -30.f, 0.1f); // still held — one snap
+  xr.stick_rx = 0.f;
+  InputMap(xr, gun, cfg, 0.01f, &t);
+  xr.stick_rx = 1.f;
+  auto c = InputMap(xr, gun, cfg, 0.01f, &t);
+  ASSERT_NEAR(c.view_yaw, -60.f, 0.1f);
+}
+
 TEST(input_deadzone_and_sdl_plan) {
   ASSERT_NEAR(ApplyDead(0.05f, 0.18f), 0.f, 1e-6);
   ASSERT_TRUE(ApplyDead(1.f, 0.18f) > 0.9f);

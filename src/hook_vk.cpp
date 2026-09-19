@@ -251,6 +251,7 @@ void* XrWorker(void*) {
       if (XrHostPollInput(&xr)) {
         static WallState leftWall, rightWall;
         static HandVelState rightVel;
+        static TurnState turn;
         static float nextMelee = 0.f;
         static float now = 0.f;
         TickIn tin;
@@ -262,6 +263,7 @@ void* XrWorker(void*) {
         tin.current_view = xr.hmd.ang;
         tin.trace = EngineMakeTraceFn(g_eng);
         tin.hand_vel = &rightVel;
+        tin.turn = &turn;
         TickOut tout = Tick(tin, leftWall, rightWall, &nextMelee);
         now += 0.011f;
         UserCmdOverlay cmd = tout.cmd;

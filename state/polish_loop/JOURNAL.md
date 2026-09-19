@@ -468,6 +468,10 @@ Tick gun/aim/melee follow primary hand. Left-handed used to keep the AK on the r
 
 Stick-right turns right. Source +yaw is left; Cube subtracts on +thumbstick. Offline 131/131. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 109
+
+Stick-turn yaw persists. One-frame offset on HMD yaw never rotated; snap now latches. Offline 133/133. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

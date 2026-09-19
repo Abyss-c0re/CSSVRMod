@@ -23,6 +23,7 @@ struct TickIn {
   float mouse_sens = 0.022f;
   TraceFn trace; // empty → skip wall / melee sweep
   HandVelState* hand_vel = nullptr; // gun / melee hand (primary)
+  TurnState* turn = nullptr;        // stick locomotion yaw (persists across ticks)
 };
 
 struct TickOut {
@@ -81,7 +82,7 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
   lo.laser_hand = lo.primary_hand;
   o.laser = Laser_Decide(lo);
 
-  o.cmd = InputMap(in.xr, o.gun, in.input, in.dt);
+  o.cmd = InputMap(in.xr, o.gun, in.input, in.dt, in.turn);
   o.sdl = PlanSdlInject(o.cmd, in.current_view, in.mouse_sens);
 
   MeleeSample ms;
