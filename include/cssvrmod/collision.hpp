@@ -266,6 +266,17 @@ inline bool ShouldReleaseWallLock(const Vec3& safePos, const Vec3& hmdPos) {
   return safePos.DistToSqr(hmdPos) > kWallReleaseFromHmdSqr;
 }
 
+/// Lua: hull-noise dead-zone; never yank more than arm-length even if last-free is farther.
+/// Tick used to snap the hand the full last-free delta (70u) when rest was solid.
+inline Vec3 ApplyHandCorrection(Vec3 desired, Vec3 safe) {
+  const Vec3 delta = safe - desired;
+  const float sqr = delta.LengthSqr();
+  if (sqr < kMinHandCorrectionSqr) return desired;
+  const float len = std::sqrt(sqr);
+  if (len <= kMaxHandCorrection) return safe;
+  return desired + delta * (kMaxHandCorrection / len);
+}
+
 /// Drop last-free when the safe sample is beyond arm-reach of the HMD (Lua).
 /// Tick used to keep last-free across spawn/teleport and yank the hand ~map-width.
 inline WallResolve ApplyWallLockRelease(WallResolve r, WallState& st, Vec3 desired, bool hmd_valid,

@@ -230,6 +230,51 @@ TEST(tick_wall_lock_releases_on_hmd_teleport) {
   ASSERT_NEAR(drop.right_resolved.pos.x, 80.f, 0.1);
 }
 
+TEST(tick_wall_correction_caps_last_free_yank) {
+  // Inward hit normal → rest is solid → last-free snap. Nearby HMD so teleport
+  // release does not fire; clamp must still stop a 70u yank.
+  auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    auto solid = [](const Vec3& p) { return p.x >= 50.f; };
+    t.start_solid = solid(start);
+    t.all_solid = solid(start) && solid(end);
+    if (t.start_solid) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = start;
+      t.hit_normal = {1, 0, 0};
+      t.fraction = 0.f;
+      return t;
+    }
+    if (start.x < 50.f && end.x >= 50.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = {50, start.y, start.z};
+      t.hit_normal = {1, 0, 0};
+      t.fraction = (50.f - start.x) / (end.x - start.x);
+    }
+    return t;
+  };
+  TickIn in;
+  in.xr.hmd.valid = true;
+  in.xr.hmd.pos = {20, 0, 40};
+  in.xr.right.valid = true;
+  in.xr.right.pos = {80, 0, 40};
+  in.xr.right.ang = {0, 90, 0}; // +Y — tip must not also pull off the X wall
+  in.trace = world;
+  WallState L, R;
+  R.last_free = {10, 0, 40};
+  R.has_free = true;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_TRUE(o.right_wall.clipped);
+  ASSERT_TRUE(o.right_resolved.pos.x > 20.f); // not snapped to last-free
+  ASSERT_TRUE(o.right_resolved.pos.x < 80.f);
+  ASSERT_NEAR(o.right_resolved.pos.x, 40.f, 1.f);
+}
+
 TEST(tick_weapon_tip_blocks_muzzle) {
   auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
     TraceHit t;

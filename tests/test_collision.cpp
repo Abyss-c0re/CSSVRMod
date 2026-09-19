@@ -104,6 +104,15 @@ TEST(collision_wall_resets_on_stop) {
   Wall_Reset(nullptr);
 }
 
+TEST(collision_hand_correction_clamps_and_deadzone) {
+  const Vec3 desired{80, 0, 40};
+  ASSERT_NEAR(ApplyHandCorrection(desired, {80.1f, 0, 40}).x, 80.f, 0.01); // dead-zone
+  ASSERT_NEAR(ApplyHandCorrection(desired, {70, 0, 40}).x, 70.f, 0.01);    // under max
+  const Vec3 yanked = ApplyHandCorrection(desired, {10, 0, 40});
+  ASSERT_NEAR(yanked.x, 40.f, 0.2); // 70u last-free snap capped at 40
+  ASSERT_TRUE(std::fabs(yanked.x - 10.f) > 20.f);
+}
+
 TEST(collision_wall_lock_releases_far_from_hmd) {
   ASSERT_FALSE(ShouldReleaseWallLock({10, 0, 40}, {20, 0, 40}));
   ASSERT_TRUE(ShouldReleaseWallLock({10, 0, 40}, {200, 0, 40}));
