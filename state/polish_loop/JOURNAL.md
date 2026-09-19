@@ -584,6 +584,22 @@ Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No
 
 Wall lock releases when last-free is beyond arm-reach of the HMD. Spawn/teleport used to yank the hand to the old map pose. Nearby walls still clip. Offline 157/157. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 138
+
+Idle hunt. CSS not running. No icvar register line. kMaxHandCorrection left unwired (no helper-ladder). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 139
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 140
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 141
+
+Hand correction clamps to 40u and dead-zones hull noise. Last-free used to snap 70u when rest was solid. Nearby walls still clip. Offline 159/159. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

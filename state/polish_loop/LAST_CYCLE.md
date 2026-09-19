@@ -1,13 +1,13 @@
-# Cycle 137 — 2026-09-19
+# Cycle 141 — 2026-09-19
 
 ## Focus
 
-`wall-lock-hmd-teleport` — last-free hull used to yank the hand across the map after spawn/teleport.
+`hand-correction-clamp` — last-free hull used to snap the hand 70u when rest was solid.
 
 ## Did
 
-- Wired Lua `ShouldReleaseWallLock` into Tick: if the safe sample is >100u from the HMD, drop last-free and keep the tracked pose (one frame of penetration beats a map-width snap). Nearby walls still clip.
-- Offline 157/157. Not HMD-proven.
+- Wired Lua `ApplyHandCorrection`: dead-zone hull noise (<0.35u) and cap yanks at 40u. Nearby walls still clip; teleport release still drops last-free past 100u from the HMD.
+- Offline 159/159. Not HMD-proven.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 157 passed, 0 failed (1125/1125 asserts)
+`cssvrmod_tests` 159 passed, 0 failed (1133/1133 asserts)
 
 ## Next
 
