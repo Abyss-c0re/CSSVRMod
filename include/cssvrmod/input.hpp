@@ -91,13 +91,13 @@ inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const Inp
   if (xr.x_click) o.buttons |= kInUse;
   if (xr.menu) o.buttons |= kInScore;
 
-  // Right stick: snap / smooth turn applied to yaw (locomotion, not aim).
+  // Right stick: Source +yaw is left. Cube subtracts on stick-right (look right).
   const float rx = ApplyDead(xr.stick_rx, cfg.stick_dead);
   if (cfg.snap_turn) {
-    if (rx > 0.7f) o.view_yaw += cfg.snap_yaw;
-    if (rx < -0.7f) o.view_yaw -= cfg.snap_yaw;
+    if (rx > 0.7f) o.view_yaw -= cfg.snap_yaw;
+    if (rx < -0.7f) o.view_yaw += cfg.snap_yaw;
   } else if (cfg.smooth_turn) {
-    o.view_yaw += rx * cfg.turn_speed * (dt > 0.f ? dt : 0.011f);
+    o.view_yaw -= rx * cfg.turn_speed * (dt > 0.f ? dt : 0.011f);
   }
   o.reason = o.look_from_gun ? "aim_gun" : "aim_hmd";
   return o;

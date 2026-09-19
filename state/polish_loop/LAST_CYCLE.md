@@ -1,14 +1,14 @@
-# Cycle 107 — 2026-09-19
+# Cycle 108 — 2026-09-19
 
 ## Focus
 
-`tick-primary-hand-gun-slave` — left-handed Tick kept the gun and knife on the right hand.
+`input-stick-right-turns-right` — stick-right increased Source yaw (look left). Cube subtracts.
 
 ## Did
 
-- Recovered cycle 106 tip `459c146`. CSS still not running; log has no `icvar ver=`.
-- Tick gun / aim / melee now follow the primary hand (`CSSVR_LEFT_HANDED` / HAND row). Laser already did.
-- Offline test: left pose owns the AK muzzle; knife melee `Hand::Left`.
+- Recovered cycle 107 tip `9ce03a9`. CSS still not running; log has no `icvar ver=`.
+- InputMap snap/smooth turn now matches gVRMod: +thumbstick decreases yaw.
+- Offline test: stick right → negative yaw; snap left → +30.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-130 passed / 0 failed (1018 asserts)
+131 passed / 0 failed (1021 asserts)
 
 ## Next
 

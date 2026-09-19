@@ -37,6 +37,28 @@ TEST(input_map_fire_and_move) {
   ASSERT_NEAR(idle.view_yaw, 45.f, 2.f);
 }
 
+TEST(input_stick_right_turns_right) {
+  XrSample xr;
+  xr.hmd.valid = true;
+  xr.hmd.ang = {0, 0, 0};
+  GunPose gun;
+  InputConfig cfg;
+  cfg.smooth_turn = true;
+  cfg.snap_turn = false;
+  cfg.turn_speed = 90.f;
+  xr.stick_rx = 1.f;
+  auto smooth = InputMap(xr, gun, cfg, 1.f);
+  ASSERT_TRUE(smooth.view_yaw < -1.f);
+
+  cfg.snap_turn = true;
+  cfg.snap_yaw = 30.f;
+  auto snap_r = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_NEAR(snap_r.view_yaw, -30.f, 0.1f);
+  xr.stick_rx = -1.f;
+  auto snap_l = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_NEAR(snap_l.view_yaw, 30.f, 0.1f);
+}
+
 TEST(input_deadzone_and_sdl_plan) {
   ASSERT_NEAR(ApplyDead(0.05f, 0.18f), 0.f, 1e-6);
   ASSERT_TRUE(ApplyDead(1.f, 0.18f) > 0.9f);
