@@ -1,13 +1,13 @@
-# Cycle 123 — 2026-09-19
+# Cycle 124 — 2026-09-19
 
 ## Focus
 
-`overlay-clears-on-stop` — last stick/buttons kept walking after `cssvr_stop`.
+`clientcmd-release-on-stop` — overlay drop left `+attack`/`+duck` held after `cssvr_stop`.
 
 ## Did
 
-- Recovered cycle 122 tip `cea9dc2`. CSS is not running. Log still has no `icvar ver=`.
-- PeekOverlay / Turn_PeekYawOff refuse when XR is off. Shutdown clears the overlay.
+- Recovered cycle 123 tip `338bf46`. CSS is not running. Log still has no `icvar ver=`.
+- Present path releases ClientCmd edges when XR is off. Prev overlay cleared.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-147 passed / 0 failed (1086 asserts)
+148 passed / 0 failed (1090 asserts)
 
 ## Next
 
