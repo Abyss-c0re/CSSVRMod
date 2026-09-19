@@ -87,6 +87,59 @@ inline bool UserCmd_Apply(void* cmd, size_t n, const UserCmdFields& f, const Use
   return ok;
 }
 
+/// Digital ClientCmd fallback. VK present used to drop +use/+attack2/+showscores (GL had them).
+struct ClientCmdEdge {
+  int bit = 0;
+  const char* plus = "";
+  const char* minus = "";
+  bool analog_move = false;
+};
+
+inline int ClientCmd_FillEdges(ClientCmdEdge* out, int n) {
+  static const ClientCmdEdge k[] = {
+      {kInAttack, "+attack", "-attack", false},
+      {kInAttack2, "+attack2", "-attack2", false},
+      {kInJump, "+jump", "-jump", false},
+      {kInReload, "+reload", "-reload", false},
+      {kInUse, "+use", "-use", false},
+      {kInScore, "+showscores", "-showscores", false},
+      {kInForward, "+forward", "-forward", true},
+      {kInBack, "+back", "-back", true},
+      {kInMoveLeft, "+moveleft", "-moveleft", true},
+      {kInMoveRight, "+moveright", "-moveright", true},
+  };
+  const int m = (int)(sizeof(k) / sizeof(k[0]));
+  if (!out || n <= 0) return m;
+  int w = 0;
+  for (; w < m && w < n; ++w) out[w] = k[w];
+  return m;
+}
+
+inline bool ClientCmd_ShouldEdge(const ClientCmdEdge& e, bool usercmd_live) {
+  return !e.analog_move || !usercmd_live;
+}
+
+inline bool ClientCmd_EdgeHas(int bit) {
+  ClientCmdEdge edges[16];
+  const int n = ClientCmd_FillEdges(edges, 16);
+  for (int i = 0; i < n; ++i)
+    if (edges[i].bit == bit) return true;
+  return false;
+}
+
+inline void ClientCmd_ApplyEdges(const EngineIf& eng, const UserCmdOverlay& cmd,
+                                 const UserCmdOverlay& prev, bool usercmd_live) {
+  ClientCmdEdge edges[16];
+  const int n = ClientCmd_FillEdges(edges, 16);
+  for (int i = 0; i < n; ++i) {
+    if (!ClientCmd_ShouldEdge(edges[i], usercmd_live)) continue;
+    const bool now = (cmd.buttons & edges[i].bit) != 0;
+    const bool was = (prev.buttons & edges[i].bit) != 0;
+    if (now && !was) EngineClientCmd(eng, edges[i].plus);
+    if (!now && was) EngineClientCmd(eng, edges[i].minus);
+  }
+}
+
 void UserCmd_NoteOverlay(const UserCmdOverlay& o);
 bool UserCmd_PeekOverlay(UserCmdOverlay* o);
 bool UserCmd_HookLive();

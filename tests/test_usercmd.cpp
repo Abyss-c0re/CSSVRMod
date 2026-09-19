@@ -46,6 +46,25 @@ TEST(usercmd_apply_no_vptr_fields) {
   ASSERT_NEAR(side, 50.f, 0.01);
 }
 
+TEST(clientcmd_edges_include_use_and_melee) {
+  ASSERT_TRUE(ClientCmd_EdgeHas(kInAttack2));
+  ASSERT_TRUE(ClientCmd_EdgeHas(kInUse));
+  ASSERT_TRUE(ClientCmd_EdgeHas(kInScore));
+  ASSERT_TRUE(ClientCmd_EdgeHas(kInReload));
+  ClientCmdEdge edges[16];
+  const int n = ClientCmd_FillEdges(edges, 16);
+  ASSERT_TRUE(n >= 10);
+  bool saw_use = false, move_skipped = false, attack2_always = false;
+  for (int i = 0; i < n; ++i) {
+    if (edges[i].bit == kInUse) saw_use = true;
+    if (edges[i].bit == kInAttack2) attack2_always = ClientCmd_ShouldEdge(edges[i], true);
+    if (edges[i].analog_move) move_skipped = !ClientCmd_ShouldEdge(edges[i], true);
+  }
+  ASSERT_TRUE(saw_use);
+  ASSERT_TRUE(attack2_always); // melee/use must fire even when CreateMove is live
+  ASSERT_TRUE(move_skipped);
+}
+
 TEST(usercmd_note_peek) {
   UserCmdOverlay o;
   o.forwardmove = 12.f;

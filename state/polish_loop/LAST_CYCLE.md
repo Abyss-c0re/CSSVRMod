@@ -1,14 +1,13 @@
-# Cycle 109 — 2026-09-19
+# Cycle 110 — 2026-09-19
 
 ## Focus
 
-`input-turn-accumulates` — stick-turn added one frame of yaw onto HMD look and dropped it.
+`vk-clientcmd-edges-use-melee` — VK present dropped +use / +attack2 / +showscores that GL already edged.
 
 ## Did
 
-- Recovered cycle 108 tip `6b13a0b`. CSS still not running; log has no `icvar ver=`.
-- `TurnState` persists locomotion yaw; snap latches like Cube. Tick/hooks hold the state.
-- Offline: two seconds of hold → -90 then -180; held snap stays one step.
+- Recovered cycle 109 tip `725fc45`. CSS not running. Log has no `icvar ver=` (a splash at 07:04 died before cmd wrap).
+- Shared `ClientCmd_ApplyEdges` so VK matches GL: melee, use, score, plus analog only when CreateMove is down.
 
 ## Did not
 
@@ -18,8 +17,8 @@
 
 ## Tests
 
-133 passed / 0 failed (1026 asserts)
+134 passed / 0 failed (1034 asserts)
 
 ## Next
 
-`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. Game-dir hook was stale vs install/. With SteamVR on, type `cssvr_start`. Dual paint stays HMD-gated.
+`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. With SteamVR on, type `cssvr_start`. Dual paint stays HMD-gated.

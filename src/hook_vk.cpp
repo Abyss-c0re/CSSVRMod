@@ -268,23 +268,8 @@ void* XrWorker(void*) {
         now += 0.011f;
         UserCmdOverlay cmd = tout.cmd;
         UserCmd_NoteOverlay(cmd);
-        if (g_eng.screen_ok || ProbeLiveEngine(g_eng)) {
-          auto edge = [&](int bit, const char* plus, const char* minus) {
-            const bool now = (cmd.buttons & bit) != 0;
-            const bool was = (g_prev_cmd.buttons & bit) != 0;
-            if (now && !was) EngineClientCmd(g_eng, plus);
-            if (!now && was) EngineClientCmd(g_eng, minus);
-          };
-          edge(kInAttack, "+attack", "-attack");
-          edge(kInJump, "+jump", "-jump");
-          edge(kInReload, "+reload", "-reload");
-          if (!UserCmd_HookLive()) {
-            edge(kInForward, "+forward", "-forward");
-            edge(kInBack, "+back", "-back");
-            edge(kInMoveLeft, "+moveleft", "-moveleft");
-            edge(kInMoveRight, "+moveright", "-moveright");
-          }
-        }
+        if (g_eng.screen_ok || ProbeLiveEngine(g_eng))
+          ClientCmd_ApplyEdges(g_eng, cmd, g_prev_cmd, UserCmd_HookLive());
         g_prev_cmd = cmd;
       }
     } else if (XrSubmit_CountFail(XrHostStatus().reason, false, XrHostLastFrameSkipped())) {

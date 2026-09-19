@@ -291,24 +291,7 @@ void PushSdl(const SdlInjectPlan& p) {
 
 void ApplyClientCmd(const UserCmdOverlay& cmd, const UserCmdOverlay& prev) {
   if (!g_eng.screen_ok) return;
-  auto edge = [&](int bit, const char* plus, const char* minus) {
-    const bool now = (cmd.buttons & bit) != 0;
-    const bool was = (prev.buttons & bit) != 0;
-    if (now && !was) EngineClientCmd(g_eng, plus);
-    if (!now && was) EngineClientCmd(g_eng, minus);
-  };
-  edge(kInAttack, "+attack", "-attack");
-  edge(kInAttack2, "+attack2", "-attack2");
-  edge(kInJump, "+jump", "-jump");
-  edge(kInReload, "+reload", "-reload");
-  edge(kInUse, "+use", "-use");
-  if (!UserCmd_HookLive()) {
-    edge(kInForward, "+forward", "-forward");
-    edge(kInBack, "+back", "-back");
-    edge(kInMoveLeft, "+moveleft", "-moveleft");
-    edge(kInMoveRight, "+moveright", "-moveright");
-  }
-  edge(kInScore, "+showscores", "-showscores");
+  ClientCmd_ApplyEdges(g_eng, cmd, prev, UserCmd_HookLive());
 }
 
 UserCmdOverlay g_prevCmd{};
