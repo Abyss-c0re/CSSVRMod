@@ -33,6 +33,25 @@ TEST(tick_fire_ak_and_knife_melee) {
   ASSERT_STREQ(knife.status, "melee_hit");
 }
 
+TEST(tick_panel_freezes_stick_turn) {
+  TickIn in;
+  in.xr.hmd.valid = true;
+  in.xr.panel_visible = true;
+  in.xr.stick_rx = 1.f;
+  in.input.smooth_turn = true;
+  in.input.snap_turn = false;
+  in.input.turn_speed = 90.f;
+  in.dt = 1.f;
+  TurnState turn;
+  turn.yaw_off = -15.f;
+  in.turn = &turn;
+  WallState L, R;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_NEAR(turn.yaw_off, -15.f, 0.1f);
+  ASSERT_NEAR(o.cmd.view_yaw, -15.f, 0.1f);
+}
+
 TEST(tick_panel_blocks_combat) {
   TickIn in;
   in.xr.hmd.valid = true;

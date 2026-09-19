@@ -128,10 +128,12 @@ inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const Inp
   if (xr.stick_click_r) o.buttons |= kInScore;
 
   // Right stick: Source +yaw is left. Cube subtracts on stick-right (look right).
+  // Vision panel owns stick-Y (rows) and stick-X (value). Turn used to spin the
+  // world under a world-locked menu — same class as trigger-steal combat.
   const float rx = ApplyDead(xr.stick_rx, cfg.stick_dead);
   TurnState once;
   TurnState* t = turn ? turn : &once;
-  Input_StickTurn(t, rx, cfg, dt);
+  if (!xr.panel_visible) Input_StickTurn(t, rx, cfg, dt);
   o.view_yaw = AngleNormalize(o.view_yaw + t->yaw_off);
   o.reason = o.look_from_gun ? "aim_gun" : "aim_hmd";
   return o;

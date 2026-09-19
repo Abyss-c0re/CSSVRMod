@@ -167,6 +167,28 @@ TEST(input_menu_is_not_score) {
   ASSERT_TRUE(p.key_tab);
 }
 
+TEST(input_panel_freezes_stick_turn) {
+  XrSample xr;
+  xr.hmd.valid = true;
+  xr.hmd.ang = {0, 0, 0};
+  xr.panel_visible = true;
+  xr.stick_rx = 1.f;
+  GunPose gun;
+  InputConfig cfg;
+  cfg.smooth_turn = true;
+  cfg.snap_turn = false;
+  cfg.turn_speed = 90.f;
+  TurnState t;
+  t.yaw_off = -30.f;
+  auto held = InputMap(xr, gun, cfg, 1.f, &t);
+  ASSERT_NEAR(t.yaw_off, -30.f, 0.1f); // heading kept; no new turn
+  ASSERT_NEAR(held.view_yaw, -30.f, 0.1f);
+  xr.panel_visible = false;
+  auto live = InputMap(xr, gun, cfg, 1.f, &t);
+  ASSERT_NEAR(t.yaw_off, -120.f, 1.f);
+  ASSERT_NEAR(live.view_yaw, -120.f, 1.f);
+}
+
 TEST(input_stick_click_ducks) {
   XrSample xr;
   xr.stick_click_l = true;

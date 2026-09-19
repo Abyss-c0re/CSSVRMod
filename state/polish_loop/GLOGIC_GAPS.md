@@ -84,6 +84,7 @@
 - [x] Stick-turn yaw wraps (cycle 118). Unbounded yaw_off passed ±720 so ViewAnglesSane dropped look / usercmd.
 - [x] Snap-on-fire pitch wraps (cycle 119). VectorAngles look-up is 270°; ViewAnglesSane dropped usercmd / SetViewAngles.
 - [x] Vision panel steals combat (cycle 120). Trigger/grab on the 3D menu used to fire and melee. Jump/reload/use stay.
+- [x] Vision panel freezes stick-turn (cycle 127). Menu owns stick-Y/X; turn used to spin the world under the quad. Existing yaw_off stays.
 - [x] Menu is Vision, not scoreboard (cycle 121). Menu click used to hold `IN_SCORE` while toggling the 3D panel. Right stick-click is TAB.
 - [x] Dual paint only when session_ok (cycle 122). Hook-in-CSS IPD-offset the desktop with no HMD / after stop. Stale HMD look dropped when not running.
 - [x] CreateMove overlay drops on stop (cycle 123). Last stick/buttons used to keep walking after `cssvr_stop`.
