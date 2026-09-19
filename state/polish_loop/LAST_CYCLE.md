@@ -1,23 +1,26 @@
-# Cycle 113 — 2026-09-19
+# Cycle 117 — 2026-09-19
 
 ## Focus
 
-`look-includes-stick-turn` — RenderView SetViewAngles(HMD) clobbered CreateMove locomotion yaw.
+`stick-click-duck` — `kInDuck` / SDL ctrl existed; XR never crouched.
 
 ## Did
 
-- Recovered cycle 112 tip `83030c9`. CSS not running. Log still has no `icvar ver=`.
-- `Look_Decide` adds persisted stick-turn yaw. Hooks `Turn_NoteYawOff`; RenderView peeks it so world cameras and engine yaw match Cube snap/smooth.
+- Recovered cycle 116 tip `09eff72`. CSS is not running. Log still has no `icvar ver=`.
+- Left thumbstick click → `IN_DUCK`. Cube uses that slot for sprint; CSS has none. A stays jump, B stays reload.
+- VK ClientCmd edge `+duck`/`-duck` so present still ducks when CreateMove is live.
+- OpenXR binds `/user/hand/left/input/thumbstick/click`.
 
 ## Did not
 
 - HMD walk. Stereo unproven.
 - Queue `dual-renderview-ipd-origin`.
+- Remap A/B to Cube crouch/jump (would steal reload).
 - Invent print/help/menu/toast/cfg chrome.
 
 ## Tests
 
-137 passed / 0 failed (1044 asserts)
+138 passed / 0 failed (1051 asserts)
 
 ## Next
 

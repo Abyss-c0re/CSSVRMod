@@ -488,6 +488,22 @@ ICvar vstdlib NOLOAD is lazy. NOW+NOLOAD can miss a no-SONAME libvstdlib; basena
 
 HMD look includes stick-turn yaw. RenderView used to clobber CreateMove locomotion. Offline 137/137. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 114
+
+Idle hunt. CSS not running. No icvar register line. CreateMove overlay / look yaw_off unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 115
+
+Idle hunt. CSS not running. No icvar register line. Last-free hull / wall sweep unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 116
+
+Idle hunt. CSS not running. No icvar register line. VK eye store / dual distinct frames unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 117
+
+Left stick-click ducks. kInDuck / SDL ctrl were dead; VK present had no +duck. Cube sprint slot — CSS has no sprint. Offline 138/138. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
