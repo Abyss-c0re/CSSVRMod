@@ -75,6 +75,12 @@ inline Hand MeleeSwingHandId(bool left_handed, bool knife) {
   return left_handed ? Hand::Right : Hand::Left;
 }
 
+/// Lua Get*HandVelocityRelative: hand.vel − hmd.vel. World vel used to punch while walking.
+inline Vec3 MeleeVelRelative(Vec3 hand_vel, const Pose& hmd) {
+  if (!hmd.valid) return hand_vel;
+  return hand_vel - hmd.vel;
+}
+
 inline float MeleeImpactMultiplier(ImpactType t) {
   switch (t) {
   case ImpactType::Blunt: return 1.25f;

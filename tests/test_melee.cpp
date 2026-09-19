@@ -26,6 +26,18 @@ TEST(melee_fist_swings_from_offhand) {
   ASSERT_EQ(static_cast<int>(MeleeSwingHandId(true, true)), static_cast<int>(Hand::Left));
 }
 
+TEST(melee_vel_is_relative_to_hmd) {
+  Pose hmd;
+  hmd.valid = true;
+  hmd.vel = {80, 0, 0};
+  const Vec3 walk = MeleeVelRelative({80, 0, 0}, hmd);
+  ASSERT_NEAR(walk.Length(), 0.f, 0.01);
+  const Vec3 punch = MeleeVelRelative({160, 0, 0}, hmd);
+  ASSERT_NEAR(punch.x, 80.f, 0.01);
+  Pose no_hmd;
+  ASSERT_NEAR(MeleeVelRelative({80, 0, 0}, no_hmd).x, 80.f, 0.01);
+}
+
 TEST(melee_threshold_and_damage) {
   MeleeConfig c;
   ASSERT_NEAR(MeleeThresholdUnits(c), 75.f, 1e-4);
