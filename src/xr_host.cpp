@@ -885,6 +885,7 @@ bool XrHostPollInput(XrSample* out) {
   g_prev_trig = trig;
   CacheHmdFromViewSpace();
   out->hmd = XrHostLastHmd();
+  out->panel_visible = g_menu3d.visible;
   // Controller midpoint is not a look pose — never cache it as HMD.
   return out->left.valid || out->right.valid || out->trigger_r > 0.f || out->hmd.valid;
 }

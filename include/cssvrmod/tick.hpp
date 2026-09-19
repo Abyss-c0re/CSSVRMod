@@ -80,6 +80,7 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
   lo.has_primary_pose = primary.valid;
   lo.primary_hand = in.input.left_handed ? "left" : "right";
   lo.laser_hand = lo.primary_hand;
+  lo.menu_focus = in.xr.panel_visible;
   o.laser = Laser_Decide(lo);
 
   o.cmd = InputMap(in.xr, o.gun, in.input, in.dt, in.turn);
@@ -87,7 +88,7 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
 
   MeleeSample ms;
   const bool knife = in.wep && in.wep->is_melee;
-  if (knife || o.cmd.melee_intent) {
+  if (!in.xr.panel_visible && (knife || o.cmd.melee_intent)) {
     const Pose& hand = primary;
     ms.pos = hand.pos;
     ms.dir = Forward(hand.ang);

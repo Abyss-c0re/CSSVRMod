@@ -83,6 +83,7 @@
 - [x] Stick-turn yaw persists across ticks (cycle 109). One-frame offset on HMD yaw never rotated. Snap latches like Cube.
 - [x] Stick-turn yaw wraps (cycle 118). Unbounded yaw_off passed ±720 so ViewAnglesSane dropped look / usercmd.
 - [x] Snap-on-fire pitch wraps (cycle 119). VectorAngles look-up is 270°; ViewAnglesSane dropped usercmd / SetViewAngles.
+- [x] Vision panel steals combat (cycle 120). Trigger/grab on the 3D menu used to fire and melee. Jump/reload/use stay.
 - [x] Stick-right turns right (cycle 108). Source +yaw is left; Cube subtracts on +thumbstick. Used to invert locomotion.
 - [x] Tick gun-slave / melee from primary hand (cycle 107). Left-handed used to keep the AK and knife on the right.
 - [x] `CUserCmd` overlay + CreateMove hook (RTTI/xmm0 self-test, cycle 8). Analog stick writes forwardmove.

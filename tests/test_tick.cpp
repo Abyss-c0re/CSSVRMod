@@ -33,6 +33,26 @@ TEST(tick_fire_ak_and_knife_melee) {
   ASSERT_STREQ(knife.status, "melee_hit");
 }
 
+TEST(tick_panel_blocks_combat) {
+  TickIn in;
+  in.xr.hmd.valid = true;
+  in.xr.panel_visible = true;
+  in.xr.right.valid = true;
+  in.xr.right.pos = {0, 0, 40};
+  in.xr.right.ang = {0, 90, 0};
+  in.xr.trigger_r = 0.9f;
+  in.xr.trigger_l = 0.9f;
+  in.wep = FindWeapon("weapon_knife");
+  in.world_melee_hit = true;
+  in.now = 1.f;
+  WallState L, R;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_FALSE(o.cmd.firing);
+  ASSERT_FALSE(o.melee.hit);
+  ASSERT_STREQ(o.laser.reason, "focus_primary");
+}
+
 TEST(tick_knife_sweep_uses_trace) {
   auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
     TraceHit t;

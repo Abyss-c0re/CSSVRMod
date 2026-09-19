@@ -130,6 +130,28 @@ TEST(input_y_click_lastinv) {
   ASSERT_FALSE(idle.lastinv);
 }
 
+TEST(input_panel_steals_combat) {
+  XrSample xr;
+  xr.trigger_r = 0.9f;
+  xr.grab_l = 1.f;
+  xr.panel_visible = true;
+  xr.a_click = true;
+  GunPose gun;
+  gun.valid = true;
+  gun.forward = {0, 1, 0};
+  InputConfig cfg;
+  auto cmd = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_FALSE(cmd.firing);
+  ASSERT_FALSE(cmd.melee_intent);
+  ASSERT_TRUE((cmd.buttons & kInAttack) == 0);
+  ASSERT_TRUE((cmd.buttons & kInAttack2) == 0);
+  ASSERT_TRUE((cmd.buttons & kInJump) != 0); // A still jumps
+  xr.panel_visible = false;
+  auto live = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_TRUE(live.firing);
+  ASSERT_TRUE((live.buttons & kInAttack) != 0);
+}
+
 TEST(input_stick_click_ducks) {
   XrSample xr;
   xr.stick_click_l = true;

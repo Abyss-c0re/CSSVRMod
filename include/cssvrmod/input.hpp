@@ -22,6 +22,7 @@ struct XrSample {
   bool x_click = false; // use / inspect
   bool y_click = false; // last weapon / knife
   bool stick_click_l = false; // duck (move-stick click; Cube sprint slot — CSS has no sprint)
+  bool panel_visible = false; // Vision 3D panel — steal trigger/grab from combat
 };
 
 struct UserCmdOverlay {
@@ -97,9 +98,11 @@ inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const Inp
   const bool primaryLeft = cfg.left_handed;
   const float fireAxis = primaryLeft ? xr.trigger_l : xr.trigger_r;
   const float meleeAxis = primaryLeft ? xr.trigger_r : xr.trigger_l;
-  o.firing = fireAxis >= cfg.trigger_thresh;
-  o.melee_intent = meleeAxis >= cfg.trigger_thresh ||
-                   (primaryLeft ? xr.grab_r : xr.grab_l) >= cfg.grab_thresh;
+  // Panel laser/grip own trigger+grab. Combat used to punch while moving Vision.
+  o.firing = !xr.panel_visible && fireAxis >= cfg.trigger_thresh;
+  o.melee_intent = !xr.panel_visible &&
+                   (meleeAxis >= cfg.trigger_thresh ||
+                    (primaryLeft ? xr.grab_r : xr.grab_l) >= cfg.grab_thresh);
   o.look_from_gun = o.firing && gun.valid;
   const Ang3 look = AimViewAngles(xr.hmd, gun, o.look_from_gun);
   o.view_pitch = AngleNormalize(look.p);
