@@ -85,6 +85,7 @@
 - [x] Snap-on-fire pitch wraps (cycle 119). VectorAngles look-up is 270°; ViewAnglesSane dropped usercmd / SetViewAngles.
 - [x] Vision panel steals combat (cycle 120). Trigger/grab on the 3D menu used to fire and melee. Jump/reload/use stay.
 - [x] Menu is Vision, not scoreboard (cycle 121). Menu click used to hold `IN_SCORE` while toggling the 3D panel. Right stick-click is TAB.
+- [x] Dual paint only when session_ok (cycle 122). Hook-in-CSS IPD-offset the desktop with no HMD / after stop. Stale HMD look dropped when not running.
 - [x] Stick-right turns right (cycle 108). Source +yaw is left; Cube subtracts on +thumbstick. Used to invert locomotion.
 - [x] Tick gun-slave / melee from primary hand (cycle 107). Left-handed used to keep the AK and knife on the right.
 - [x] `CUserCmd` overlay + CreateMove hook (RTTI/xmm0 self-test, cycle 8). Analog stick writes forwardmove.

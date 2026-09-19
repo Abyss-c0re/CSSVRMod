@@ -17,6 +17,12 @@ struct DualPaintResult {
   const char* reason = "idle";
 };
 
+/// Dual IPD paints only while OpenXR is wanted and session_ok.
+/// Hook-in-CSS used to offset the desktop even with no HMD / after stop.
+inline bool DualPaint_ShouldRun(bool xr_wanted, bool session_ok) {
+  return xr_wanted && session_ok;
+}
+
 /// paint(eye) must draw that camera. capture(eye) must copy that framebuffer.
 /// One paint or a failed capture leaves painted_dual false (heresy gate).
 inline DualPaintResult DualPaint_Run(const StereoViewIn& in, const DualPaintFn& paint,

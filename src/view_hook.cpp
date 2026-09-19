@@ -1,5 +1,6 @@
 #include "cssvrmod/view_hook.hpp"
 #include "cssvrmod/calib.hpp"
+#include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/dual_paint.hpp"
 #include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/launch.hpp"
@@ -9,6 +10,7 @@
 #include "cssvrmod/toast.hpp"
 #include "cssvrmod/usercmd.hpp"
 #include "cssvrmod/vk_eye.hpp"
+#include "cssvrmod/xr_session.hpp"
 #include "xr_host.hpp"
 
 #define GL_GLEXT_PROTOTYPES 1
@@ -142,6 +144,10 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
   Ang3 angles;
   float fov = 90.f;
   if (!ViewSetup_ReadPose(view, kBlob, g_loc.fields, &origin, &angles, &fov)) {
+    g_orig(self, view, clear, draw);
+    return;
+  }
+  if (!DualPaint_ShouldRun(CssvrWantXr(), XrSession_IsOkReason(XrHostStatus().reason))) {
     g_orig(self, view, clear, draw);
     return;
   }

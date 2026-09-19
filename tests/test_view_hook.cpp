@@ -3,6 +3,7 @@
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/module_base.hpp"
 #include "cssvrmod/view_hook.hpp"
+#include "cssvrmod/xr_session.hpp"
 #include "test_framework.h"
 #include <cstring>
 #include <vector>
@@ -37,6 +38,16 @@ TEST(dual_capture_vk_live_ignores_gl_blit) {
   ASSERT_TRUE(DualCapture_Accept(false, true, false));
   ASSERT_TRUE(DualCapture_Accept(true, true, false));
   ASSERT_FALSE(DualCapture_Accept(false, false, false));
+}
+
+TEST(dual_paint_only_when_session_ok) {
+  ASSERT_FALSE(DualPaint_ShouldRun(false, false));
+  ASSERT_FALSE(DualPaint_ShouldRun(true, false));
+  ASSERT_FALSE(DualPaint_ShouldRun(false, true));
+  ASSERT_TRUE(DualPaint_ShouldRun(true, true));
+  ASSERT_FALSE(XrSession_IsOkReason("no_hmd"));
+  ASSERT_FALSE(XrSession_IsOkReason("session_created"));
+  ASSERT_TRUE(XrSession_IsOkReason("session_ok"));
 }
 
 TEST(dual_paint_gate_needs_present) {

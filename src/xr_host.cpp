@@ -656,6 +656,7 @@ static void CacheHmdFromViewSpace() {
 }
 
 Pose XrHostLastHmd() {
+  if (!g_running) return {};
   std::lock_guard<std::mutex> lk(g_hmd_mu);
   return g_hmd_cache;
 }
