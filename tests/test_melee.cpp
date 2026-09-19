@@ -133,6 +133,15 @@ TEST(melee_finite_diff_is_relative_to_hmd) {
   ASSERT_NEAR(punch.x, 80.f, 0.1);
 }
 
+TEST(melee_vel_state_is_per_hand) {
+  HandVelState left, right, fallback;
+  ASSERT_EQ(HandVelForHand(Hand::Left, &left, &right), &left);
+  ASSERT_EQ(HandVelForHand(Hand::Right, &left, &right), &right);
+  ASSERT_EQ(HandVelForHand(Hand::Left, nullptr, &right, &fallback), &fallback);
+  ASSERT_EQ(HandVelForHand(Hand::Right, &left, nullptr, &fallback), &fallback);
+  ASSERT_EQ(HandVelForHand(Hand::Head, &left, &right, &fallback), &fallback);
+}
+
 TEST(melee_hand_vel_resets_on_stop) {
   Pose p;
   p.pos = {0, 0, 0};

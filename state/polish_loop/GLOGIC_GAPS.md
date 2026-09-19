@@ -114,6 +114,7 @@
 - [x] Off-hand fist melee uses the off-hand (cycle 157). Lua left is always fist; off-hand trigger used to hull the primary. Knife stays on the gun hand.
 - [x] Melee vel is relative to the HMD (cycle 158). Lua Get*HandVelocityRelative; world vel used to punch while walking.
 - [x] Melee finite-diff is relative to HMD pos (cycle 164). Live OpenXR never fills pose.vel; world delta used to punch while walking. No CSS damage dispatch.
+- [x] Melee vel is per-hand (cycle 167). Lua left/right relative vel are independent; one HandVelState used to finite-diff from the off-hand fist to the knife.
 - [ ] Live melee proven in-game (HMD). No guessed CSS damage dispatch.
 
 ## Honest limits (do not delete)

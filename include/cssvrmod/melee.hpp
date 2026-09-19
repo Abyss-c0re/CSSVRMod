@@ -160,6 +160,15 @@ inline void HandVel_Reset(HandVelState* s) {
   if (s) *s = HandVelState{};
 }
 
+/// Lua GetLeft/RightHandVelocityRelative are independent. One HandVelState
+/// used to finite-diff from the off-hand fist to the knife (fake swing).
+inline HandVelState* HandVelForHand(Hand h, HandVelState* left, HandVelState* right,
+                                    HandVelState* fallback = nullptr) {
+  if (h == Hand::Left && left) return left;
+  if (h == Hand::Right && right) return right;
+  return fallback;
+}
+
 /// Prefer XR linear vel (minus HMD). Else finite-diff. Live OpenXR never fills
 /// pose.vel, so a world delta used to punch while walking with the hands still.
 inline Vec3 HandVelOrDelta(const Pose& hand, float now, HandVelState* st, const Pose& hmd = {}) {

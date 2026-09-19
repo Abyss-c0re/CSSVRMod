@@ -486,6 +486,44 @@ TEST(tick_gun_hull_blocks_before_wrist) {
   ASSERT_TRUE(o.right_resolved.pos.x < 20.f);
 }
 
+TEST(tick_melee_vel_is_per_hand) {
+  // Shared finite-diff used to jump from off-hand fist to knife (~100u) and punch.
+  TickIn in;
+  in.xr.hmd.valid = true;
+  in.xr.hmd.pos = {0, 0, 40};
+  in.xr.left.valid = true;
+  in.xr.left.pos = {0, 0, 40};
+  in.xr.left.ang = {0, 0, 0};
+  in.xr.right.valid = true;
+  in.xr.right.pos = {100, 0, 40};
+  in.xr.right.ang = {0, 0, 0};
+  in.xr.trigger_l = 0.9f; // off-hand fist
+  in.world_melee_hit = true;
+  HandVelState Lvel, Rvel;
+  in.hand_vel_left = &Lvel;
+  in.hand_vel_right = &Rvel;
+  WallState L, R;
+  float next = 0.f;
+  Tick(in, L, R, &next);
+  in.now = 0.1f;
+  auto fist = Tick(in, L, R, &next);
+  ASSERT_FALSE(fist.melee.hit);
+  ASSERT_STREQ(fist.melee.reason, "below_threshold");
+
+  in.wep = FindWeapon("weapon_knife");
+  in.xr.trigger_l = 0.f;
+  in.now = 0.2f;
+  auto knife = Tick(in, L, R, &next);
+  ASSERT_FALSE(knife.melee.hit);
+  ASSERT_STREQ(knife.melee.reason, "below_threshold");
+
+  in.now = 0.3f;
+  in.xr.right.pos = {108, 0, 40}; // 80 u/s relative
+  auto slash = Tick(in, L, R, &next);
+  ASSERT_TRUE(slash.melee.hit);
+  ASSERT_EQ(static_cast<int>(slash.melee.hand), static_cast<int>(Hand::Right));
+}
+
 TEST(tick_empty_primary_is_not_a_gun) {
   // Live hook has no weapon query. Gun 10u hull / 18u barrel used to yank an empty fist.
   auto world = [](Vec3 start, Vec3 end, Vec3 mins, Vec3 maxs) {

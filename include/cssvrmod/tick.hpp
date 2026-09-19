@@ -22,8 +22,10 @@ struct TickIn {
   Ang3 current_view;
   float mouse_sens = 0.022f;
   TraceFn trace; // empty → skip wall / melee sweep
-  HandVelState* hand_vel = nullptr; // swinging melee hand (off-hand fist / primary knife)
-  TurnState* turn = nullptr;        // stick locomotion yaw (persists across ticks)
+  HandVelState* hand_vel = nullptr;       // fallback when per-hand states are unset
+  HandVelState* hand_vel_left = nullptr;  // Lua left relative vel
+  HandVelState* hand_vel_right = nullptr; // Lua right relative vel
+  TurnState* turn = nullptr;              // stick locomotion yaw (persists across ticks)
 };
 
 struct TickOut {
@@ -117,8 +119,10 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
       // Lua fist: pos + Forward * DEFAULT_OFFSET (5). Wrist-only left the knuckles short.
       ms.pos = knife ? hand.pos : MeleeHandOrigin(hand.pos, hand.ang);
       ms.dir = Forward(hand.ang);
-      ms.vel = HandVelOrDelta(hand, in.now, in.hand_vel, in.xr.hmd);
       ms.hand = MeleeSwingHandId(in.input.left_handed, knife);
+      ms.vel = HandVelOrDelta(
+          hand, in.now,
+          HandVelForHand(ms.hand, in.hand_vel_left, in.hand_vel_right, in.hand_vel), in.xr.hmd);
       ms.impact = knife ? in.wep->melee_impact : ImpactType::Fist;
       ms.use_weapon = knife;
       ms.is_melee_weapon = knife;

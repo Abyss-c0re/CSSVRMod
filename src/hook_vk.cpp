@@ -222,7 +222,7 @@ void* XrWorker(void*) {
   Log("xr worker start");
   TurnState turn;
   WallState leftWall, rightWall;
-  HandVelState rightVel;
+  HandVelState leftVel, rightVel;
   float nextMelee = 0.f;
   float now = 0.f;
   while (true) {
@@ -230,6 +230,7 @@ void* XrWorker(void*) {
       Turn_Reset(&turn);
       Wall_Reset(&leftWall);
       Wall_Reset(&rightWall);
+      HandVel_Reset(&leftVel);
       HandVel_Reset(&rightVel);
       nextMelee = 0.f;
       now = 0.f;
@@ -270,7 +271,8 @@ void* XrWorker(void*) {
         tin.input.left_handed = Input_LeftHandedLive();
         tin.current_view = xr.hmd.ang;
         tin.trace = EngineMakeTraceFn(g_eng);
-        tin.hand_vel = &rightVel;
+        tin.hand_vel_left = &leftVel;
+        tin.hand_vel_right = &rightVel;
         tin.turn = &turn;
         TickOut tout = Tick(tin, leftWall, rightWall, &nextMelee);
         now += 0.011f;
