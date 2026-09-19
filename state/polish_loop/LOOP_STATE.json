@@ -5,7 +5,7 @@
   "started_at": "2026-09-19T04:00:29Z",
   "last_focus": "input-turn-accumulates",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "6b13a0b",
+  "last_commit": "725fc45",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
