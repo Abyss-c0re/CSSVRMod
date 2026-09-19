@@ -1,13 +1,13 @@
-# Cycle 120 — 2026-09-19
+# Cycle 121 — 2026-09-19
 
 ## Focus
 
-`menu-steals-combat` — Vision panel trigger/grab used to fire and melee.
+`menu-not-score` — menu click held `IN_SCORE` while toggling the Vision panel.
 
 ## Did
 
-- Recovered cycle 119 tip `c781e92`. CSS is not running. Log still has no `icvar ver=`.
-- Panel-visible steals trigger/grab from attack and melee. Jump/reload/use stay. Laser reason `focus_primary`.
+- Recovered cycle 120 tip `907286f`. CSS is not running. Log still has no `icvar ver=`.
+- Menu is Vision only. Right stick-click is scoreboard (`+showscores` / TAB).
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-144 passed / 0 failed (1071 asserts)
+145 passed / 0 failed (1074 asserts)
 
 ## Next
 

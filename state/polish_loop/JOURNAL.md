@@ -516,6 +516,10 @@ Snap-on-fire pitch wraps. VectorAngles look-up is 270°; ViewAnglesSane dropped 
 
 Vision panel steals combat. Trigger/grab on the 3D menu used to fire and melee. Offline 144/144. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 121
+
+Menu is Vision, not scoreboard. Menu click used to hold IN_SCORE while toggling the 3D panel. Right stick-click is TAB. Offline 145/145. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
