@@ -1,23 +1,23 @@
-# Cycle 145 — 2026-09-19
+# Cycle 147 — 2026-09-19
 
 ## Focus
 
-`gun-hull-offset` — wrist-only hull left the gun body in the wall.
+`offhand-hull-knuckle-offset` — Lua processHand samples the off-hand sphere 2.5u along forward.
 
 ## Did
 
-- Wired Lua `AdjustCollisionsBox` on the primary hand: sweep the 10u (3u melee) gun sample, apply that delta back to the wrist. Off-hand stays a wrist sphere. Nearby walls / teleport release / 40u clamp unchanged.
-- Offline 161/161. Not HMD-proven.
+- Recovered cycle 146 tip `bdf41cf` (`855938d` on origin). CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`. Product commit `4111583`.
+- Wrist-only off-hand hull left the knuckles in the wall. Tick now samples `HandCollisionSample` (2.5u) on the off-hand; gun hand still uses AdjustCollisionsBox. Still a sphere, not a gun box.
 
 ## Did not
 
-- HMD walk. Stereo unproven. CSS is not running; log still has no `icvar ver=`.
+- HMD walk. Stereo unproven.
 - Queue `dual-renderview-ipd-origin`.
 - Invent print/help/menu/toast/cfg chrome.
 
 ## Tests
 
-`cssvrmod_tests` 161 passed, 0 failed (1139/1139 asserts)
+`cssvrmod_tests` 163/163 (1145 asserts). Offline green ≠ stereo/HMD.
 
 ## Next
 
