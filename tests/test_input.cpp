@@ -152,6 +152,21 @@ TEST(input_panel_steals_combat) {
   ASSERT_TRUE((live.buttons & kInAttack) != 0);
 }
 
+TEST(input_menu_is_not_score) {
+  XrSample xr;
+  xr.menu = true;
+  GunPose gun;
+  InputConfig cfg;
+  auto cmd = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_TRUE((cmd.buttons & kInScore) == 0);
+  xr.menu = false;
+  xr.stick_click_r = true;
+  auto tab = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_TRUE((tab.buttons & kInScore) != 0);
+  auto p = PlanSdlInject(tab, Ang3{0, 0, 0}, 0.022f);
+  ASSERT_TRUE(p.key_tab);
+}
+
 TEST(input_stick_click_ducks) {
   XrSample xr;
   xr.stick_click_l = true;

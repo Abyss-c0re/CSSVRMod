@@ -456,6 +456,7 @@ bool SetupInput() {
   bind(g_click_x, cube_xr::path::leftXClick);
   bind(g_click_y, cube_xr::path::leftYClick);
   bind(g_stick_click, cube_xr::path::leftThumbClick);
+  bind(g_stick_click, cube_xr::path::rightThumbClick);
   XrInteractionProfileSuggestedBinding sug{XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING};
   sug.interactionProfile = prof;
   sug.countSuggestedBindings = static_cast<uint32_t>(nb);
@@ -834,6 +835,7 @@ bool XrHostPollInput(XrSample* out) {
   out->x_click = bval(g_click_x, 0);
   out->y_click = bval(g_click_y, 0);
   out->stick_click_l = bval(g_stick_click, 0);
+  out->stick_click_r = bval(g_stick_click, 1);
   pose(0, &out->left);
   pose(1, &out->right);
   SyncMenuHandedness();

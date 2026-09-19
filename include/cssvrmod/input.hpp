@@ -16,12 +16,13 @@ struct XrSample {
   float grab_l = 0.f, grab_r = 0.f;
   float stick_lx = 0.f, stick_ly = 0.f;
   float stick_rx = 0.f, stick_ry = 0.f;
-  bool menu = false;
+  bool menu = false; // Vision panel toggle — not scoreboard
   bool a_click = false; // jump
   bool b_click = false; // reload
   bool x_click = false; // use / inspect
   bool y_click = false; // last weapon / knife
   bool stick_click_l = false; // duck (move-stick click; Cube sprint slot — CSS has no sprint)
+  bool stick_click_r = false; // scoreboard (Cube weapon-menu slot)
   bool panel_visible = false; // Vision 3D panel — steal trigger/grab from combat
 };
 
@@ -124,7 +125,7 @@ inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const Inp
   if (xr.x_click) o.buttons |= kInUse;
   if (xr.y_click) o.lastinv = true;
   if (xr.stick_click_l) o.buttons |= kInDuck;
-  if (xr.menu) o.buttons |= kInScore;
+  if (xr.stick_click_r) o.buttons |= kInScore;
 
   // Right stick: Source +yaw is left. Cube subtracts on stick-right (look right).
   const float rx = ApplyDead(xr.stick_rx, cfg.stick_dead);
