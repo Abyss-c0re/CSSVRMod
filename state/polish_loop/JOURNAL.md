@@ -624,6 +624,34 @@ Idle hunt. CSS not running. No icvar register line. Collision path just shipped;
 
 Off-hand hull sample is 2.5u ahead of the wrist. Wrist-only sphere left the knuckles in the wall. Still a sphere, not a gun box. Offline 163/163. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 148
+
+Idle hunt. CSS not running. No icvar register line. Collision path just shipped; remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 149
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 150
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 151
+
+Idle hunt. CSS not running. No icvar register line. Fist melee origin left unwired (no helper-ladder). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 152
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 153
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 154
+
+Fist melee origin is 5u along hand forward. Wrist-only 5u reach left the knuckles short. Off-hand still swings from primary. Offline 165/165. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

@@ -108,6 +108,7 @@
 - [x] Trace miss toasts once (cycle 19). Missing iface / failed self-test is not silent.
 - [ ] Live wall collision proven in-game (HMD).
 - [x] Melee hull sweep + pose-delta vel in Tick (cycle 10). Start-solid is not a hit.
+- [x] Fist melee origin is 5u along hand forward (cycle 154). Lua DEFAULT_OFFSET; wrist-only 5u reach left the knuckles short. Off-hand still swings from primary. No CSS damage dispatch.
 - [ ] Live melee proven in-game (HMD). No guessed CSS damage dispatch.
 
 ## Honest limits (do not delete)
