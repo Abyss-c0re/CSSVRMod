@@ -21,6 +21,7 @@ struct XrSample {
   bool b_click = false; // reload
   bool x_click = false; // use / inspect
   bool y_click = false; // last weapon / knife
+  bool stick_click_l = false; // duck (move-stick click; Cube sprint slot — CSS has no sprint)
 };
 
 struct UserCmdOverlay {
@@ -118,6 +119,7 @@ inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const Inp
   if (xr.b_click) o.buttons |= kInReload;
   if (xr.x_click) o.buttons |= kInUse;
   if (xr.y_click) o.lastinv = true;
+  if (xr.stick_click_l) o.buttons |= kInDuck;
   if (xr.menu) o.buttons |= kInScore;
 
   // Right stick: Source +yaw is left. Cube subtracts on stick-right (look right).

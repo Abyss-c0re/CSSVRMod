@@ -114,6 +114,21 @@ TEST(input_y_click_lastinv) {
   ASSERT_FALSE(idle.lastinv);
 }
 
+TEST(input_stick_click_ducks) {
+  XrSample xr;
+  xr.stick_click_l = true;
+  GunPose gun;
+  InputConfig cfg;
+  auto cmd = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_TRUE((cmd.buttons & kInDuck) != 0);
+  ASSERT_TRUE((cmd.buttons & kInJump) == 0);
+  auto p = PlanSdlInject(cmd, Ang3{0, 0, 0}, 0.022f);
+  ASSERT_TRUE(p.key_ctrl);
+  xr.stick_click_l = false;
+  auto idle = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_TRUE((idle.buttons & kInDuck) == 0);
+}
+
 TEST(input_deadzone_and_sdl_plan) {
   ASSERT_NEAR(ApplyDead(0.05f, 0.18f), 0.f, 1e-6);
   ASSERT_TRUE(ApplyDead(1.f, 0.18f) > 0.9f);

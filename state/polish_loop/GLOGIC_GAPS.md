@@ -78,6 +78,7 @@
 - [x] HMD look includes stick-turn yaw (cycle 113). RenderView used to SetViewAngles(HMD) and clobber CreateMove locomotion.
 - [x] ICvar vstdlib NOLOAD is lazy (cycle 112). NOW+NOLOAD can miss a no-SONAME libvstdlib; basename matches maps `(deleted)`.
 - [x] XR B/X/Y + lastinv (cycle 111). Only A was bound; InputMap already mapped reload/use but Y never fired `lastinv`.
+- [x] Left stick-click ducks (cycle 117). `kInDuck` / SDL ctrl existed; InputMap never set them; VK present had no `+duck`. Cube sprint slot — CSS has no sprint.
 - [x] VK ClientCmd edges match GL (cycle 110). Present path dropped +use / +attack2 / +showscores; melee and use never fired without CreateMove.
 - [x] Stick-turn yaw persists across ticks (cycle 109). One-frame offset on HMD yaw never rotated. Snap latches like Cube.
 - [x] Stick-right turns right (cycle 108). Source +yaw is left; Cube subtracts on +thumbstick. Used to invert locomotion.

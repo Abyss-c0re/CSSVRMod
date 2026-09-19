@@ -100,6 +100,7 @@ inline int ClientCmd_FillEdges(ClientCmdEdge* out, int n) {
       {kInAttack, "+attack", "-attack", false},
       {kInAttack2, "+attack2", "-attack2", false},
       {kInJump, "+jump", "-jump", false},
+      {kInDuck, "+duck", "-duck", false},
       {kInReload, "+reload", "-reload", false},
       {kInUse, "+use", "-use", false},
       {kInScore, "+showscores", "-showscores", false},
