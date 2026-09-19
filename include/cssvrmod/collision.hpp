@@ -17,6 +17,8 @@ constexpr float kWallReleaseFromHmdSqr = 100.f * 100.f;
 constexpr float kMaxLastFreeDistSqr = 48.f * 48.f;
 constexpr float kMaxHandCorrection = 40.f;
 constexpr float kMinHandCorrectionSqr = 0.35f * 0.35f;
+// Lua processHand: min(DEFAULT_OFFSET, 2.5). Knuckles, not the controller body.
+constexpr float kHandSampleOffset = 2.5f;
 
 struct Aabb {
   Vec3 mins;
@@ -82,6 +84,12 @@ inline Vec3 AdjustCollisionsBox(Vec3 pos, const Ang3& ang, bool isMelee) {
   const float leftOffset = isMelee ? 1.f : 1.5f;
   const float upOffset = 4.f;
   return pos + fwd * forwardOffset - right * leftOffset + up * upOffset;
+}
+
+/// Lua: off-hand sphere sits 2.5u along forward (fist/knuckles). Wrist-only left the
+/// palm in the wall. Gun hand still uses AdjustCollisionsBox.
+inline Vec3 HandCollisionSample(Vec3 pos, const Ang3& ang) {
+  return pos + Forward(ang) * kHandSampleOffset;
 }
 
 /// Lua: sweep the gun hull sample, apply that delta back to the wrist.

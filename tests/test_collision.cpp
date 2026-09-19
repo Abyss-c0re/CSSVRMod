@@ -104,6 +104,15 @@ TEST(collision_adjust_box_offsets_gun_forward) {
   ASSERT_NEAR(wrist.x, 18.f, 0.1);
 }
 
+TEST(collision_offhand_sample_is_knuckles) {
+  const Vec3 s = HandCollisionSample({20, 0, 40}, {0, 0, 0}); // +X
+  ASSERT_NEAR(s.x, 22.5f, 0.05);
+  ASSERT_NEAR(s.y, 0.f, 0.05);
+  ASSERT_NEAR(s.z, 40.f, 0.05);
+  const Vec3 left = HandCollisionSample({0, 0, 0}, {0, 90, 0}); // +Y
+  ASSERT_NEAR(left.y, 2.5f, 0.05);
+}
+
 TEST(collision_wall_resets_on_stop) {
   WallState st;
   st.last_free = {50, 0, 40};

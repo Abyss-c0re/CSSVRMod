@@ -275,6 +275,47 @@ TEST(tick_wall_correction_caps_last_free_yank) {
   ASSERT_NEAR(o.right_resolved.pos.x, 40.f, 1.f);
 }
 
+TEST(tick_offhand_hull_blocks_before_wrist) {
+  // Wrist is free; knuckles 2.5u ahead are in the wall. Point traces (tip) miss
+  // so this is the off-hand sphere offset, not the gun box / barrel ray.
+  auto world = [](Vec3 start, Vec3 end, Vec3 mins, Vec3 maxs) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    const bool hull = mins.LengthSqr() > 0.01f || maxs.LengthSqr() > 0.01f;
+    if (!hull) return t;
+    auto solid = [](const Vec3& p) { return p.x >= 22.f; };
+    t.start_solid = solid(start);
+    t.all_solid = solid(start) && solid(end);
+    if (t.start_solid) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = start;
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = 0.f;
+      return t;
+    }
+    if (start.x < 22.f && end.x >= 22.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = {22, start.y, start.z};
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = (22.f - start.x) / (end.x - start.x);
+    }
+    return t;
+  };
+  TickIn in;
+  in.xr.left.valid = true;
+  in.xr.left.pos = {20, 0, 40};
+  in.xr.left.ang = {0, 0, 0}; // +X, knuckle sample ~2.5u ahead
+  in.trace = world;
+  WallState L, R;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_TRUE(o.left_wall.clipped);
+  ASSERT_TRUE(o.left_resolved.pos.x < 20.f);
+}
+
 TEST(tick_gun_hull_blocks_before_wrist) {
   // Wrist is free; the 10u gun sample is in the wall. Point traces (tip) miss
   // so this is the hull offset, not the barrel ray.

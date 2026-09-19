@@ -50,8 +50,8 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
     auto resolve = [&](const Pose& hand, bool primary, WallState& st, WallResolve* wall,
                        Pose* resolved) {
       if (!hand.valid) return;
-      const Vec3 sample =
-          primary ? AdjustCollisionsBox(hand.pos, hand.ang, melee) : hand.pos;
+      const Vec3 sample = primary ? AdjustCollisionsBox(hand.pos, hand.ang, melee)
+                                  : HandCollisionSample(hand.pos, hand.ang);
       *wall = ResolveHandWallSweep(sample, st, in.hand_radius, in.wall_pad, in.trace);
       *wall = ApplyWallLockRelease(*wall, st, sample, in.xr.hmd.valid, in.xr.hmd.pos);
       const Vec3 safe = ApplyHandCorrection(sample, wall->pos);
