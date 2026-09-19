@@ -1,13 +1,13 @@
-# Cycle 121 — 2026-09-19
+# Cycle 122 — 2026-09-19
 
 ## Focus
 
-`menu-not-score` — menu click held `IN_SCORE` while toggling the Vision panel.
+`dual-only-when-session-ok` — hook IPD-offset the desktop with no HMD / after stop.
 
 ## Did
 
-- Recovered cycle 120 tip `907286f`. CSS is not running. Log still has no `icvar ver=`.
-- Menu is Vision only. Right stick-click is scoreboard (`+showscores` / TAB).
+- Recovered cycle 121 tip `09c43bf`. CSS is not running. Log still has no `icvar ver=`.
+- Dual paint + HMD look only when XR wanted and `session_ok`. Stale HMD pose ignored when not running.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-145 passed / 0 failed (1074 asserts)
+146 passed / 0 failed (1081 asserts)
 
 ## Next
 

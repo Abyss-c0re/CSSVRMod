@@ -520,6 +520,10 @@ Vision panel steals combat. Trigger/grab on the 3D menu used to fire and melee. 
 
 Menu is Vision, not scoreboard. Menu click used to hold IN_SCORE while toggling the 3D panel. Right stick-click is TAB. Offline 145/145. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 122
+
+Dual paint only when session_ok. Hook-in-CSS IPD-offset the desktop with no HMD / after stop. Offline 146/146. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
