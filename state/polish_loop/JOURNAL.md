@@ -664,6 +664,10 @@ Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unch
 
 Off-hand fist melee uses the off-hand (`20d9e1f`). Off-hand trigger used to hull the primary. Knife stays on the gun hand. Offline 167/167. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 158
+
+Melee vel is relative to the HMD (`467ae0a`). World vel used to punch while walking. Offline 169/169. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

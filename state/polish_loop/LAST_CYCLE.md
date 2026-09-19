@@ -1,13 +1,13 @@
-# Cycle 157 — 2026-09-19
+# Cycle 158 — 2026-09-19
 
 ## Focus
 
-`offhand-fist-melee-origin` — Lua left is always fist; off-hand trigger must hull the off-hand.
+`melee-vel-relative-to-hmd` — Lua Get*HandVelocityRelative; world vel used to punch while walking.
 
 ## Did
 
-- Recovered cycle 156 tip `70e2284` (`c69703b` on origin). CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`. Product commit `20d9e1f`.
-- Fist melee used the primary pose even when `melee_intent` came from the off-hand trigger. Tick now uses `MeleeSwingPose` / `MeleeSwingHandId`: knife stays on the gun hand; fist hulls the off-hand knuckles. No CSS damage dispatch.
+- Recovered cycle 157 tip `20d9e1f` (`c583215` on origin). CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`. Product commit `467ae0a`.
+- Tick used raw hand world vel for melee gates. Walking with the HMD (hand.vel == hmd.vel) crossed the 75 u/s threshold. `MeleeVelRelative` subtracts HMD vel like Lua. No CSS damage dispatch.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 167/167 (1161 asserts). Offline green ≠ stereo/HMD.
+`cssvrmod_tests` 169/169 (1168 asserts). Offline green ≠ stereo/HMD.
 
 ## Next
 
