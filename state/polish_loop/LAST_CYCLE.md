@@ -1,13 +1,13 @@
-# Cycle 122 — 2026-09-19
+# Cycle 123 — 2026-09-19
 
 ## Focus
 
-`dual-only-when-session-ok` — hook IPD-offset the desktop with no HMD / after stop.
+`overlay-clears-on-stop` — last stick/buttons kept walking after `cssvr_stop`.
 
 ## Did
 
-- Recovered cycle 121 tip `09c43bf`. CSS is not running. Log still has no `icvar ver=`.
-- Dual paint + HMD look only when XR wanted and `session_ok`. Stale HMD pose ignored when not running.
+- Recovered cycle 122 tip `cea9dc2`. CSS is not running. Log still has no `icvar ver=`.
+- PeekOverlay / Turn_PeekYawOff refuse when XR is off. Shutdown clears the overlay.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-146 passed / 0 failed (1081 asserts)
+147 passed / 0 failed (1086 asserts)
 
 ## Next
 
