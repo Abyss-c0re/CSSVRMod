@@ -544,6 +544,10 @@ Idle hunt. CSS not running. No icvar register line. Session teardown left live-g
 
 Vision panel freezes stick-turn. Menu owns stick-Y/X; turn used to spin the world under the quad. Existing yaw_off stays. Offline 150/150. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 128
+
+Stick-turn yaw resets on stop. Worker/GL TurnState used to keep heading across cssvr_stop. Offline 151/151. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

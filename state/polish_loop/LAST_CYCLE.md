@@ -1,14 +1,14 @@
-# Cycle 127 — 2026-09-19
+# Cycle 128 — 2026-09-19
 
 ## Focus
 
-`panel-freeze-stick-turn` — Vision panel owns the right stick; locomotion turn must not spin the world under the quad.
+`turn-reset-on-stop` — stick-turn yaw must not survive cssvr_stop.
 
 ## Did
 
-- Recovered cycle 126 tip `a027028`. CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`.
-- InputMap skips `Input_StickTurn` while `panel_visible`. Existing `yaw_off` still applies (heading kept). Move / jump / reload / use unchanged.
-- Tests: `input_panel_freezes_stick_turn`, `tick_panel_freezes_stick_turn`. Offline 150/150.
+- Recovered cycle 127 tip `f462c8b`. CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`.
+- `Turn_Reset` zeros yaw_off + snap latch. VK worker and GL swap call it when XR is off. Overlay clear already zeroed the peek; the live TurnState did not.
+- Test: `input_turn_resets_on_stop`. Offline 151/151.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 150 passed, 0 failed (1096/1096 asserts)
+`cssvrmod_tests` 151 passed, 0 failed (1099/1099 asserts)
 
 ## Next
 
