@@ -117,7 +117,7 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
       // Lua fist: pos + Forward * DEFAULT_OFFSET (5). Wrist-only left the knuckles short.
       ms.pos = knife ? hand.pos : MeleeHandOrigin(hand.pos, hand.ang);
       ms.dir = Forward(hand.ang);
-      ms.vel = MeleeVelRelative(HandVelOrDelta(hand, in.now, in.hand_vel), in.xr.hmd);
+      ms.vel = HandVelOrDelta(hand, in.now, in.hand_vel, in.xr.hmd);
       ms.hand = MeleeSwingHandId(in.input.left_handed, knife);
       ms.impact = knife ? in.wep->melee_impact : ImpactType::Fist;
       ms.use_weapon = knife;

@@ -116,6 +116,23 @@ TEST(melee_sweep_and_vel_delta) {
   ASSERT_NEAR(v1.x, 80.f, 0.1);
 }
 
+TEST(melee_finite_diff_is_relative_to_hmd) {
+  // Live OpenXR leaves pose.vel empty; world delta used to punch while walking.
+  Pose hand;
+  hand.pos = {0, 0, 40};
+  Pose hmd;
+  hmd.valid = true;
+  hmd.pos = {0, 0, 40};
+  HandVelState st;
+  ASSERT_NEAR(HandVelOrDelta(hand, 0.f, &st, hmd).Length(), 0.f, 0.001);
+  hand.pos = {8, 0, 40};
+  hmd.pos = {8, 0, 40};
+  ASSERT_NEAR(HandVelOrDelta(hand, 0.1f, &st, hmd).Length(), 0.f, 0.001);
+  hand.pos = {16, 0, 40}; // 80 u/s relative, HMD still
+  auto punch = HandVelOrDelta(hand, 0.2f, &st, hmd);
+  ASSERT_NEAR(punch.x, 80.f, 0.1);
+}
+
 TEST(melee_hand_vel_resets_on_stop) {
   Pose p;
   p.pos = {0, 0, 0};

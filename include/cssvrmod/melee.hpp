@@ -160,20 +160,22 @@ inline void HandVel_Reset(HandVelState* s) {
   if (s) *s = HandVelState{};
 }
 
-/// Prefer XR linear vel. Else finite difference. First sample is zero.
-inline Vec3 HandVelOrDelta(const Pose& hand, float now, HandVelState* st) {
-  if (hand.vel.LengthSqr() > 1e-4f) return hand.vel;
+/// Prefer XR linear vel (minus HMD). Else finite-diff. Live OpenXR never fills
+/// pose.vel, so a world delta used to punch while walking with the hands still.
+inline Vec3 HandVelOrDelta(const Pose& hand, float now, HandVelState* st, const Pose& hmd = {}) {
+  if (hand.vel.LengthSqr() > 1e-4f) return MeleeVelRelative(hand.vel, hmd);
   if (!st) return {};
+  const Vec3 sample = hmd.valid ? (hand.pos - hmd.pos) : hand.pos;
   if (!st->have) {
-    st->last = hand.pos;
+    st->last = sample;
     st->t = now;
     st->have = true;
     return {};
   }
   const float dt = now - st->t;
   Vec3 v{};
-  if (dt > 1e-4f && dt < 0.25f) v = (hand.pos - st->last) * (1.f / dt);
-  st->last = hand.pos;
+  if (dt > 1e-4f && dt < 0.25f) v = (sample - st->last) * (1.f / dt);
+  st->last = sample;
   st->t = now;
   return v;
 }

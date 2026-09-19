@@ -148,6 +148,34 @@ TEST(tick_offhand_fist_ignores_primary_swing) {
   ASSERT_NEAR(o.melee.src.x, 105.f, 0.1);
 }
 
+TEST(tick_melee_finite_diff_ignores_hmd_walk) {
+  TickIn in;
+  in.xr.hmd.valid = true;
+  in.xr.hmd.pos = {0, 0, 40};
+  in.xr.left.valid = true;
+  in.xr.left.pos = {0, 0, 40};
+  in.xr.left.ang = {0, 0, 0};
+  in.xr.trigger_l = 0.9f;
+  in.world_melee_hit = true;
+  HandVelState vel;
+  in.hand_vel = &vel;
+  in.now = 0.f;
+  WallState L, R;
+  float next = 0.f;
+  Tick(in, L, R, &next);
+  in.now = 0.1f;
+  in.xr.hmd.pos = {8, 0, 40};
+  in.xr.left.pos = {8, 0, 40};
+  auto walk = Tick(in, L, R, &next);
+  ASSERT_FALSE(walk.melee.hit);
+  ASSERT_STREQ(walk.melee.reason, "below_threshold");
+
+  in.now = 0.2f;
+  in.xr.left.pos = {16, 0, 40}; // 80 u/s relative
+  auto punch = Tick(in, L, R, &next);
+  ASSERT_TRUE(punch.melee.hit);
+}
+
 TEST(tick_melee_ignores_hmd_walk) {
   // World 80 u/s on both HMD and fist — Lua relative vel is 0; used to punch.
   TickIn in;
