@@ -16,13 +16,14 @@ inline LookDecision Look_Decide(const Pose& hmd, const GunPose* gun, bool firing
   d.angles = game;
   if (firing && gun && gun->valid) {
     d.angles = VectorAngles(gun->forward);
+    d.angles.y = AngleNormalize(d.angles.y);
     d.applied = true;
     d.reason = "snap_fire";
     return d;
   }
   if (hmd.valid) {
     d.angles = hmd.ang;
-    d.angles.y += yaw_off; // stick locomotion; RenderView used to clobber CreateMove yaw
+    d.angles.y = AngleNormalize(d.angles.y + yaw_off);
     d.applied = true;
     d.reason = "hmd";
     return d;

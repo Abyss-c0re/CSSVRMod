@@ -88,6 +88,7 @@ inline void Input_StickTurn(TurnState* t, float rx, const InputConfig& cfg, floa
   } else if (cfg.smooth_turn) {
     t->yaw_off -= rx * cfg.turn_speed * (dt > 0.f ? dt : 0.011f);
   }
+  t->yaw_off = AngleNormalize(t->yaw_off);
 }
 
 inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const InputConfig& cfg,
@@ -127,7 +128,7 @@ inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const Inp
   TurnState once;
   TurnState* t = turn ? turn : &once;
   Input_StickTurn(t, rx, cfg, dt);
-  o.view_yaw += t->yaw_off;
+  o.view_yaw = AngleNormalize(o.view_yaw + t->yaw_off);
   o.reason = o.look_from_gun ? "aim_gun" : "aim_hmd";
   return o;
 }

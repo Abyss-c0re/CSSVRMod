@@ -28,6 +28,16 @@ TEST(look_hmd_includes_stick_turn) {
   ASSERT_NEAR(d.angles.p, 0.f, 0.001);
 }
 
+TEST(look_stick_turn_wraps_sane) {
+  Pose hmd;
+  hmd.ang = {0.f, 10.f, 0.f};
+  hmd.valid = true;
+  auto d = Look_Decide(hmd, nullptr, false, Ang3{0, 0, 0}, 800.f);
+  ASSERT_TRUE(d.applied);
+  ASSERT_TRUE(ViewAnglesSane(d.angles));
+  ASSERT_NEAR(d.angles.y, AngleNormalize(810.f), 0.01f);
+}
+
 TEST(look_invalid_hmd_keeps_game) {
   Pose hmd;
   hmd.ang = {9.f, 9.f, 0.f};

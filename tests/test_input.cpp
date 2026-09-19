@@ -76,6 +76,22 @@ TEST(input_smooth_turn_accumulates) {
   ASSERT_NEAR(b.view_yaw, -180.f, 1.f);
 }
 
+TEST(input_smooth_turn_stays_sane) {
+  XrSample xr;
+  xr.hmd.valid = true;
+  xr.stick_rx = 1.f;
+  GunPose gun;
+  InputConfig cfg;
+  cfg.smooth_turn = true;
+  cfg.snap_turn = false;
+  cfg.turn_speed = 90.f;
+  TurnState t;
+  UserCmdOverlay last;
+  for (int i = 0; i < 12; ++i) last = InputMap(xr, gun, cfg, 1.f, &t);
+  ASSERT_TRUE(std::fabs(t.yaw_off) <= 180.f);
+  ASSERT_TRUE(std::fabs(last.view_yaw) <= 180.f);
+}
+
 TEST(input_snap_turn_latches) {
   XrSample xr;
   xr.hmd.valid = true;

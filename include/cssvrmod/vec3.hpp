@@ -107,6 +107,14 @@ inline float AngleDeltaDeg(float from, float to) {
   return d;
 }
 
+/// Source QAngle wrap. Stick-turn used to grow past ±720 so ViewAnglesSane dropped look.
+inline float AngleNormalize(float a) {
+  a = std::fmod(a, 360.f);
+  if (a > 180.f) a -= 360.f;
+  if (a < -180.f) a += 360.f;
+  return a;
+}
+
 struct Pose {
   Vec3 pos;
   Ang3 ang;
