@@ -504,7 +504,27 @@ TEST(tick_empty_primary_is_not_a_gun) {
   float next = 0.f;
   auto o = Tick(in, L, R, &next);
   ASSERT_FALSE(o.right_wall.clipped);
+  ASSERT_FALSE(o.gun.valid);
   ASSERT_NEAR(o.right_resolved.pos.x, 20.f, 0.1);
+}
+
+TEST(tick_empty_fire_keeps_hmd_look) {
+  // Fist +Y would snap view to 90 if GunFromHand ran with the default offset.
+  TickIn in;
+  in.xr.hmd.valid = true;
+  in.xr.hmd.ang = {0, 0, 0};
+  in.xr.right.valid = true;
+  in.xr.right.pos = {0, 0, 40};
+  in.xr.right.ang = {0, 90, 0};
+  in.xr.trigger_r = 0.9f;
+  WallState L, R;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_TRUE(o.cmd.firing);
+  ASSERT_FALSE(o.gun.valid);
+  ASSERT_FALSE(o.cmd.look_from_gun);
+  ASSERT_NEAR(o.cmd.view_yaw, 0.f, 2.f);
+  ASSERT_STREQ(o.cmd.reason, "aim_hmd");
 }
 
 TEST(tick_weapon_tip_blocks_muzzle) {

@@ -89,8 +89,12 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
       }
     }
   }
-  o.gun = GunFromHand(primary, off);
-  o.aim = ResolveMuzzle(o.gun, primary);
+  // Default WeaponOffset used to slave a phantom 12u muzzle on an empty fist.
+  // Live Tick has no weapon query; snap-on-fire must stay on the HMD.
+  if (WeaponIsGun(in.wep)) {
+    o.gun = GunFromHand(primary, off);
+    o.aim = ResolveMuzzle(o.gun, primary);
+  }
 
   LaserOpts lo;
   lo.vr_active = in.xr.hmd.valid;
