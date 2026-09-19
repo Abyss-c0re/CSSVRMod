@@ -600,6 +600,22 @@ Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No
 
 Hand correction clamps to 40u and dead-zones hull noise. Last-free used to snap 70u when rest was solid. Nearby walls still clip. Offline 159/159. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 142
+
+Idle hunt. CSS not running. No icvar register line. AdjustCollisionsBox left unwired (no helper-ladder). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 143
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 144
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 145
+
+Gun hull sample is 10u ahead of the wrist. Wrist-only sweep left the gun body in the wall. Off-hand stays a sphere. Offline 161/161. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

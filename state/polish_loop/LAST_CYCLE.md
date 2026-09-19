@@ -1,13 +1,13 @@
-# Cycle 141 — 2026-09-19
+# Cycle 145 — 2026-09-19
 
 ## Focus
 
-`hand-correction-clamp` — last-free hull used to snap the hand 70u when rest was solid.
+`gun-hull-offset` — wrist-only hull left the gun body in the wall.
 
 ## Did
 
-- Wired Lua `ApplyHandCorrection`: dead-zone hull noise (<0.35u) and cap yanks at 40u. Nearby walls still clip; teleport release still drops last-free past 100u from the HMD.
-- Offline 159/159. Not HMD-proven.
+- Wired Lua `AdjustCollisionsBox` on the primary hand: sweep the 10u (3u melee) gun sample, apply that delta back to the wrist. Off-hand stays a wrist sphere. Nearby walls / teleport release / 40u clamp unchanged.
+- Offline 161/161. Not HMD-proven.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 159 passed, 0 failed (1133/1133 asserts)
+`cssvrmod_tests` 161 passed, 0 failed (1139/1139 asserts)
 
 ## Next
 

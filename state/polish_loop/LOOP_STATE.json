@@ -1,11 +1,11 @@
 {
-  "cycle": 141,
+  "cycle": 145,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-19T10:58:27Z",
-  "last_focus": "hand-correction-clamp",
+  "started_at": "2026-09-19T11:50:46Z",
+  "last_focus": "gun-hull-offset",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "c08e748",
+  "last_commit": "bdf41cf",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }

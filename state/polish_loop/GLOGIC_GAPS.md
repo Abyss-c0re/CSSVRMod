@@ -103,6 +103,7 @@
 - [x] Weapon tip pulls the primary hand (cycle 133). Tick hulled the wrist then slaved a barrel through the wall. Lua ApplyWeaponWallToHand.
 - [x] Wall lock releases when last-free is >100u from the HMD (cycle 137). Spawn/teleport used to yank the hand to the old map pose.
 - [x] Hand correction clamps to 40u and dead-zones hull noise (cycle 141). Last-free used to snap 70u when rest was solid.
+- [x] Gun hull sample is 10u ahead of the wrist (cycle 145). Lua AdjustCollisionsBox; wrist-only sweep left the gun body in the wall.
 - [x] Trace miss toasts once (cycle 19). Missing iface / failed self-test is not silent.
 - [ ] Live wall collision proven in-game (HMD).
 - [x] Melee hull sweep + pose-delta vel in Tick (cycle 10). Start-solid is not a hit.
