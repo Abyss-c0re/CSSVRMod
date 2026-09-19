@@ -1,13 +1,13 @@
-# Cycle 119 — 2026-09-19
+# Cycle 120 — 2026-09-19
 
 ## Focus
 
-`aim-pitch-normalize` — VectorAngles look-up is 270°; ViewAnglesSane dropped snap-on-fire.
+`menu-steals-combat` — Vision panel trigger/grab used to fire and melee.
 
 ## Did
 
-- Recovered cycle 118 tip `34eb480`. CSS is not running. Log still has no `icvar ver=`.
-- AimViewAngles / Look_Decide wrap pitch (270 → -90). Firing while aiming up used to skip usercmd and SetViewAngles.
+- Recovered cycle 119 tip `c781e92`. CSS is not running. Log still has no `icvar ver=`.
+- Panel-visible steals trigger/grab from attack and melee. Jump/reload/use stay. Laser reason `focus_primary`.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-142 passed / 0 failed (1061 asserts)
+144 passed / 0 failed (1071 asserts)
 
 ## Next
 
