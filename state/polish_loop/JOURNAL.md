@@ -384,6 +384,46 @@ Idle hunt. CSS not running. No icvar register line (new hook never mapped). No c
 
 ICvar factory is libvstdlib.so. CSS engine CreateInterface is VCvarQuery001, not VEngineCvar004. Offline 128/128. Not HMD-proven. Start CSS from the menu.
 
+## 2026-09-19 cycle 88
+
+Idle hunt. CSS not running. No icvar register line (9196a74 hook never mapped in CSS). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 89
+
+Idle hunt. CSS not running. Standalone CCvar has no `echo` until engine register — not a slot miss. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 90
+
+Idle hunt. CSS not running. ICvar register is one-shot after cmd wrap; splash echo miss unproven. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 91
+
+Idle hunt. CSS not running. CCvar slot 6=Register, 14=FindCommand (disasm). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 92
+
+Idle hunt. CSS not running. Register prepends m_pNext; ConCommand virtuals match. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 93
+
+Idle hunt. CSS not running. No icvar register line (9196a74 hook never mapped in CSS). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 94
+
+Idle hunt. CSS not running. No icvar register line. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 95
+
+Idle hunt. CSS not running. No icvar register line. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 96
+
+Idle hunt. CSS not running. No icvar register line. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 97
+
+Present keeps ProbeLiveEngine until ICvar cmds. Splash wrap froze register (CCvar has no echo yet). Offline 129/129. Not HMD-proven. Start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

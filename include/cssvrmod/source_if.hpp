@@ -100,6 +100,12 @@ inline bool EngineCmd_WrapComplete(bool have_unrestricted, bool slot106_present,
   return slot106_present && !slot106_in_engine;
 }
 
+/// Splash wrap used to skip ICvar. CCvar exists before engine registers `echo`;
+/// a one-shot ProbeLiveEngine after slot 106 never lists cssvr_*.
+inline bool EngineProbe_PresentDone(bool cmd_wrap_ready, bool icvar_ready) {
+  return cmd_wrap_ready && icvar_ready;
+}
+
 /// ClientCmd_Unrestricted is `mov rdi,rsi; jmp rel32` to Cbuf_AddText.
 /// Typed console calls Cbuf_AddText, not the IVEngineClient wrapper.
 inline void* EngineCmd_DecodeCbuf(const unsigned char* p) {
@@ -149,6 +155,7 @@ inline bool EngineCmd_CbufStealOk(const unsigned char* p, int n) {
 }
 
 bool EngineCmd_WrapReady();
+bool ICvar_CmdsReady();
 
 /// VEngineCvar004: IAppSystem(5) + Allocate + Register = 6. FindCommand = 14.
 constexpr int kCvarRegister004 = 6;

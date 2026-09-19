@@ -16,6 +16,7 @@ using ClientCmdFn = void (*)(void*, const char*);
 ClientCmdFn g_real_cmd = nullptr;
 ClientCmdFn g_orig_unrestricted = nullptr;
 bool g_cmd_wrapped = false;
+bool g_icvar_cmds = false;
 
 void FilterOrOrig(void* eng, const char* cmd, ClientCmdFn orig) {
   if (g_cmd_filter && cmd && g_cmd_filter(cmd)) return;
@@ -164,38 +165,54 @@ bool RegisterCvarCommands(void* cvar, const char* ver) {
   Dl_info info{};
   const bool named = dladdr(vt[find_i], &info) != 0;
   if (!named || !cssvr::ICvar_FnInModule(info.dli_fname)) {
-    if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
-      std::fprintf(f, "cssvr icvar skip module=%s\n",
-                   named && info.dli_fname ? info.dli_fname : "?");
-      std::fclose(f);
+    static bool logged_skip = false;
+    if (!logged_skip) {
+      logged_skip = true;
+      if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
+        std::fprintf(f, "cssvr icvar skip module=%s\n",
+                     named && info.dli_fname ? info.dli_fname : "?");
+        std::fclose(f);
+      }
     }
     return false;
   }
   void* echo = ((Fn)vt[find_i])(cvar, "echo");
-  if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
-    std::fprintf(f, "cssvr icvar ver=%s find=%d echo=%d\n", ver ? ver : "?", find_i, echo ? 1 : 0);
-    std::fclose(f);
+  static bool logged_ver = false;
+  if (!logged_ver) {
+    logged_ver = true;
+    if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
+      std::fprintf(f, "cssvr icvar ver=%s find=%d echo=%d\n", ver ? ver : "?", find_i, echo ? 1 : 0);
+      std::fclose(f);
+    }
   }
   if (!echo) return false;
   static bool done = false;
-  if (done) return true;
+  if (done) {
+    g_icvar_cmds = true;
+    return true;
+  }
   static const char* helps[] = {"CSSVRMod status", "Start OpenXR", "Stop OpenXR", "Toggle OpenXR",
                                 "Vision menu", "cssvr_set key value", "Help", nullptr};
   static CssvrConCmd04 cmds04[8];
   static CssvrConCmd07 cmds07[8];
-  for (int i = 0; kCmdNames[i]; ++i) {
-    if (v07) {
-      cmds07[i].m_pszName = kCmdNames[i];
-      cmds07[i].m_pszHelpString = helps[i] ? helps[i] : "";
-      ((Reg)vt[reg_i])(cvar, &cmds07[i]);
-    } else {
-      cmds04[i].m_pszName = kCmdNames[i];
-      cmds04[i].m_pszHelpString = helps[i] ? helps[i] : "";
-      ((Reg)vt[reg_i])(cvar, &cmds04[i]);
+  static bool registered = false;
+  if (!registered) {
+    for (int i = 0; kCmdNames[i]; ++i) {
+      if (v07) {
+        cmds07[i].m_pszName = kCmdNames[i];
+        cmds07[i].m_pszHelpString = helps[i] ? helps[i] : "";
+        ((Reg)vt[reg_i])(cvar, &cmds07[i]);
+      } else {
+        cmds04[i].m_pszName = kCmdNames[i];
+        cmds04[i].m_pszHelpString = helps[i] ? helps[i] : "";
+        ((Reg)vt[reg_i])(cvar, &cmds04[i]);
+      }
     }
+    registered = true;
   }
   void* found = ((Fn)vt[find_i])(cvar, "cssvr_start");
   done = found != nullptr;
+  g_icvar_cmds = done;
   if (FILE* f = std::fopen("/tmp/cssvrmod.log", "a")) {
     std::fprintf(f, "cssvr icvar register cssvr_start=%d ver=%s\n", found ? 1 : 0, ver ? ver : "?");
     std::fclose(f);
@@ -231,6 +248,8 @@ void InstallCmdWrap(void* engine) {
 namespace cssvr {
 
 bool EngineCmd_WrapReady() { return g_cmd_wrapped; }
+
+bool ICvar_CmdsReady() { return g_icvar_cmds; }
 
 static const char* kEngineNames[] = {"VEngineClient014", "VEngineClient013", nullptr};
 static const char* kClientNames[] = {"VClient017", "VClient016", "VClient015", nullptr};

@@ -1,14 +1,14 @@
-# Cycle 87 — 2026-09-19
+# Cycle 97 — 2026-09-19
 
 ## Focus
 
-`icvar-vstdlib-factory` — CSS ICvar is CCvar in libvstdlib.so.
+`icvar-retry-after-wrap` — splash cmd-wrap must not freeze ICvar register.
 
 ## Did
 
-- Offline probe: `engine.so` CreateInterface(`VEngineCvar004`) is null (it has `VCvarQuery001`). `libvstdlib.so` returns CCvar.
-- Probe ICvar from vstdlib after the engine factory. FindCommand/Register may live in libvstdlib.so — `SlotInEngine` would skip them.
-- Offline 128/128.
+- `EngineProbe_PresentDone(wrap, icvar)` — present keeps `ProbeLiveEngine` until `cssvr_*` is on CCvar.
+- Register the static ConCommands once; retry FindCommand only. Quiet the per-present miss log.
+- Offline 129/129. CSS still not running — `9196a74` never mapped; no `icvar ver=` yet.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 128 passed (1004/1004)
+`cssvrmod_tests` 129 passed, 0 failed.
 
 ## Next
 

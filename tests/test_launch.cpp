@@ -311,3 +311,10 @@ TEST(engine_cmd_wrap_retries_until_unrestricted) {
   ASSERT_FALSE(EngineCmd_WrapComplete(false, true, true));
   ASSERT_TRUE(EngineCmd_WrapComplete(false, true, false));
 }
+
+TEST(engine_probe_keeps_going_until_icvar) {
+  ASSERT_FALSE(EngineProbe_PresentDone(false, false));
+  ASSERT_FALSE(EngineProbe_PresentDone(true, false)); // splash wrap is not ICvar
+  ASSERT_FALSE(EngineProbe_PresentDone(false, true));
+  ASSERT_TRUE(EngineProbe_PresentDone(true, true));
+}

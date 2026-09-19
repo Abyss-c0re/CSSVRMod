@@ -1,11 +1,11 @@
 {
-  "cycle": 87,
+  "cycle": 97,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-18T23:16:02Z",
-  "last_focus": "icvar-vstdlib-factory",
+  "started_at": "2026-09-19T01:24:45Z",
+  "last_focus": "icvar-retry-after-wrap",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "9196a74",
+  "last_commit": "PENDING",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
