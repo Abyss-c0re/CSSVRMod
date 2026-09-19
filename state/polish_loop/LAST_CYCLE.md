@@ -1,13 +1,13 @@
-# Cycle 111 — 2026-09-19
+# Cycle 112 — 2026-09-19
 
 ## Focus
 
-`xr-abxy-lastinv` — XR only bound A; B/X/Y were documented but never polled, Y never fired lastinv.
+`icvar-vstdlib-noload-lazy` — NOW+NOLOAD can miss CSS libvstdlib (no SONAME); ICvar never logged.
 
 ## Did
 
-- Recovered cycle 110 tip `d4273e7`. CSS not running. Log has no `icvar ver=` (splash toast only).
-- Bind Touch B/X/Y. InputMap: B reload, X use, Y `lastinv`. ClientCmd edges lastinv on rising edge.
+- Recovered cycle 111 tip `4074014`. CSS not running. Log still has no `icvar ver=`.
+- `Module_SoHandle` uses `RTLD_LAZY|RTLD_NOLOAD`. ICvar basename matches maps `(deleted)`. Sibling vstdlib from mapped engine if FindCssInstall misses.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-135 passed / 0 failed (1038 asserts)
+136 passed / 0 failed (1041 asserts)
 
 ## Next
 

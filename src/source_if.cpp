@@ -343,6 +343,13 @@ bool ProbeLiveEngine(EngineIf& out) {
   const char* vst_full = nullptr;
   if (inst.found && ICvar_VstdlibBesideEngine(inst.engine_so.c_str(), vst_path, (int)sizeof(vst_path)))
     vst_full = vst_path;
+  if (!vst_full && e) {
+    Dl_info ei{};
+    void* ci = dlsym(e, "CreateInterface");
+    if (ci && dladdr(ci, &ei) && ei.dli_fname &&
+        ICvar_VstdlibBesideEngine(ei.dli_fname, vst_path, (int)sizeof(vst_path)))
+      vst_full = vst_path;
+  }
   void* v = Module_SoHandle("libvstdlib.so", vst_full);
   if (e) eng = reinterpret_cast<CreateInterfaceFn>(dlsym(e, "CreateInterface"));
   if (c) cli = reinterpret_cast<CreateInterfaceFn>(dlsym(c, "CreateInterface"));

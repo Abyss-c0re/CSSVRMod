@@ -1,6 +1,7 @@
 #pragma once
 // Source CreateInterface probe. No guessed vtable calls unless a self-test passes.
 #include "collision.hpp"
+#include "module_base.hpp"
 #include "vec3.hpp"
 #include <cmath>
 #include <cstdint>
@@ -166,11 +167,11 @@ inline bool ICvar_Layout004(const char* ver) {
 }
 
 /// CSS ICvar is CCvar in libvstdlib.so. engine.so only exposes VCvarQuery001.
+/// Same basename rule as maps (`(deleted)` stripped).
 inline bool ICvar_FnInModule(const char* fname) {
   if (!fname || !fname[0]) return false;
-  const char* slash = std::strrchr(fname, '/');
-  const char* base = slash ? slash + 1 : fname;
-  return std::strcmp(base, "libvstdlib.so") == 0 || std::strcmp(base, "engine.so") == 0;
+  const char* end = fname + std::strlen(fname);
+  return Maps_LineHasNeedle(fname, end, "libvstdlib.so") || Maps_LineHasNeedle(fname, end, "engine.so");
 }
 
 /// Sibling of engine.so in bin/linux64. Empty if engine path has no slash.

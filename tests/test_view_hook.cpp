@@ -224,6 +224,11 @@ TEST(maps_module_prefers_elf_base_not_exec) {
   ASSERT_STREQ(path, "/opt/css/cstrike/bin/linux64/client.so");
 }
 
+TEST(module_so_noload_is_lazy) {
+  ASSERT_EQ(Module_SoNoloadFlags(), RTLD_LAZY | RTLD_NOLOAD);
+  ASSERT_TRUE((Module_SoNoloadFlags() & RTLD_NOW) == 0);
+}
+
 TEST(module_so_plan_never_uses_main_exe) {
   const auto p = Module_SoPlan("engine.so", "/opt/css/bin/linux64/engine.so");
   ASSERT_STREQ(p.short_name, "engine.so");

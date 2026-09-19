@@ -480,6 +480,10 @@ VK ClientCmd edges match GL (+use / +attack2 / +showscores). Present path used t
 
 XR B/X/Y bound. Y fires lastinv; B/X already mapped reload/use but were never polled. Offline 135/135. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 112
+
+ICvar vstdlib NOLOAD is lazy. NOW+NOLOAD can miss a no-SONAME libvstdlib; basename matches maps (deleted). Offline 136/136. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

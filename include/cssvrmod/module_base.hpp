@@ -125,12 +125,16 @@ inline ModuleSoPlan Module_SoPlan(const char* short_name, const char* full_path)
   return p;
 }
 
+/// Already-loaded handle. NOW+NOLOAD can fail a promote; CSS libvstdlib has no SONAME.
+inline int Module_SoNoloadFlags() { return RTLD_LAZY | RTLD_NOLOAD; }
+
 /// Already-loaded handle. Short-name NOLOAD misses CSS's full path.
 inline void* Module_SoHandle(const char* short_name, const char* full_path) {
   const ModuleSoPlan plan = Module_SoPlan(short_name, full_path);
+  const int flags = Module_SoNoloadFlags();
   void* h = nullptr;
-  if (plan.short_name) h = dlopen(plan.short_name, RTLD_NOW | RTLD_NOLOAD);
-  if (!h && plan.full_path) h = dlopen(plan.full_path, RTLD_NOW | RTLD_NOLOAD);
+  if (plan.short_name) h = dlopen(plan.short_name, flags);
+  if (!h && plan.full_path) h = dlopen(plan.full_path, flags);
   if (!h && plan.try_maps && plan.short_name) {
     FILE* f = std::fopen("/proc/self/maps", "r");
     if (f) {
@@ -142,7 +146,7 @@ inline void* Module_SoHandle(const char* short_name, const char* full_path) {
         if (!Maps_ParseLine(line, plan.short_name, &start, &exec, path, (int)sizeof(path)))
           continue;
         if (path[0] != '/') continue;
-        h = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+        h = dlopen(path, flags);
         if (h) break;
       }
       std::fclose(f);

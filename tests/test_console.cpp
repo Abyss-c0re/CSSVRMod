@@ -39,6 +39,7 @@ TEST(icvar_fn_in_vstdlib) {
   ASSERT_TRUE(ICvar_FnInModule("/opt/css/bin/linux64/libvstdlib.so"));
   ASSERT_TRUE(ICvar_FnInModule("/opt/css/bin/linux64/engine.so"));
   ASSERT_TRUE(ICvar_FnInModule("libvstdlib.so"));
+  ASSERT_TRUE(ICvar_FnInModule("/opt/css/bin/linux64/libvstdlib.so (deleted)"));
   ASSERT_FALSE(ICvar_FnInModule("/opt/css/cstrike/bin/linux64/client.so"));
   ASSERT_FALSE(ICvar_FnInModule("/opt/css/bin/linux64/libtier0.so"));
   ASSERT_FALSE(ICvar_FnInModule(nullptr));
