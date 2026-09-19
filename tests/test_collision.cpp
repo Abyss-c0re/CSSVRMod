@@ -74,3 +74,13 @@ TEST(collision_floor_does_not_lock) {
   auto r = ResolveHandWallSweep({10, 10, 20}, st, 2.2f, 0.75f, floor);
   ASSERT_FALSE(r.clipped);
 }
+
+TEST(collision_wall_resets_on_stop) {
+  WallState st;
+  st.last_free = {50, 0, 40};
+  st.has_free = true;
+  Wall_Reset(&st);
+  ASSERT_FALSE(st.has_free);
+  ASSERT_NEAR(st.last_free.Length(), 0.f, 0.001);
+  Wall_Reset(nullptr);
+}

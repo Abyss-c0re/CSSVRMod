@@ -131,6 +131,11 @@ struct HandVelState {
   bool have = false;
 };
 
+/// cssvr_stop used to keep the last hand sample, so restart delta-vel was a fake swing.
+inline void HandVel_Reset(HandVelState* s) {
+  if (s) *s = HandVelState{};
+}
+
 /// Prefer XR linear vel. Else finite difference. First sample is zero.
 inline Vec3 HandVelOrDelta(const Pose& hand, float now, HandVelState* st) {
   if (hand.vel.LengthSqr() > 1e-4f) return hand.vel;

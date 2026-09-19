@@ -116,6 +116,11 @@ struct WallState {
   bool has_free = false;
 };
 
+/// cssvr_stop used to keep last-free, so restart could yank a hand to the old map pose.
+inline void Wall_Reset(WallState* s) {
+  if (s) *s = WallState{};
+}
+
 struct WallResolve {
   Vec3 pos;
   bool clipped = false;

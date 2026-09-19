@@ -80,3 +80,18 @@ TEST(melee_sweep_and_vel_delta) {
   auto v1 = HandVelOrDelta(p, 0.1f, &st);
   ASSERT_NEAR(v1.x, 80.f, 0.1);
 }
+
+TEST(melee_hand_vel_resets_on_stop) {
+  Pose p;
+  p.pos = {0, 0, 0};
+  HandVelState st;
+  HandVelOrDelta(p, 0.f, &st);
+  p.pos = {80, 0, 0};
+  auto swing = HandVelOrDelta(p, 0.1f, &st);
+  ASSERT_TRUE(swing.Length() > 70.f);
+  HandVel_Reset(&st);
+  p.pos = {0, 0, 40}; // new session — must not inherit the old sample
+  auto first = HandVelOrDelta(p, 1.f, &st);
+  ASSERT_NEAR(first.Length(), 0.f, 0.001);
+  HandVel_Reset(nullptr);
+}

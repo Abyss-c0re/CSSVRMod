@@ -343,6 +343,11 @@ void HookOnSwap() {
     ClientCmd_ReleaseHeld(g_eng, &g_prevCmd, UserCmd_HookLive());
     UserCmd_ClearOverlay();
     Turn_Reset(&g_turn);
+    Wall_Reset(&g_leftWall);
+    Wall_Reset(&g_rightWall);
+    HandVel_Reset(&g_rightVel);
+    g_nextMelee = 0.f;
+    g_now = 0.f;
   }
   XrSample xr{};
   const bool got = g_xr_ok && XrHostPollInput(&xr);

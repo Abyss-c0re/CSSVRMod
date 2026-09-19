@@ -90,6 +90,7 @@
 - [x] CreateMove overlay drops on stop (cycle 123). Last stick/buttons used to keep walking after `cssvr_stop`.
 - [x] ClientCmd minus on stop (cycle 124). Overlay drop left `+attack`/`+duck` held; present now releases edges.
 - [x] Stick-turn yaw resets on stop (cycle 128). Worker/GL TurnState used to keep heading across cssvr_stop; next start inherited it.
+- [x] Hand vel + last-free reset on stop (cycle 129). Restart used to finite-diff a fake melee swing and yank hands to the old map pose.
 - [x] Stick-right turns right (cycle 108). Source +yaw is left; Cube subtracts on +thumbstick. Used to invert locomotion.
 - [x] Tick gun-slave / melee from primary hand (cycle 107). Left-handed used to keep the AK and knife on the right.
 - [x] `CUserCmd` overlay + CreateMove hook (RTTI/xmm0 self-test, cycle 8). Analog stick writes forwardmove.

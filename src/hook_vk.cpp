@@ -221,8 +221,19 @@ bool MailboxFull() {
 void* XrWorker(void*) {
   Log("xr worker start");
   TurnState turn;
+  WallState leftWall, rightWall;
+  HandVelState rightVel;
+  float nextMelee = 0.f;
+  float now = 0.f;
   while (true) {
-    if (!XrWanted()) Turn_Reset(&turn);
+    if (!XrWanted()) {
+      Turn_Reset(&turn);
+      Wall_Reset(&leftWall);
+      Wall_Reset(&rightWall);
+      HandVel_Reset(&rightVel);
+      nextMelee = 0.f;
+      now = 0.f;
+    }
     std::vector<unsigned char> frame, frame_r;
     int w = 0, h = 0;
     bool bgra = false;
@@ -251,10 +262,6 @@ void* XrWorker(void*) {
         Log("xr submit #%d %ux%u %s", g_xr_ok, w, h, XrHostStatus().reason);
       XrSample xr{};
       if (XrHostPollInput(&xr)) {
-        static WallState leftWall, rightWall;
-        static HandVelState rightVel;
-        static float nextMelee = 0.f;
-        static float now = 0.f;
         TickIn tin;
         tin.xr = xr;
         tin.wep = nullptr; // no live weapon query yet — fist only on melee_intent
