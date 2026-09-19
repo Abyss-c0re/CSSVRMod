@@ -1,14 +1,14 @@
-# Cycle 97 — 2026-09-19
+# Cycle 107 — 2026-09-19
 
 ## Focus
 
-`icvar-retry-after-wrap` — splash cmd-wrap must not freeze ICvar register.
+`tick-primary-hand-gun-slave` — left-handed Tick kept the gun and knife on the right hand.
 
 ## Did
 
-- `EngineProbe_PresentDone(wrap, icvar)` — present keeps `ProbeLiveEngine` until `cssvr_*` is on CCvar.
-- Register the static ConCommands once; retry FindCommand only. Quiet the per-present miss log.
-- Offline 129/129. CSS still not running — `9196a74` never mapped; no `icvar ver=` yet.
+- Recovered cycle 106 tip `459c146`. CSS still not running; log has no `icvar ver=`.
+- Tick gun / aim / melee now follow the primary hand (`CSSVR_LEFT_HANDED` / HAND row). Laser already did.
+- Offline test: left pose owns the AK muzzle; knife melee `Hand::Left`.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 129 passed, 0 failed.
+130 passed / 0 failed (1018 asserts)
 
 ## Next
 

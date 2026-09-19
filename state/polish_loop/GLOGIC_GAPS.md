@@ -75,6 +75,7 @@
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.
 - [x] Honest MONO desktop label until `painted_dual` (cycle 15). Not stamped onto dual-eye / lens submit.
 - [ ] Optional GTK/Qt window (CLI host is enough to persist knobs).
+- [x] Tick gun-slave / melee from primary hand (cycle 107). Left-handed used to keep the AK and knife on the right.
 - [x] `CUserCmd` overlay + CreateMove hook (RTTI/xmm0 self-test, cycle 8). Analog stick writes forwardmove.
 - [x] CreateMove locate/hook miss toasts once (cycle 18). No per-tick re-locate.
 - [ ] Live XR input proven in-game (HMD). Offline green ≠ controls smoke.

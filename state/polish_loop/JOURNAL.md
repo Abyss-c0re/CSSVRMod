@@ -424,6 +424,46 @@ Idle hunt. CSS not running. No icvar register line. No code. Not HMD-proven. Nex
 
 Present keeps ProbeLiveEngine until ICvar cmds. Splash wrap froze register (CCvar has no echo yet). Offline 129/129. Not HMD-proven. Start CSS from the menu.
 
+## 2026-09-19 cycle 98
+
+Idle hunt. CSS not running. No icvar register line. Deployed `459c146` hook via `--install` (game dir was still `9196a74`). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 99
+
+Idle hunt. CSS not running. No icvar register line. CCvar slot 6=Register / 14=FindCommand (disasm). Standalone echo still nil. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 100
+
+Idle hunt. CSS not running. No icvar register line. Late-attach present skip is the vulkan shim, not a miss. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 101
+
+Idle hunt. CSS not running. No icvar register line. Submit pose X stays 0; CViewSetup 0x40/0x4c unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 102
+
+Idle hunt. CSS not running. No icvar register line. Itanium ConCommand slots match Register/FindCommand. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 103
+
+Idle hunt. CSS not running. No icvar register line. Tick last-free hull unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 104
+
+Idle hunt. CSS not running. No icvar register line. Melee types / ICvar basename unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 105
+
+Idle hunt. CSS not running. No icvar register line. Input overlay / hand-bullet G37 unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 106
+
+Idle hunt. CSS not running. No icvar register line. Aim gun-slave / weapon catalog unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 107
+
+Tick gun/aim/melee follow primary hand. Left-handed used to keep the AK on the right. Offline 130/130. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

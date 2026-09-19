@@ -22,7 +22,7 @@ struct TickIn {
   Ang3 current_view;
   float mouse_sens = 0.022f;
   TraceFn trace; // empty → skip wall / melee sweep
-  HandVelState* right_vel = nullptr;
+  HandVelState* hand_vel = nullptr; // gun / melee hand (primary)
 };
 
 struct TickOut {
@@ -68,13 +68,15 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
   WeaponOffset off;
   if (in.wep) off = in.wep->offset;
   if (in.wep && in.wep->muzzle_len > 0.f) off.muzzle_len = in.wep->muzzle_len;
-  o.gun = GunFromHand(o.right_resolved, off);
-  o.aim = ResolveMuzzle(o.gun, o.right_resolved);
+  // Gun slaves the primary hand (aim.hpp). Left-handed must not keep the AK on the right.
+  const Pose& primary = in.input.left_handed ? o.left_resolved : o.right_resolved;
+  o.gun = GunFromHand(primary, off);
+  o.aim = ResolveMuzzle(o.gun, primary);
 
   LaserOpts lo;
   lo.vr_active = in.xr.hmd.valid;
   lo.laser_on = true;
-  lo.has_primary_pose = in.input.left_handed ? in.xr.left.valid : in.xr.right.valid;
+  lo.has_primary_pose = primary.valid;
   lo.primary_hand = in.input.left_handed ? "left" : "right";
   lo.laser_hand = lo.primary_hand;
   o.laser = Laser_Decide(lo);
@@ -85,11 +87,11 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
   MeleeSample ms;
   const bool knife = in.wep && in.wep->is_melee;
   if (knife || o.cmd.melee_intent) {
-    const Pose& hand = o.right_resolved.valid ? o.right_resolved : in.xr.right;
+    const Pose& hand = primary;
     ms.pos = hand.pos;
     ms.dir = Forward(hand.ang);
-    ms.vel = HandVelOrDelta(hand, in.now, in.right_vel);
-    ms.hand = Hand::Right;
+    ms.vel = HandVelOrDelta(hand, in.now, in.hand_vel);
+    ms.hand = in.input.left_handed ? Hand::Left : Hand::Right;
     ms.impact = knife ? in.wep->melee_impact : ImpactType::Fist;
     ms.use_weapon = knife;
     ms.is_melee_weapon = knife;

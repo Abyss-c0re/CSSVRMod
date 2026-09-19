@@ -261,7 +261,7 @@ void* XrWorker(void*) {
         tin.input.left_handed = Input_LeftHandedLive();
         tin.current_view = xr.hmd.ang;
         tin.trace = EngineMakeTraceFn(g_eng);
-        tin.right_vel = &rightVel;
+        tin.hand_vel = &rightVel;
         TickOut tout = Tick(tin, leftWall, rightWall, &nextMelee);
         now += 0.011f;
         UserCmdOverlay cmd = tout.cmd;

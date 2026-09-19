@@ -63,6 +63,42 @@ TEST(tick_knife_sweep_uses_trace) {
   ASSERT_STREQ(o.status, "melee_hit");
 }
 
+TEST(tick_left_handed_gun_slaves_primary) {
+  TickIn in;
+  in.input.left_handed = true;
+  in.xr.hmd.valid = true;
+  in.xr.hmd.ang = {0, 0, 0};
+  in.xr.left.valid = true;
+  in.xr.left.pos = {10, 20, 40};
+  in.xr.left.ang = {0, 90, 0}; // +Y
+  in.xr.right.valid = true;
+  in.xr.right.pos = {0, 0, 40};
+  in.xr.right.ang = {0, 0, 0}; // +X — must not own the gun
+  in.xr.trigger_l = 0.9f;
+  in.wep = FindWeapon("weapon_ak47");
+  WallState L, R;
+  float next = 0.f;
+  auto fire = Tick(in, L, R, &next);
+  ASSERT_TRUE(fire.gun.valid);
+  ASSERT_TRUE(fire.aim.valid);
+  ASSERT_TRUE(fire.cmd.firing);
+  ASSERT_STREQ(fire.laser.primary_hand, "left");
+  ASSERT_NEAR(fire.aim.dir.y, 1.f, 0.05);
+  ASSERT_TRUE(std::fabs(fire.aim.dir.x) < 0.2f);
+  ASSERT_TRUE(fire.gun.pos.DistToSqr({10, 20, 40}) < fire.gun.pos.DistToSqr({0, 0, 40}));
+
+  in.xr.trigger_l = 0.f;
+  in.xr.trigger_r = 0.9f; // off-hand melee
+  in.wep = FindWeapon("weapon_knife");
+  in.world_melee_hit = true;
+  in.xr.left.vel = {120, 0, 0};
+  in.now = 1.f;
+  auto knife = Tick(in, L, R, &next);
+  ASSERT_TRUE(knife.melee.hit);
+  ASSERT_EQ(static_cast<int>(knife.melee.hand), static_cast<int>(Hand::Left));
+  ASSERT_NEAR(knife.melee.src.x, 10.f, 0.1);
+}
+
 TEST(tick_wall_blocks_hand) {
   auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
     TraceHit t;
