@@ -692,6 +692,18 @@ Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unch
 
 Melee finite-diff is relative to HMD pos (`6262bc2`). Live OpenXR never fills pose.vel; world delta used to punch while walking. Offline 173/173. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 165
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 166
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 167
+
+Melee vel is per-hand (`ce4f587`). One HandVelState used to finite-diff from the off-hand fist to the knife. Offline 175/175. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
