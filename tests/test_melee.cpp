@@ -11,6 +11,21 @@ TEST(melee_hand_origin_is_knuckles) {
   ASSERT_NEAR(left.y, 5.f, 0.05);
 }
 
+TEST(melee_fist_swings_from_offhand) {
+  Pose primary;
+  primary.valid = true;
+  primary.pos = {0, 0, 40};
+  Pose offhand;
+  offhand.valid = true;
+  offhand.pos = {10, 20, 40};
+  ASSERT_EQ(&MeleeSwingPose(primary, offhand, false), &offhand);
+  ASSERT_EQ(&MeleeSwingPose(primary, offhand, true), &primary);
+  ASSERT_EQ(static_cast<int>(MeleeSwingHandId(false, false)), static_cast<int>(Hand::Left));
+  ASSERT_EQ(static_cast<int>(MeleeSwingHandId(false, true)), static_cast<int>(Hand::Right));
+  ASSERT_EQ(static_cast<int>(MeleeSwingHandId(true, false)), static_cast<int>(Hand::Right));
+  ASSERT_EQ(static_cast<int>(MeleeSwingHandId(true, true)), static_cast<int>(Hand::Left));
+}
+
 TEST(melee_threshold_and_damage) {
   MeleeConfig c;
   ASSERT_NEAR(MeleeThresholdUnits(c), 75.f, 1e-4);

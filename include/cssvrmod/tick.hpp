@@ -22,7 +22,7 @@ struct TickIn {
   Ang3 current_view;
   float mouse_sens = 0.022f;
   TraceFn trace; // empty → skip wall / melee sweep
-  HandVelState* hand_vel = nullptr; // gun / melee hand (primary)
+  HandVelState* hand_vel = nullptr; // swinging melee hand (off-hand fist / primary knife)
   TurnState* turn = nullptr;        // stick locomotion yaw (persists across ticks)
 };
 
@@ -102,21 +102,24 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
 
   MeleeSample ms;
   const bool knife = in.wep && in.wep->is_melee;
+  const Pose offhand = in.input.left_handed ? o.right_resolved : o.left_resolved;
   if (!in.xr.panel_visible && (knife || o.cmd.melee_intent)) {
-    const Pose& hand = primary;
-    // Lua fist: pos + Forward * DEFAULT_OFFSET (5). Wrist-only left the knuckles short.
-    ms.pos = knife ? hand.pos : MeleeHandOrigin(hand.pos, hand.ang);
-    ms.dir = Forward(hand.ang);
-    ms.vel = HandVelOrDelta(hand, in.now, in.hand_vel);
-    ms.hand = in.input.left_handed ? Hand::Left : Hand::Right;
-    ms.impact = knife ? in.wep->melee_impact : ImpactType::Fist;
-    ms.use_weapon = knife;
-    ms.is_melee_weapon = knife;
-    if (knife) ms.weapon_base_damage = in.wep->damage;
-    ms.reach = knife ? 24.f : kDefaultReach;
-    bool world_hit = in.world_melee_hit;
-    if (in.trace) world_hit = MeleeSweepHit(ms, in.trace);
-    o.melee = MeleeDecide(ms, world_hit, in.melee, in.now, next_melee);
+    const Pose& hand = MeleeSwingPose(primary, offhand, knife);
+    if (hand.valid) {
+      // Lua fist: pos + Forward * DEFAULT_OFFSET (5). Wrist-only left the knuckles short.
+      ms.pos = knife ? hand.pos : MeleeHandOrigin(hand.pos, hand.ang);
+      ms.dir = Forward(hand.ang);
+      ms.vel = HandVelOrDelta(hand, in.now, in.hand_vel);
+      ms.hand = MeleeSwingHandId(in.input.left_handed, knife);
+      ms.impact = knife ? in.wep->melee_impact : ImpactType::Fist;
+      ms.use_weapon = knife;
+      ms.is_melee_weapon = knife;
+      if (knife) ms.weapon_base_damage = in.wep->damage;
+      ms.reach = knife ? 24.f : kDefaultReach;
+      bool world_hit = in.world_melee_hit;
+      if (in.trace) world_hit = MeleeSweepHit(ms, in.trace);
+      o.melee = MeleeDecide(ms, world_hit, in.melee, in.now, next_melee);
+    }
   }
 
   if (o.melee.hit) o.status = "melee_hit";

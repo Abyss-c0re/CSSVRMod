@@ -91,19 +91,61 @@ TEST(tick_fist_melee_starts_at_knuckles) {
     return t;
   };
   TickIn in;
-  in.xr.right.valid = true;
-  in.xr.right.pos = {0, 0, 40};
-  in.xr.right.ang = {0, 0, 0}; // +X
+  in.xr.left.valid = true;
+  in.xr.left.pos = {0, 0, 40};
+  in.xr.left.ang = {0, 0, 0}; // +X — off-hand fist
+  in.xr.left.vel = {80, 0, 0};
+  in.xr.right.valid = true; // primary present but must not own the fist hull
+  in.xr.right.pos = {100, 0, 40};
+  in.xr.right.ang = {0, 0, 0};
   in.xr.right.vel = {80, 0, 0};
-  in.xr.trigger_l = 0.9f; // melee intent (off-hand trigger, primary still swings)
+  in.xr.trigger_l = 0.9f; // melee intent (off-hand trigger)
   in.trace = world;
   in.now = 1.f;
   WallState L, R;
   float next = 0.f;
   auto o = Tick(in, L, R, &next);
   ASSERT_TRUE(o.melee.hit);
+  ASSERT_EQ(static_cast<int>(o.melee.hand), static_cast<int>(Hand::Left));
   ASSERT_NEAR(o.melee.src.x, 5.f, 0.1);
   ASSERT_STREQ(o.status, "melee_hit");
+}
+
+TEST(tick_offhand_fist_ignores_primary_swing) {
+  // Primary is at the wall; off-hand is not. Fist used to hull the gun hand.
+  auto world = [](Vec3 start, Vec3 end, Vec3 mins, Vec3 maxs) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    const bool hull = mins.LengthSqr() > 0.01f || maxs.LengthSqr() > 0.01f;
+    if (!hull) return t;
+    if (start.x < 6.f && end.x >= 6.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = (6.f - start.x) / (end.x - start.x);
+      t.hit_pos = {6.f, start.y, start.z};
+    }
+    return t;
+  };
+  TickIn in;
+  in.xr.right.valid = true;
+  in.xr.right.pos = {0, 0, 40};
+  in.xr.right.ang = {0, 0, 0};
+  in.xr.right.vel = {80, 0, 0};
+  in.xr.left.valid = true;
+  in.xr.left.pos = {100, 0, 40};
+  in.xr.left.ang = {0, 0, 0};
+  in.xr.left.vel = {80, 0, 0};
+  in.xr.trigger_l = 0.9f;
+  in.trace = world;
+  in.now = 1.f;
+  WallState L, R;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_FALSE(o.melee.hit);
+  ASSERT_EQ(static_cast<int>(o.melee.hand), static_cast<int>(Hand::Left));
+  ASSERT_NEAR(o.melee.src.x, 105.f, 0.1);
 }
 
 TEST(tick_knife_sweep_uses_trace) {

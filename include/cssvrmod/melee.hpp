@@ -64,6 +64,17 @@ inline Vec3 MeleeHandOrigin(Vec3 pos, const Ang3& ang) {
   return pos + Forward(ang) * kMeleeHandOffset;
 }
 
+/// Lua left is always fist; knife/gun stay on the primary. Off-hand trigger
+/// used to hull the gun hand instead of the swinging fist.
+inline const Pose& MeleeSwingPose(const Pose& primary, const Pose& offhand, bool knife) {
+  return knife ? primary : offhand;
+}
+
+inline Hand MeleeSwingHandId(bool left_handed, bool knife) {
+  if (knife) return left_handed ? Hand::Left : Hand::Right;
+  return left_handed ? Hand::Right : Hand::Left;
+}
+
 inline float MeleeImpactMultiplier(ImpactType t) {
   switch (t) {
   case ImpactType::Blunt: return 1.25f;
