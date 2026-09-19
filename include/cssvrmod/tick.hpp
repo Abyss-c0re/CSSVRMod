@@ -70,7 +70,22 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
   if (in.wep) off = in.wep->offset;
   if (in.wep && in.wep->muzzle_len > 0.f) off.muzzle_len = in.wep->muzzle_len;
   // Gun slaves the primary hand (aim.hpp). Left-handed must not keep the AK on the right.
-  const Pose& primary = in.input.left_handed ? o.left_resolved : o.right_resolved;
+  Pose primary = in.input.left_handed ? o.left_resolved : o.right_resolved;
+  if (in.trace && primary.valid) {
+    const float tip_len = off.muzzle_len > 0.f ? off.muzzle_len : 18.f;
+    const WeaponTipResolve tip =
+        ApplyWeaponTip(primary.pos, primary.ang, tip_len, in.wall_pad, in.trace);
+    if (tip.clipped) {
+      primary.pos = tip.hand_pos;
+      if (in.input.left_handed) {
+        o.left_resolved.pos = primary.pos;
+        o.left_wall.clipped = true;
+      } else {
+        o.right_resolved.pos = primary.pos;
+        o.right_wall.clipped = true;
+      }
+    }
+  }
   o.gun = GunFromHand(primary, off);
   o.aim = ResolveMuzzle(o.gun, primary);
 

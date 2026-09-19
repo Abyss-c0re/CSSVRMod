@@ -75,6 +75,25 @@ TEST(collision_floor_does_not_lock) {
   ASSERT_FALSE(r.clipped);
 }
 
+TEST(collision_weapon_tip_pulls_hand) {
+  auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    if (start.x < 32.f && end.x >= 32.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = (32.f - start.x) / (end.x - start.x);
+      t.hit_pos = {32.f, start.y, start.z};
+    }
+    return t;
+  };
+  auto r = ApplyWeaponTip({20, 0, 40}, Ang3{0, 0, 0}, 18.f, 0.75f, world);
+  ASSERT_TRUE(r.clipped);
+  ASSERT_TRUE(r.hand_pos.x < 20.f); // pulled back off the barrel-in-wall
+}
+
 TEST(collision_wall_resets_on_stop) {
   WallState st;
   st.last_free = {50, 0, 40};

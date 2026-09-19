@@ -176,3 +176,31 @@ TEST(tick_wall_blocks_hand) {
   ASSERT_TRUE(o.right_wall.clipped);
   ASSERT_TRUE(o.right_resolved.pos.x < 80.f);
 }
+
+TEST(tick_weapon_tip_blocks_muzzle) {
+  auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    if (start.x < 32.f && end.x >= 32.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = (32.f - start.x) / (end.x - start.x);
+      t.hit_pos = {32.f, start.y, start.z};
+    }
+    return t;
+  };
+  TickIn in;
+  in.xr.right.valid = true;
+  in.xr.right.pos = {20, 0, 40};
+  in.xr.right.ang = {0, 0, 0}; // +X, barrel toward the wall
+  in.wep = FindWeapon("weapon_ak47");
+  in.trace = world;
+  WallState L, R;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_TRUE(o.gun.valid);
+  ASSERT_TRUE(o.right_wall.clipped);
+  ASSERT_TRUE(o.right_resolved.pos.x < 20.f); // wrist pulled off the barrel-in-wall
+}
