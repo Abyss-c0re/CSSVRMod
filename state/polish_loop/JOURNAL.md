@@ -532,6 +532,18 @@ CreateMove overlay drops on stop. Last stick/buttons used to keep walking after 
 
 ClientCmd minus on stop. Overlay drop left +attack/+duck held. Present releases edges. Offline 148/148. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 125
+
+Idle hunt. CSS not running. No icvar register line. XR worker / stop path unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 126
+
+Idle hunt. CSS not running. No icvar register line. Session teardown left live-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 127
+
+Vision panel freezes stick-turn. Menu owns stick-Y/X; turn used to spin the world under the quad. Existing yaw_off stays. Offline 150/150. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

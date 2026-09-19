@@ -1,13 +1,14 @@
-# Cycle 124 — 2026-09-19
+# Cycle 127 — 2026-09-19
 
 ## Focus
 
-`clientcmd-release-on-stop` — overlay drop left `+attack`/`+duck` held after `cssvr_stop`.
+`panel-freeze-stick-turn` — Vision panel owns the right stick; locomotion turn must not spin the world under the quad.
 
 ## Did
 
-- Recovered cycle 123 tip `338bf46`. CSS is not running. Log still has no `icvar ver=`.
-- Present path releases ClientCmd edges when XR is off. Prev overlay cleared.
+- Recovered cycle 126 tip `a027028`. CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`.
+- InputMap skips `Input_StickTurn` while `panel_visible`. Existing `yaw_off` still applies (heading kept). Move / jump / reload / use unchanged.
+- Tests: `input_panel_freezes_stick_turn`, `tick_panel_freezes_stick_turn`. Offline 150/150.
 
 ## Did not
 
@@ -17,7 +18,7 @@
 
 ## Tests
 
-148 passed / 0 failed (1090 asserts)
+`cssvrmod_tests` 150 passed, 0 failed (1096/1096 asserts)
 
 ## Next
 
