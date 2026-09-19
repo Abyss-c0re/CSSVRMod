@@ -96,6 +96,24 @@ TEST(input_snap_turn_latches) {
   ASSERT_NEAR(c.view_yaw, -60.f, 0.1f);
 }
 
+TEST(input_y_click_lastinv) {
+  XrSample xr;
+  xr.y_click = true;
+  xr.b_click = true;
+  xr.x_click = true;
+  GunPose gun;
+  InputConfig cfg;
+  auto cmd = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_TRUE(cmd.lastinv);
+  ASSERT_TRUE((cmd.buttons & kInReload) != 0);
+  ASSERT_TRUE((cmd.buttons & kInUse) != 0);
+  xr.y_click = false;
+  xr.b_click = false;
+  xr.x_click = false;
+  auto idle = InputMap(xr, gun, cfg, 0.01f);
+  ASSERT_FALSE(idle.lastinv);
+}
+
 TEST(input_deadzone_and_sdl_plan) {
   ASSERT_NEAR(ApplyDead(0.05f, 0.18f), 0.f, 1e-6);
   ASSERT_TRUE(ApplyDead(1.f, 0.18f) > 0.9f);

@@ -33,6 +33,7 @@ struct UserCmdOverlay {
   bool firing = false;
   bool melee_intent = false;
   bool look_from_gun = false;
+  bool lastinv = false; // Y button — CSS lastinv (not a usercmd bit)
   const char* reason = "ok";
 };
 
@@ -116,6 +117,7 @@ inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const Inp
   if (xr.a_click) o.buttons |= kInJump;
   if (xr.b_click) o.buttons |= kInReload;
   if (xr.x_click) o.buttons |= kInUse;
+  if (xr.y_click) o.lastinv = true;
   if (xr.menu) o.buttons |= kInScore;
 
   // Right stick: Source +yaw is left. Cube subtracts on stick-right (look right).

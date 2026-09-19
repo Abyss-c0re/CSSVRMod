@@ -138,6 +138,7 @@ inline void ClientCmd_ApplyEdges(const EngineIf& eng, const UserCmdOverlay& cmd,
     if (now && !was) EngineClientCmd(eng, edges[i].plus);
     if (!now && was) EngineClientCmd(eng, edges[i].minus);
   }
+  if (cmd.lastinv && !prev.lastinv) EngineClientCmd(eng, "lastinv");
 }
 
 void UserCmd_NoteOverlay(const UserCmdOverlay& o);

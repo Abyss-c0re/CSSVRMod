@@ -75,6 +75,7 @@
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.
 - [x] Honest MONO desktop label until `painted_dual` (cycle 15). Not stamped onto dual-eye / lens submit.
 - [ ] Optional GTK/Qt window (CLI host is enough to persist knobs).
+- [x] XR B/X/Y + lastinv (cycle 111). Only A was bound; InputMap already mapped reload/use but Y never fired `lastinv`.
 - [x] VK ClientCmd edges match GL (cycle 110). Present path dropped +use / +attack2 / +showscores; melee and use never fired without CreateMove.
 - [x] Stick-turn yaw persists across ticks (cycle 109). One-frame offset on HMD yaw never rotated. Snap latches like Cube.
 - [x] Stick-right turns right (cycle 108). Source +yaw is left; Cube subtracts on +thumbstick. Used to invert locomotion.

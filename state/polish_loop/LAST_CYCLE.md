@@ -1,13 +1,13 @@
-# Cycle 110 — 2026-09-19
+# Cycle 111 — 2026-09-19
 
 ## Focus
 
-`vk-clientcmd-edges-use-melee` — VK present dropped +use / +attack2 / +showscores that GL already edged.
+`xr-abxy-lastinv` — XR only bound A; B/X/Y were documented but never polled, Y never fired lastinv.
 
 ## Did
 
-- Recovered cycle 109 tip `725fc45`. CSS not running. Log has no `icvar ver=` (a splash at 07:04 died before cmd wrap).
-- Shared `ClientCmd_ApplyEdges` so VK matches GL: melee, use, score, plus analog only when CreateMove is down.
+- Recovered cycle 110 tip `d4273e7`. CSS not running. Log has no `icvar ver=` (splash toast only).
+- Bind Touch B/X/Y. InputMap: B reload, X use, Y `lastinv`. ClientCmd edges lastinv on rising edge.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-134 passed / 0 failed (1034 asserts)
+135 passed / 0 failed (1038 asserts)
 
 ## Next
 

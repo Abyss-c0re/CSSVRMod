@@ -104,6 +104,7 @@ XrHostInfo g_info{};
 XrActionSet g_set = XR_NULL_HANDLE;
 XrAction g_pose = XR_NULL_HANDLE, g_trig = XR_NULL_HANDLE, g_grab = XR_NULL_HANDLE;
 XrAction g_stick = XR_NULL_HANDLE, g_menu = XR_NULL_HANDLE, g_abxy = XR_NULL_HANDLE;
+XrAction g_click_b = XR_NULL_HANDLE, g_click_x = XR_NULL_HANDLE, g_click_y = XR_NULL_HANDLE;
 XrPath g_hand[2]{};
 XrSpace g_aim[2]{};
 
@@ -426,6 +427,9 @@ bool SetupInput() {
   mk(XR_ACTION_TYPE_VECTOR2F_INPUT, "stick", &g_stick);
   mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "menu", &g_menu);
   mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "abxy", &g_abxy);
+  mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "click_b", &g_click_b);
+  mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "click_x", &g_click_x);
+  mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "click_y", &g_click_y);
 
   XrPath prof{};
   xrStringToPath(g_inst, cube_xr::kProfileOculusTouch, &prof);
@@ -446,6 +450,9 @@ bool SetupInput() {
   bind(g_stick, cube_xr::path::rightThumbstick);
   bind(g_menu, cube_xr::path::leftMenuClick);
   bind(g_abxy, cube_xr::path::rightAClick);
+  bind(g_click_b, cube_xr::path::rightBClick);
+  bind(g_click_x, cube_xr::path::leftXClick);
+  bind(g_click_y, cube_xr::path::leftYClick);
   XrInteractionProfileSuggestedBinding sug{XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING};
   sug.interactionProfile = prof;
   sug.countSuggestedBindings = static_cast<uint32_t>(nb);
@@ -820,6 +827,9 @@ bool XrHostPollInput(XrSample* out) {
   stick(1, &out->stick_rx, &out->stick_ry);
   out->menu = bval(g_menu, 0) || bval(g_menu, 1);
   out->a_click = bval(g_abxy, 1);
+  out->b_click = bval(g_click_b, 1);
+  out->x_click = bval(g_click_x, 0);
+  out->y_click = bval(g_click_y, 0);
   pose(0, &out->left);
   pose(1, &out->right);
   SyncMenuHandedness();
