@@ -105,6 +105,7 @@
 - [x] Hand correction clamps to 40u and dead-zones hull noise (cycle 141). Last-free used to snap 70u when rest was solid.
 - [x] Gun hull sample is 10u ahead of the wrist (cycle 145). Lua AdjustCollisionsBox; wrist-only sweep left the gun body in the wall.
 - [x] Empty primary is a fist hull, not a gun (cycle 159). Live Tick has no weapon query; gun box + barrel tip used to yank an empty hand. Lua processHand until holdingGun.
+- [x] Empty fire keeps HMD look (cycle 160). Default WeaponOffset used to slave a phantom 12u muzzle; snap-on-fire yanked view off the HMD. GunFromHand only when WeaponIsGun.
 - [x] Off-hand hull sample is 2.5u ahead of the wrist (cycle 147). Lua processHand offset; wrist-only sphere left the knuckles in the wall. Still a sphere, not a gun box.
 - [x] Trace miss toasts once (cycle 19). Missing iface / failed self-test is not silent.
 - [ ] Live wall collision proven in-game (HMD).

@@ -1,11 +1,11 @@
 {
-  "cycle": 159,
+  "cycle": 160,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-19T14:53:05Z",
-  "last_focus": "empty-primary-not-a-gun",
+  "started_at": "2026-09-19T15:04:52Z",
+  "last_focus": "empty-fire-keeps-hmd-look",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "7329f7d",
+  "last_commit": "ae56d53",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }

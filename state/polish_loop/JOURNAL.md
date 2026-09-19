@@ -672,6 +672,10 @@ Melee vel is relative to the HMD (`467ae0a`). World vel used to punch while walk
 
 Empty primary is a fist hull, not a gun (`7329f7d`). Live Tick has no weapon query; gun box + barrel tip used to yank an empty hand. Offline 170/170. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 160
+
+Empty fire keeps HMD look (`ae56d53`). Default WeaponOffset used to slave a phantom 12u muzzle. Offline 171/171. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
