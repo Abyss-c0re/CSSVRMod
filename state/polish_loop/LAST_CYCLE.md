@@ -1,14 +1,14 @@
-# Cycle 167 — 2026-09-19
+# Cycle 168 — 2026-09-19
 
 ## Focus
 
-`melee-vel-per-hand` — Lua left/right relative vel are independent.
+`floor-ceiling-passthrough` — Lua processHand drops floor/ceiling clips.
 
 ## Did
 
-- Recovered cycle 166 tip `6262bc2` (`2d4b0e9` on origin). CSS is not running.
-- One `HandVelState` finite-diff used to jump from the off-hand fist to the knife (~100u) and punch. Tick now picks left vs right state (`HandVelForHand`). VK/GL hooks reset both on stop. Commit `ce4f587`.
-- Offline tests include `tick_melee_vel_is_per_hand` / `melee_vel_state_is_per_hand`.
+- Recovered cycle 167 tip `ce4f587` (`ba34796` on origin). CSS is not running.
+- Sweep still depens at a floor+solid joint (`floor_solid_depen`). Tick now runs `DropFloorCeilingLock` so the fist is not yanked off the ground. Vertical walls still lock. Commit `e925357`.
+- Offline tests include `collision_floor_passthrough_when_desired_solid` / `tick_floor_does_not_yank_fist`.
 
 ## Did not
 
@@ -19,7 +19,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 175/175 (1193 asserts)
+`cssvrmod_tests` 177/177 (1202 asserts)
 
 ## Next
 

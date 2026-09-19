@@ -1,11 +1,11 @@
 {
-  "cycle": 167,
+  "cycle": 168,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-19T16:39:06Z",
-  "last_focus": "melee-vel-per-hand",
+  "started_at": "2026-09-19T16:51:14Z",
+  "last_focus": "floor-ceiling-passthrough",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "ce4f587",
+  "last_commit": "e925357",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
