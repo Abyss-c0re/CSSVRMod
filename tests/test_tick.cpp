@@ -486,6 +486,43 @@ TEST(tick_gun_hull_blocks_before_wrist) {
   ASSERT_TRUE(o.right_resolved.pos.x < 20.f);
 }
 
+TEST(tick_melee_vel_tracks_between_swings) {
+  // Frozen finite-diff used to jump ~80u on the next punch after an idle swing.
+  TickIn in;
+  in.xr.hmd.valid = true;
+  in.xr.hmd.pos = {0, 0, 40};
+  in.xr.left.valid = true;
+  in.xr.left.pos = {0, 0, 40};
+  in.xr.left.ang = {0, 0, 0};
+  in.xr.trigger_l = 0.9f;
+  in.world_melee_hit = true;
+  HandVelState Lvel, Rvel;
+  in.hand_vel_left = &Lvel;
+  in.hand_vel_right = &Rvel;
+  WallState L, R;
+  float next = 0.f;
+  Tick(in, L, R, &next);
+  in.now = 0.1f;
+  auto hold = Tick(in, L, R, &next);
+  ASSERT_FALSE(hold.melee.hit);
+
+  in.xr.trigger_l = 0.f; // idle swing, no intent
+  in.now = 0.2f;
+  in.xr.left.pos = {16, 0, 40}; // 160 u/s if frozen from t=0.1
+  Tick(in, L, R, &next);
+
+  in.xr.trigger_l = 0.9f; // punch in place
+  in.now = 0.3f;
+  auto punch = Tick(in, L, R, &next);
+  ASSERT_FALSE(punch.melee.hit);
+  ASSERT_STREQ(punch.melee.reason, "below_threshold");
+
+  in.now = 0.4f;
+  in.xr.left.pos = {24, 0, 40}; // 80 u/s relative
+  auto swing = Tick(in, L, R, &next);
+  ASSERT_TRUE(swing.melee.hit);
+}
+
 TEST(tick_melee_vel_is_per_hand) {
   // Shared finite-diff used to jump from off-hand fist to knife (~100u) and punch.
   TickIn in;

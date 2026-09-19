@@ -114,6 +114,20 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
   MeleeSample ms;
   const bool knife = in.wep && in.wep->is_melee;
   const Pose offhand = in.input.left_handed ? o.right_resolved : o.left_resolved;
+  // Lua tracks relative vel every frame. Fist used to sample only while
+  // melee_intent, so the next punch finite-diffed a stale map-width delta.
+  Vec3 vel_l{}, vel_r{};
+  const bool per_hand = in.hand_vel_left || in.hand_vel_right;
+  if (per_hand) {
+    if (o.left_resolved.valid)
+      vel_l = HandVelOrDelta(o.left_resolved, in.now,
+                             HandVelForHand(Hand::Left, in.hand_vel_left, in.hand_vel_right),
+                             in.xr.hmd);
+    if (o.right_resolved.valid)
+      vel_r = HandVelOrDelta(o.right_resolved, in.now,
+                             HandVelForHand(Hand::Right, in.hand_vel_left, in.hand_vel_right),
+                             in.xr.hmd);
+  }
   if (!in.xr.panel_visible && (knife || o.cmd.melee_intent)) {
     const Pose& hand = MeleeSwingPose(primary, offhand, knife);
     if (hand.valid) {
@@ -121,9 +135,8 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
       ms.pos = knife ? hand.pos : MeleeHandOrigin(hand.pos, hand.ang);
       ms.dir = Forward(hand.ang);
       ms.hand = MeleeSwingHandId(in.input.left_handed, knife);
-      ms.vel = HandVelOrDelta(
-          hand, in.now,
-          HandVelForHand(ms.hand, in.hand_vel_left, in.hand_vel_right, in.hand_vel), in.xr.hmd);
+      ms.vel = per_hand ? ((ms.hand == Hand::Left) ? vel_l : vel_r)
+                        : HandVelOrDelta(hand, in.now, in.hand_vel, in.xr.hmd);
       ms.impact = knife ? in.wep->melee_impact : ImpactType::Fist;
       ms.use_weapon = knife;
       ms.is_melee_weapon = knife;
