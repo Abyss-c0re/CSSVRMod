@@ -18,6 +18,16 @@ TEST(look_hmd_overrides_game) {
   ASSERT_NEAR(d.angles.p, 12.f, 0.001);
 }
 
+TEST(look_hmd_includes_stick_turn) {
+  Pose hmd;
+  hmd.ang = {0.f, 80.f, 0.f};
+  hmd.valid = true;
+  auto d = Look_Decide(hmd, nullptr, false, Ang3{0, 0, 0}, -30.f);
+  ASSERT_TRUE(d.applied);
+  ASSERT_NEAR(d.angles.y, 50.f, 0.001);
+  ASSERT_NEAR(d.angles.p, 0.f, 0.001);
+}
+
 TEST(look_invalid_hmd_keeps_game) {
   Pose hmd;
   hmd.ang = {9.f, 9.f, 0.f};

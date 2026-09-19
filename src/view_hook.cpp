@@ -7,6 +7,7 @@
 #include "cssvrmod/module_base.hpp"
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/toast.hpp"
+#include "cssvrmod/usercmd.hpp"
 #include "cssvrmod/vk_eye.hpp"
 #include "xr_host.hpp"
 
@@ -144,7 +145,7 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
     g_orig(self, view, clear, draw);
     return;
   }
-  const auto look = Look_Decide(XrHostLastHmd(), nullptr, false, angles);
+  const auto look = Look_Decide(XrHostLastHmd(), nullptr, false, angles, Turn_PeekYawOff());
   if (look.applied) {
     angles = look.angles;
     ViewSetup_WriteAngles(view, kBlob, g_loc.fields, angles);

@@ -268,6 +268,7 @@ void* XrWorker(void*) {
         now += 0.011f;
         UserCmdOverlay cmd = tout.cmd;
         UserCmd_NoteOverlay(cmd);
+        Turn_NoteYawOff(turn.yaw_off);
         if (g_eng.screen_ok || ProbeLiveEngine(g_eng))
           ClientCmd_ApplyEdges(g_eng, cmd, g_prev_cmd, UserCmd_HookLive());
         g_prev_cmd = cmd;

@@ -484,6 +484,10 @@ XR B/X/Y bound. Y fires lastinv; B/X already mapped reload/use but were never po
 
 ICvar vstdlib NOLOAD is lazy. NOW+NOLOAD can miss a no-SONAME libvstdlib; basename matches maps (deleted). Offline 136/136. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 113
+
+HMD look includes stick-turn yaw. RenderView used to clobber CreateMove locomotion. Offline 137/137. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

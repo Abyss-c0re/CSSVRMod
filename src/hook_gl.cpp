@@ -357,6 +357,7 @@ void HookOnSwap() {
     tin.turn = &g_turn;
     TickOut tout = Tick(tin, g_leftWall, g_rightWall, &g_nextMelee);
     UserCmd_NoteOverlay(tout.cmd);
+    Turn_NoteYawOff(g_turn.yaw_off);
     ApplyClientCmd(tout.cmd, g_prevCmd);
     g_prevCmd = tout.cmd;
     PushSdl(tout.sdl);
