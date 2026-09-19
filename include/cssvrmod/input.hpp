@@ -102,7 +102,7 @@ inline UserCmdOverlay InputMap(const XrSample& xr, const GunPose& gun, const Inp
                    (primaryLeft ? xr.grab_r : xr.grab_l) >= cfg.grab_thresh;
   o.look_from_gun = o.firing && gun.valid;
   const Ang3 look = AimViewAngles(xr.hmd, gun, o.look_from_gun);
-  o.view_pitch = look.p;
+  o.view_pitch = AngleNormalize(look.p);
   o.view_yaw = look.y;
 
   const float mx = ApplyDead(xr.stick_lx, cfg.stick_dead);

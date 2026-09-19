@@ -16,6 +16,7 @@ inline LookDecision Look_Decide(const Pose& hmd, const GunPose* gun, bool firing
   d.angles = game;
   if (firing && gun && gun->valid) {
     d.angles = VectorAngles(gun->forward);
+    d.angles.p = AngleNormalize(d.angles.p);
     d.angles.y = AngleNormalize(d.angles.y);
     d.applied = true;
     d.reason = "snap_fire";

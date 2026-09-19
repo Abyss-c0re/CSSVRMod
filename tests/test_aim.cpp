@@ -62,3 +62,14 @@ TEST(aim_view_snap_on_fire) {
   auto idle = AimViewAngles(hmd, gun, false);
   ASSERT_NEAR(idle.y, 0.f, 1.f);
 }
+
+TEST(aim_view_lookup_pitch_sane) {
+  Pose hmd;
+  hmd.valid = true;
+  GunPose gun;
+  gun.forward = {0, 0, 1}; // Source +Z up — VectorAngles pitch 270
+  gun.valid = true;
+  auto look = AimViewAngles(hmd, gun, true);
+  ASSERT_NEAR(look.p, -90.f, 1.f);
+  ASSERT_TRUE(std::fabs(look.p) <= 180.f);
+}

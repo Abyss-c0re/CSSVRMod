@@ -177,11 +177,16 @@ inline const char* Laser_StatusLabel(const LaserDecision& d) {
 }
 
 /// Snap-on-fire: while shooting, viewangles follow the gun; otherwise HMD.
+/// VectorAngles uses 270 for look-up; ViewAnglesSane rejects pitch > 180.
 inline Ang3 AimViewAngles(const Pose& hmd, const GunPose& gun, bool firing) {
-  if (firing && gun.valid) return VectorAngles(gun.forward);
-  if (hmd.valid) return hmd.ang;
-  if (gun.valid) return gun.ang;
-  return {};
+  Ang3 a;
+  if (firing && gun.valid) a = VectorAngles(gun.forward);
+  else if (hmd.valid) a = hmd.ang;
+  else if (gun.valid) a = gun.ang;
+  else return {};
+  a.p = AngleNormalize(a.p);
+  a.y = AngleNormalize(a.y);
+  return a;
 }
 
 /// Mouse delta (pixels) to close viewangles toward target. CSS look via SDL mouse.

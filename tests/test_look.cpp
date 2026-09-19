@@ -62,6 +62,18 @@ TEST(look_snap_fire_beats_hmd) {
   ASSERT_NEAR(d.angles.y, 90.f, 1.f);
 }
 
+TEST(look_snap_fire_lookup_sane) {
+  Pose hmd;
+  hmd.valid = true;
+  GunPose gun;
+  gun.forward = {0.f, 0.f, 1.f};
+  gun.valid = true;
+  auto d = Look_Decide(hmd, &gun, true, Ang3{0, 0, 0});
+  ASSERT_TRUE(d.applied);
+  ASSERT_TRUE(ViewAnglesSane(d.angles));
+  ASSERT_NEAR(d.angles.p, -90.f, 1.f);
+}
+
 static Ang3 g_fake_ang{0.f, 10.f, 0.f};
 
 static void FakeGetAng(void*, Ang3* a) {
