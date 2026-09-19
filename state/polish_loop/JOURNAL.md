@@ -652,6 +652,18 @@ Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No
 
 Fist melee origin is 5u along hand forward. Wrist-only 5u reach left the knuckles short. Off-hand still swings from primary. Offline 165/165. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 155
+
+Idle hunt. CSS not running. No icvar register line. Off-hand melee left unwired (no helper-ladder). No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 156
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 157
+
+Off-hand fist melee uses the off-hand (`20d9e1f`). Off-hand trigger used to hull the primary. Knife stays on the gun hand. Offline 167/167. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
