@@ -104,7 +104,8 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
   const bool knife = in.wep && in.wep->is_melee;
   if (!in.xr.panel_visible && (knife || o.cmd.melee_intent)) {
     const Pose& hand = primary;
-    ms.pos = hand.pos;
+    // Lua fist: pos + Forward * DEFAULT_OFFSET (5). Wrist-only left the knuckles short.
+    ms.pos = knife ? hand.pos : MeleeHandOrigin(hand.pos, hand.ang);
     ms.dir = Forward(hand.ang);
     ms.vel = HandVelOrDelta(hand, in.now, in.hand_vel);
     ms.hand = in.input.left_handed ? Hand::Left : Hand::Right;

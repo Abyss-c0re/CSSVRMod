@@ -57,6 +57,13 @@ struct MeleeConfig {
 inline float MeleeThresholdUnits(const MeleeConfig& c) { return c.vel_threshold * 50.f; }
 inline float MeleeHeadThresholdUnits(const MeleeConfig& c) { return MeleeThresholdUnits(c) * 0.5f; }
 
+// Lua DEFAULT_OFFSET. Fist traces from the knuckles, not the controller body.
+constexpr float kMeleeHandOffset = 5.f;
+
+inline Vec3 MeleeHandOrigin(Vec3 pos, const Ang3& ang) {
+  return pos + Forward(ang) * kMeleeHandOffset;
+}
+
 inline float MeleeImpactMultiplier(ImpactType t) {
   switch (t) {
   case ImpactType::Blunt: return 1.25f;

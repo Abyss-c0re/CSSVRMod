@@ -3,6 +3,14 @@
 
 using namespace cssvr;
 
+TEST(melee_hand_origin_is_knuckles) {
+  const Vec3 fist = MeleeHandOrigin({0, 0, 40}, {0, 0, 0}); // +X
+  ASSERT_NEAR(fist.x, 5.f, 0.05);
+  ASSERT_NEAR(fist.z, 40.f, 0.05);
+  const Vec3 left = MeleeHandOrigin({0, 0, 0}, {0, 90, 0}); // +Y
+  ASSERT_NEAR(left.y, 5.f, 0.05);
+}
+
 TEST(melee_threshold_and_damage) {
   MeleeConfig c;
   ASSERT_NEAR(MeleeThresholdUnits(c), 75.f, 1e-4);
