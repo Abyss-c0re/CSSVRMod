@@ -508,6 +508,10 @@ Left stick-click ducks. kInDuck / SDL ctrl were dead; VK present had no +duck. C
 
 Stick-turn yaw wraps. Unbounded yaw_off passed ±720 so ViewAnglesSane dropped look. Offline 140/140. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 119
+
+Snap-on-fire pitch wraps. VectorAngles look-up is 270°; ViewAnglesSane dropped usercmd / SetViewAngles. Offline 142/142. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

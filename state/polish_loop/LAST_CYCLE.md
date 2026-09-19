@@ -1,13 +1,13 @@
-# Cycle 118 — 2026-09-19
+# Cycle 119 — 2026-09-19
 
 ## Focus
 
-`stick-turn-yaw-wrap` — unbounded stick yaw passed ±720 so ViewAnglesSane dropped look.
+`aim-pitch-normalize` — VectorAngles look-up is 270°; ViewAnglesSane dropped snap-on-fire.
 
 ## Did
 
-- Recovered cycle 117 tip `c8a10d6`. CSS is not running. Log still has no `icvar ver=`.
-- `AngleNormalize` wraps stick-turn `yaw_off` and Look/InputMap yaw. After ~6 spins, SetViewAngles / usercmd used to refuse.
+- Recovered cycle 118 tip `34eb480`. CSS is not running. Log still has no `icvar ver=`.
+- AimViewAngles / Look_Decide wrap pitch (270 → -90). Firing while aiming up used to skip usercmd and SetViewAngles.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-140 passed / 0 failed (1056 asserts)
+142 passed / 0 failed (1061 asserts)
 
 ## Next
 
