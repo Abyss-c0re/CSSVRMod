@@ -1,14 +1,14 @@
-# Cycle 168 — 2026-09-19
+# Cycle 170 — 2026-09-19
 
 ## Focus
 
-`floor-ceiling-passthrough` — Lua processHand drops floor/ceiling clips.
+`melee-vel-tracks-between-swings` — Lua samples relative vel every frame.
 
 ## Did
 
-- Recovered cycle 167 tip `ce4f587` (`ba34796` on origin). CSS is not running.
-- Sweep still depens at a floor+solid joint (`floor_solid_depen`). Tick now runs `DropFloorCeilingLock` so the fist is not yanked off the ground. Vertical walls still lock. Commit `e925357`.
-- Offline tests include `collision_floor_passthrough_when_desired_solid` / `tick_floor_does_not_yank_fist`.
+- Recovered cycle 169 tip `e925357` (`9d08ff1` on origin). CSS is not running.
+- Fist finite-diff used to sample only while `melee_intent`. Live Tick is empty-handed, so the next punch inherited a stale delta. Per-hand states now update every tick. Commit `94d7b29`.
+- Offline test `tick_melee_vel_tracks_between_swings`.
 
 ## Did not
 
@@ -19,7 +19,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 177/177 (1202 asserts)
+`cssvrmod_tests` 178/178 (1206 asserts)
 
 ## Next
 

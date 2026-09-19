@@ -708,6 +708,14 @@ Melee vel is per-hand (`ce4f587`). One HandVelState used to finite-diff from the
 
 Floor/ceiling clips do not lock the fist (`e925357`). Lua processHand drops them after the sweep; floor_solid_depen used to yank the hand off the ground. Offline 177/177. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 169
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 170
+
+Melee vel tracks between swings (`94d7b29`). Fist finite-diff used to sample only while melee_intent; next punch inherited a stale delta. Offline 178/178. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
