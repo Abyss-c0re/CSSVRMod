@@ -84,6 +84,11 @@ inline Vec3 AdjustCollisionsBox(Vec3 pos, const Ang3& ang, bool isMelee) {
   return pos + fwd * forwardOffset - right * leftOffset + up * upOffset;
 }
 
+/// Lua: sweep the gun hull sample, apply that delta back to the wrist.
+inline Vec3 WristFromHullSample(Vec3 wrist, Vec3 sample, Vec3 safe) {
+  return wrist + (safe - sample);
+}
+
 inline bool IsFloorOrCeilingNormal(const Vec3& n, float thresh = 0.55f) {
   return std::fabs(n.z) > thresh;
 }

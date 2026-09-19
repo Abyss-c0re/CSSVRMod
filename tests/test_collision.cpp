@@ -94,6 +94,16 @@ TEST(collision_weapon_tip_pulls_hand) {
   ASSERT_TRUE(r.hand_pos.x < 20.f); // pulled back off the barrel-in-wall
 }
 
+TEST(collision_adjust_box_offsets_gun_forward) {
+  const Vec3 gun = AdjustCollisionsBox({0, 0, 0}, {0, 0, 0}, false);
+  ASSERT_NEAR(gun.x, 10.f, 0.1);
+  ASSERT_NEAR(gun.z, 4.f, 0.1);
+  const Vec3 knife = AdjustCollisionsBox({0, 0, 0}, {0, 0, 0}, true);
+  ASSERT_NEAR(knife.x, 3.f, 0.1);
+  const Vec3 wrist = WristFromHullSample({20, 0, 40}, {30, 0, 44}, {28, 0, 44});
+  ASSERT_NEAR(wrist.x, 18.f, 0.1);
+}
+
 TEST(collision_wall_resets_on_stop) {
   WallState st;
   st.last_free = {50, 0, 40};

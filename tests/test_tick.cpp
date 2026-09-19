@@ -275,6 +275,48 @@ TEST(tick_wall_correction_caps_last_free_yank) {
   ASSERT_NEAR(o.right_resolved.pos.x, 40.f, 1.f);
 }
 
+TEST(tick_gun_hull_blocks_before_wrist) {
+  // Wrist is free; the 10u gun sample is in the wall. Point traces (tip) miss
+  // so this is the hull offset, not the barrel ray.
+  auto world = [](Vec3 start, Vec3 end, Vec3 mins, Vec3 maxs) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    const bool hull = mins.LengthSqr() > 0.01f || maxs.LengthSqr() > 0.01f;
+    if (!hull) return t;
+    auto solid = [](const Vec3& p) { return p.x >= 28.f; };
+    t.start_solid = solid(start);
+    t.all_solid = solid(start) && solid(end);
+    if (t.start_solid) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = start;
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = 0.f;
+      return t;
+    }
+    if (start.x < 28.f && end.x >= 28.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = {28, start.y, start.z};
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = (28.f - start.x) / (end.x - start.x);
+    }
+    return t;
+  };
+  TickIn in;
+  in.xr.right.valid = true;
+  in.xr.right.pos = {20, 0, 40};
+  in.xr.right.ang = {0, 0, 0}; // +X, gun sample ~10u ahead
+  in.wep = FindWeapon("weapon_ak47");
+  in.trace = world;
+  WallState L, R;
+  float next = 0.f;
+  auto o = Tick(in, L, R, &next);
+  ASSERT_TRUE(o.right_wall.clipped);
+  ASSERT_TRUE(o.right_resolved.pos.x < 20.f);
+}
+
 TEST(tick_weapon_tip_blocks_muzzle) {
   auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
     TraceHit t;

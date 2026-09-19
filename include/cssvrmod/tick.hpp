@@ -46,28 +46,23 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
   o.right_resolved = in.xr.right;
 
   if (in.trace) {
-    if (in.xr.left.valid) {
-      o.left_wall =
-          ResolveHandWallSweep(in.xr.left.pos, leftWall, in.hand_radius, in.wall_pad, in.trace);
-      o.left_wall = ApplyWallLockRelease(o.left_wall, leftWall, in.xr.left.pos, in.xr.hmd.valid,
-                                        in.xr.hmd.pos);
-      o.left_resolved.pos = ApplyHandCorrection(in.xr.left.pos, o.left_wall.pos);
-      if (!o.left_wall.clipped) {
-        leftWall.last_free = o.left_resolved.pos;
-        leftWall.has_free = true;
+    const bool melee = in.wep && in.wep->is_melee;
+    auto resolve = [&](const Pose& hand, bool primary, WallState& st, WallResolve* wall,
+                       Pose* resolved) {
+      if (!hand.valid) return;
+      const Vec3 sample =
+          primary ? AdjustCollisionsBox(hand.pos, hand.ang, melee) : hand.pos;
+      *wall = ResolveHandWallSweep(sample, st, in.hand_radius, in.wall_pad, in.trace);
+      *wall = ApplyWallLockRelease(*wall, st, sample, in.xr.hmd.valid, in.xr.hmd.pos);
+      const Vec3 safe = ApplyHandCorrection(sample, wall->pos);
+      resolved->pos = WristFromHullSample(hand.pos, sample, safe);
+      if (!wall->clipped) {
+        st.last_free = safe;
+        st.has_free = true;
       }
-    }
-    if (in.xr.right.valid) {
-      o.right_wall =
-          ResolveHandWallSweep(in.xr.right.pos, rightWall, in.hand_radius, in.wall_pad, in.trace);
-      o.right_wall = ApplyWallLockRelease(o.right_wall, rightWall, in.xr.right.pos, in.xr.hmd.valid,
-                                         in.xr.hmd.pos);
-      o.right_resolved.pos = ApplyHandCorrection(in.xr.right.pos, o.right_wall.pos);
-      if (!o.right_wall.clipped) {
-        rightWall.last_free = o.right_resolved.pos;
-        rightWall.has_free = true;
-      }
-    }
+    };
+    resolve(in.xr.left, in.input.left_handed, leftWall, &o.left_wall, &o.left_resolved);
+    resolve(in.xr.right, !in.input.left_handed, rightWall, &o.right_wall, &o.right_resolved);
   }
 
   WeaponOffset off;
