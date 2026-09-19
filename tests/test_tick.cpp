@@ -177,6 +177,59 @@ TEST(tick_wall_blocks_hand) {
   ASSERT_TRUE(o.right_resolved.pos.x < 80.f);
 }
 
+TEST(tick_wall_lock_releases_on_hmd_teleport) {
+  auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
+    TraceHit t;
+    t.start_pos = start;
+    t.end_pos = end;
+    auto solid = [](const Vec3& p) { return p.x >= 50.f; };
+    t.start_solid = solid(start);
+    t.all_solid = solid(start) && solid(end);
+    if (t.start_solid) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = start;
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = 0.f;
+      return t;
+    }
+    if (start.x < 50.f && end.x >= 50.f) {
+      t.hit = true;
+      t.hit_world = true;
+      t.hit_pos = {50, start.y, start.z};
+      t.hit_normal = {-1, 0, 0};
+      t.fraction = (50.f - start.x) / (end.x - start.x);
+    }
+    return t;
+  };
+  TickIn in;
+  in.xr.right.valid = true;
+  in.xr.right.pos = {80, 0, 40};
+  in.xr.right.ang = {0, 0, 0};
+  in.trace = world;
+  WallState L, R;
+  R.last_free = {10, 0, 40};
+  R.has_free = true;
+  float next = 0.f;
+
+  // Nearby HMD: keep last-free so the hand does not punch through.
+  in.xr.hmd.valid = true;
+  in.xr.hmd.pos = {20, 0, 40};
+  auto keep = Tick(in, L, R, &next);
+  ASSERT_TRUE(keep.right_wall.clipped);
+  ASSERT_TRUE(keep.right_resolved.pos.x < 50.f);
+
+  // Spawn/teleport: last-free is a map away from the HMD — do not yank the hand.
+  R.last_free = {10, 0, 40};
+  R.has_free = true;
+  in.xr.hmd.pos = {200, 0, 40};
+  auto drop = Tick(in, L, R, &next);
+  ASSERT_FALSE(drop.right_wall.clipped);
+  ASSERT_STREQ(drop.right_wall.reason, "hmd_teleport");
+  ASSERT_TRUE(drop.right_resolved.pos.x > 40.f);
+  ASSERT_NEAR(drop.right_resolved.pos.x, 80.f, 0.1);
+}
+
 TEST(tick_weapon_tip_blocks_muzzle) {
   auto world = [](Vec3 start, Vec3 end, Vec3, Vec3) {
     TraceHit t;

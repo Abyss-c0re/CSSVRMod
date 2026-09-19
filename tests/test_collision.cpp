@@ -103,3 +103,31 @@ TEST(collision_wall_resets_on_stop) {
   ASSERT_NEAR(st.last_free.Length(), 0.f, 0.001);
   Wall_Reset(nullptr);
 }
+
+TEST(collision_wall_lock_releases_far_from_hmd) {
+  ASSERT_FALSE(ShouldReleaseWallLock({10, 0, 40}, {20, 0, 40}));
+  ASSERT_TRUE(ShouldReleaseWallLock({10, 0, 40}, {200, 0, 40}));
+
+  WallState st;
+  st.last_free = {10, 0, 40};
+  st.has_free = true;
+  WallResolve r;
+  r.pos = {10, 0, 40};
+  r.clipped = true;
+  r.reason = "wall_rest";
+  auto keep = ApplyWallLockRelease(r, st, {80, 0, 40}, true, {20, 0, 40});
+  ASSERT_TRUE(keep.clipped);
+  ASSERT_TRUE(st.has_free);
+  ASSERT_STREQ(keep.reason, "wall_rest");
+
+  auto drop = ApplyWallLockRelease(r, st, {80, 0, 40}, true, {200, 0, 40});
+  ASSERT_FALSE(drop.clipped);
+  ASSERT_FALSE(st.has_free);
+  ASSERT_NEAR(drop.pos.x, 80.f, 0.01);
+  ASSERT_STREQ(drop.reason, "hmd_teleport");
+
+  st.has_free = true;
+  auto no_hmd = ApplyWallLockRelease(r, st, {80, 0, 40}, false, {200, 0, 40});
+  ASSERT_TRUE(no_hmd.clipped);
+  ASSERT_TRUE(st.has_free);
+}

@@ -49,6 +49,8 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
     if (in.xr.left.valid) {
       o.left_wall =
           ResolveHandWallSweep(in.xr.left.pos, leftWall, in.hand_radius, in.wall_pad, in.trace);
+      o.left_wall = ApplyWallLockRelease(o.left_wall, leftWall, in.xr.left.pos, in.xr.hmd.valid,
+                                        in.xr.hmd.pos);
       o.left_resolved.pos = o.left_wall.pos;
       if (!o.left_wall.clipped) {
         leftWall.last_free = o.left_resolved.pos;
@@ -58,6 +60,8 @@ inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float*
     if (in.xr.right.valid) {
       o.right_wall =
           ResolveHandWallSweep(in.xr.right.pos, rightWall, in.hand_radius, in.wall_pad, in.trace);
+      o.right_wall = ApplyWallLockRelease(o.right_wall, rightWall, in.xr.right.pos, in.xr.hmd.valid,
+                                         in.xr.hmd.pos);
       o.right_resolved.pos = o.right_wall.pos;
       if (!o.right_wall.clipped) {
         rightWall.last_free = o.right_resolved.pos;

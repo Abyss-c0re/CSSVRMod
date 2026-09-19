@@ -266,4 +266,17 @@ inline bool ShouldReleaseWallLock(const Vec3& safePos, const Vec3& hmdPos) {
   return safePos.DistToSqr(hmdPos) > kWallReleaseFromHmdSqr;
 }
 
+/// Drop last-free when the safe sample is beyond arm-reach of the HMD (Lua).
+/// Tick used to keep last-free across spawn/teleport and yank the hand ~map-width.
+inline WallResolve ApplyWallLockRelease(WallResolve r, WallState& st, Vec3 desired, bool hmd_valid,
+                                        const Vec3& hmd) {
+  if (!r.clipped || !hmd_valid) return r;
+  if (!ShouldReleaseWallLock(r.pos, hmd)) return r;
+  Wall_Reset(&st);
+  r.pos = desired;
+  r.clipped = false;
+  r.reason = "hmd_teleport";
+  return r;
+}
+
 } // namespace cssvr
