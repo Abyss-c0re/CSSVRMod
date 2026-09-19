@@ -504,6 +504,10 @@ Idle hunt. CSS not running. No icvar register line. VK eye store / dual distinct
 
 Left stick-click ducks. kInDuck / SDL ctrl were dead; VK present had no +duck. Cube sprint slot — CSS has no sprint. Offline 138/138. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 118
+
+Stick-turn yaw wraps. Unbounded yaw_off passed ±720 so ViewAnglesSane dropped look. Offline 140/140. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

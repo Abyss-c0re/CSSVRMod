@@ -1,26 +1,23 @@
-# Cycle 117 — 2026-09-19
+# Cycle 118 — 2026-09-19
 
 ## Focus
 
-`stick-click-duck` — `kInDuck` / SDL ctrl existed; XR never crouched.
+`stick-turn-yaw-wrap` — unbounded stick yaw passed ±720 so ViewAnglesSane dropped look.
 
 ## Did
 
-- Recovered cycle 116 tip `09eff72`. CSS is not running. Log still has no `icvar ver=`.
-- Left thumbstick click → `IN_DUCK`. Cube uses that slot for sprint; CSS has none. A stays jump, B stays reload.
-- VK ClientCmd edge `+duck`/`-duck` so present still ducks when CreateMove is live.
-- OpenXR binds `/user/hand/left/input/thumbstick/click`.
+- Recovered cycle 117 tip `c8a10d6`. CSS is not running. Log still has no `icvar ver=`.
+- `AngleNormalize` wraps stick-turn `yaw_off` and Look/InputMap yaw. After ~6 spins, SetViewAngles / usercmd used to refuse.
 
 ## Did not
 
 - HMD walk. Stereo unproven.
 - Queue `dual-renderview-ipd-origin`.
-- Remap A/B to Cube crouch/jump (would steal reload).
 - Invent print/help/menu/toast/cfg chrome.
 
 ## Tests
 
-138 passed / 0 failed (1051 asserts)
+140 passed / 0 failed (1056 asserts)
 
 ## Next
 
