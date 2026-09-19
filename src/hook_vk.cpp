@@ -220,7 +220,9 @@ bool MailboxFull() {
 
 void* XrWorker(void*) {
   Log("xr worker start");
+  TurnState turn;
   while (true) {
+    if (!XrWanted()) Turn_Reset(&turn);
     std::vector<unsigned char> frame, frame_r;
     int w = 0, h = 0;
     bool bgra = false;
@@ -251,7 +253,6 @@ void* XrWorker(void*) {
       if (XrHostPollInput(&xr)) {
         static WallState leftWall, rightWall;
         static HandVelState rightVel;
-        static TurnState turn;
         static float nextMelee = 0.f;
         static float now = 0.f;
         TickIn tin;

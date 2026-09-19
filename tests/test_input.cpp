@@ -189,6 +189,23 @@ TEST(input_panel_freezes_stick_turn) {
   ASSERT_NEAR(live.view_yaw, -120.f, 1.f);
 }
 
+TEST(input_turn_resets_on_stop) {
+  TurnState t;
+  t.yaw_off = -90.f;
+  t.snap_latched = true;
+  Turn_Reset(&t);
+  ASSERT_NEAR(t.yaw_off, 0.f, 0.001);
+  ASSERT_FALSE(t.snap_latched);
+  Turn_Reset(nullptr);
+  XrSample xr;
+  xr.hmd.valid = true;
+  xr.hmd.ang = {0, 10, 0};
+  GunPose gun;
+  InputConfig cfg;
+  auto cmd = InputMap(xr, gun, cfg, 0.01f, &t);
+  ASSERT_NEAR(cmd.view_yaw, 10.f, 0.1f);
+}
+
 TEST(input_stick_click_ducks) {
   XrSample xr;
   xr.stick_click_l = true;

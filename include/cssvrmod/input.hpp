@@ -71,6 +71,11 @@ struct TurnState {
   bool snap_latched = false;
 };
 
+/// cssvr_stop used to keep the worker/GL TurnState, so the next start inherited heading.
+inline void Turn_Reset(TurnState* t) {
+  if (t) *t = TurnState{};
+}
+
 inline void Input_StickTurn(TurnState* t, float rx, const InputConfig& cfg, float dt) {
   if (!t) return;
   if (cfg.snap_turn) {

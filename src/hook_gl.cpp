@@ -342,6 +342,7 @@ void HookOnSwap() {
   if (!CssvrWantXr()) {
     ClientCmd_ReleaseHeld(g_eng, &g_prevCmd, UserCmd_HookLive());
     UserCmd_ClearOverlay();
+    Turn_Reset(&g_turn);
   }
   XrSample xr{};
   const bool got = g_xr_ok && XrHostPollInput(&xr);
