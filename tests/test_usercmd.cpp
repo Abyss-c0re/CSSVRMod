@@ -1,4 +1,5 @@
 #include "cssvrmod/create_move.hpp"
+#include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/usercmd.hpp"
 #include "test_framework.h"
@@ -80,6 +81,24 @@ TEST(usercmd_note_peek) {
   UserCmdOverlay b{};
   ASSERT_TRUE(UserCmd_PeekOverlay(&b));
   ASSERT_NEAR(b.forwardmove, 12.f, 0.001);
+}
+
+TEST(usercmd_overlay_drops_when_xr_off) {
+  UserCmdOverlay o;
+  o.forwardmove = 450.f;
+  o.buttons = kInForward;
+  UserCmd_NoteOverlay(o);
+  Turn_NoteYawOff(30.f);
+  CssvrSetEnabled(false);
+  UserCmdOverlay b{};
+  ASSERT_FALSE(UserCmd_PeekOverlay(&b));
+  ASSERT_NEAR(Turn_PeekYawOff(), 0.f, 0.001);
+  CssvrSetEnabled(true);
+  ASSERT_TRUE(UserCmd_PeekOverlay(&b));
+  ASSERT_NEAR(b.forwardmove, 450.f, 0.001);
+  UserCmd_ClearOverlay();
+  ASSERT_FALSE(UserCmd_PeekOverlay(&b));
+  CssvrOverride().store(-1);
 }
 
 TEST(createmove_locate_css) {

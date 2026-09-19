@@ -144,6 +144,7 @@ inline void ClientCmd_ApplyEdges(const EngineIf& eng, const UserCmdOverlay& cmd,
 
 void UserCmd_NoteOverlay(const UserCmdOverlay& o);
 bool UserCmd_PeekOverlay(UserCmdOverlay* o);
+void UserCmd_ClearOverlay();
 void Turn_NoteYawOff(float yaw_off);
 float Turn_PeekYawOff();
 bool UserCmd_HookLive();

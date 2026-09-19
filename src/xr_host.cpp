@@ -6,6 +6,7 @@
 #include "cssvrmod/settings.hpp"
 #include "cssvrmod/stereo_view.hpp"
 #include "cssvrmod/toast.hpp"
+#include "cssvrmod/usercmd.hpp"
 #include "cssvrmod/xr_loader.hpp"
 #include "cssvrmod/xr_session.hpp"
 #include "openxr_paths.hpp"
@@ -634,6 +635,7 @@ void XrHostShutdown() {
   g_sess = XR_NULL_HANDLE;
   g_info = XrHostInfo{};
   g_info.reason = "shutdown";
+  UserCmd_ClearOverlay();
   if (XrSession_ResetToastOnShutdown()) g_toast_shown = false;
 }
 

@@ -1,3 +1,4 @@
+#include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/usercmd.hpp"
 #include <mutex>
 
@@ -17,10 +18,18 @@ void UserCmd_NoteOverlay(const UserCmdOverlay& o) {
 
 bool UserCmd_PeekOverlay(UserCmdOverlay* o) {
   if (!o) return false;
+  if (!CssvrWantXr()) return false;
   std::lock_guard<std::mutex> lk(g_ov_mu);
   if (!g_have) return false;
   *o = g_ov;
   return true;
+}
+
+void UserCmd_ClearOverlay() {
+  std::lock_guard<std::mutex> lk(g_ov_mu);
+  g_ov = {};
+  g_have = false;
+  g_yaw_off = 0.f;
 }
 
 void Turn_NoteYawOff(float yaw_off) {
@@ -29,6 +38,7 @@ void Turn_NoteYawOff(float yaw_off) {
 }
 
 float Turn_PeekYawOff() {
+  if (!CssvrWantXr()) return 0.f;
   std::lock_guard<std::mutex> lk(g_ov_mu);
   return g_yaw_off;
 }
