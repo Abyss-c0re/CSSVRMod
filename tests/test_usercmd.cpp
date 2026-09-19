@@ -83,6 +83,16 @@ TEST(usercmd_note_peek) {
   ASSERT_NEAR(b.forwardmove, 12.f, 0.001);
 }
 
+TEST(clientcmd_release_held_clears_prev) {
+  EngineIf e;
+  UserCmdOverlay prev;
+  prev.buttons = kInAttack | kInDuck | kInJump;
+  ASSERT_TRUE(ClientCmd_ReleaseHeld(e, &prev, true));
+  ASSERT_EQ(prev.buttons, 0);
+  ASSERT_FALSE(ClientCmd_ReleaseHeld(e, &prev, true));
+  ASSERT_FALSE(ClientCmd_ReleaseHeld(e, nullptr, true));
+}
+
 TEST(usercmd_overlay_drops_when_xr_off) {
   UserCmdOverlay o;
   o.forwardmove = 450.f;

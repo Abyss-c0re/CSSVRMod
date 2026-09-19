@@ -339,6 +339,10 @@ void HookOnSwap() {
   Once();
   ViewHookTryInstall();
   UserCmd_HookLive();
+  if (!CssvrWantXr()) {
+    ClientCmd_ReleaseHeld(g_eng, &g_prevCmd, UserCmd_HookLive());
+    UserCmd_ClearOverlay();
+  }
   XrSample xr{};
   const bool got = g_xr_ok && XrHostPollInput(&xr);
   if (g_xr_ok) XrHostBeginFrame();

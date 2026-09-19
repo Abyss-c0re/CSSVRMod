@@ -142,6 +142,16 @@ inline void ClientCmd_ApplyEdges(const EngineIf& eng, const UserCmdOverlay& cmd,
   if (cmd.lastinv && !prev.lastinv) EngineClientCmd(eng, "lastinv");
 }
 
+/// cssvr_stop used to leave +attack/+duck held (CreateMove overlay dropped, minus never sent).
+inline bool ClientCmd_ReleaseHeld(const EngineIf& eng, UserCmdOverlay* prev, bool usercmd_live) {
+  if (!prev) return false;
+  if (prev->buttons == 0 && !prev->lastinv) return false;
+  UserCmdOverlay empty{};
+  ClientCmd_ApplyEdges(eng, empty, *prev, usercmd_live);
+  *prev = empty;
+  return true;
+}
+
 void UserCmd_NoteOverlay(const UserCmdOverlay& o);
 bool UserCmd_PeekOverlay(UserCmdOverlay* o);
 void UserCmd_ClearOverlay();
