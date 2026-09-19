@@ -552,6 +552,22 @@ Stick-turn yaw resets on stop. Worker/GL TurnState used to keep heading across c
 
 Hand vel + last-free reset on stop. Restart used to finite-diff a fake melee swing and yank hands to the old map pose. Offline 153/153. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 130
+
+Idle hunt. CSS not running. No icvar register line. Session teardown left live-gated; weapon-tip still unwired. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 131
+
+Idle hunt. CSS not running. No icvar register line. cssvr_set already live-saves calib; snap-fire stays CreateMove-only. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 132
+
+Idle hunt. CSS not running. No icvar register line. ViewAnglesSane / QuatToAng unchanged; live wep still nullptr. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 133
+
+Weapon tip pulls the primary hand. Tick hulled the wrist then slaved a barrel through the wall. Offline 155/155. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

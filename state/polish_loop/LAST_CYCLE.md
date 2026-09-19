@@ -1,14 +1,14 @@
-# Cycle 129 — 2026-09-19
+# Cycle 133 — 2026-09-19
 
 ## Focus
 
-`pose-session-reset-on-stop` — hand vel and last-free hull must not survive cssvr_stop.
+`weapon-tip-wall` — barrel tip must not pass through a wall (Lua ApplyWeaponWallToHand).
 
 ## Did
 
-- Recovered cycle 128 tip `69f87bc`. CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`.
-- `HandVel_Reset` / `Wall_Reset`. VK worker and GL swap clear them with turn when XR is off. Restart no longer finite-diffs a fake swing or yanks hands to the old map pose.
-- Tests: `melee_hand_vel_resets_on_stop`, `collision_wall_resets_on_stop`. Offline 153/153.
+- Recovered cycle 132 (uncommitted idle) tip `9d0144e`. CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`.
+- Tick applies `ApplyWeaponTip` on the primary hand after the last-free hull, then slaves the gun. Wrist pulled back when the muzzle ray hits.
+- Tests: `collision_weapon_tip_pulls_hand`, `tick_weapon_tip_blocks_muzzle`. Offline 155/155.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 153 passed, 0 failed (1103/1103 asserts)
+`cssvrmod_tests` 155 passed, 0 failed (1108/1108 asserts)
 
 ## Next
 
