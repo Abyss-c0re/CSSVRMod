@@ -676,6 +676,22 @@ Empty primary is a fist hull, not a gun (`7329f7d`). Live Tick has no weapon que
 
 Empty fire keeps HMD look (`ae56d53`). Default WeaponOffset used to slave a phantom 12u muzzle. Offline 171/171. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 161
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 162
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 163
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 164
+
+Melee finite-diff is relative to HMD pos (`6262bc2`). Live OpenXR never fills pose.vel; world delta used to punch while walking. Offline 173/173. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

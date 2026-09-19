@@ -1,13 +1,13 @@
-# Cycle 160 — 2026-09-19
+# Cycle 164 — 2026-09-19
 
 ## Focus
 
-`empty-fire-keeps-hmd-look` — no gun means no snap-on-fire; live Tick has no weapon query.
+`melee-finite-diff-relative-to-hmd` — live OpenXR never fills pose.vel; world delta used to punch while walking.
 
 ## Did
 
-- Recovered cycle 159 tip `7329f7d` (`b1ce28b` on origin). CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`. Product commit `ae56d53`.
-- Empty primary still ran `GunFromHand` with the default 12u muzzle. Trigger fire snap-aimed along the fist instead of the HMD. `GunFromHand` / `ResolveMuzzle` now only when `WeaponIsGun`.
+- Recovered cycle 163 tip `ae56d53` (`515879c` on origin). CSS is not running. Log still has no `icvar ver=` / `register cssvr_start=`. Product commit `6262bc2`.
+- Cycle 158 subtracted HMD vel, but `XrHostPollInput` never writes `pose.vel`. Live melee finite-diffed world hand pos, so walking with still hands crossed 75 u/s. `HandVelOrDelta` now diffs `hand.pos − hmd.pos`. No CSS damage dispatch.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 171/171 (1176 asserts). Offline green ≠ stereo/HMD.
+`cssvrmod_tests` 173/173 (1182 asserts). Offline green ≠ stereo/HMD.
 
 ## Next
 

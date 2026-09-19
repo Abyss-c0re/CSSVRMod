@@ -112,7 +112,8 @@
 - [x] Melee hull sweep + pose-delta vel in Tick (cycle 10). Start-solid is not a hit.
 - [x] Fist melee origin is 5u along hand forward (cycle 154). Lua DEFAULT_OFFSET; wrist-only 5u reach left the knuckles short.
 - [x] Off-hand fist melee uses the off-hand (cycle 157). Lua left is always fist; off-hand trigger used to hull the primary. Knife stays on the gun hand.
-- [x] Melee vel is relative to the HMD (cycle 158). Lua Get*HandVelocityRelative; world vel used to punch while walking. No CSS damage dispatch.
+- [x] Melee vel is relative to the HMD (cycle 158). Lua Get*HandVelocityRelative; world vel used to punch while walking.
+- [x] Melee finite-diff is relative to HMD pos (cycle 164). Live OpenXR never fills pose.vel; world delta used to punch while walking. No CSS damage dispatch.
 - [ ] Live melee proven in-game (HMD). No guessed CSS damage dispatch.
 
 ## Honest limits (do not delete)
