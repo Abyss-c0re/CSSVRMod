@@ -1,14 +1,14 @@
-# Cycle 263 — 2026-09-20
+# Cycle 264 — 2026-09-20
 
 ## Focus
 
-`xr-shutdown-endsession-after-leave` — Shutdown must LeaveRunning (close Wait/Begin) before EndSession.
+`xr-leave-keeps-waited-on-begin-miss` — LeaveRunning must not clear waited if Begin failed to close Wait.
 
 ## Did
 
-- Recovered cycle 262 tip `3ec4d6c` (product `b44e9c5`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / exit-req / Wait-needs-Begin already drop. Shutdown still EndSession first, so a Wait-without-Begin pair leaked.
-- `XrFrame_CanEndSession`. Shutdown LeaveRunning then EndSession. Dual paint stays HMD-gated.
+- Recovered cycle 263 tip `1cabe06` (record `5d3a51e`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession-after-Leave already drop. LeaveRunning still cleared waited on Begin fail, so CanEndSession EndSession'd an open Wait.
+- `XrFrame_KeepWaited`. Dual paint stays HMD-gated.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 189/189 (1329/1329 asserts). Not HMD-proven.
+offline 189/189 (1335/1335 asserts). Not HMD-proven.
 
 ## Next
 
