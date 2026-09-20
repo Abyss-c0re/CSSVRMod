@@ -1,14 +1,14 @@
-# Cycle 268 — 2026-09-20
+# Cycle 269 — 2026-09-20
 
 ## Focus
 
-`xr-init-no-hmd-does-not-latch` — GetSystem no_hmd must not burn the init-fail cap before the HMD appears.
+`idle-no-shell-ladder` — no product commit unless a real offline bug appears.
 
 ## Did
 
-- Recovered cycle 267 tip `eeb1782` (record `f390980`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession / KeepWaited / STOPPING retry / DropLostSession / init-fail reset already drop. Splash no_hmd still incremented the cap so four presents blocked CreateSess.
-- `XrSession_CountInitFail`. Dual paint stays HMD-gated.
+- Recovered cycle 268 tip `18be126` (record `b9a7c2e`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession / KeepWaited / STOPPING retry / DropLostSession / init-fail reset / no_hmd cap already drop. pose_x stays 0. Remaining gaps HMD-gated.
+- No code. Dual paint stays HMD-gated.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 189/189 (1360/1360 asserts). Not HMD-proven.
+no rebuild (no code). Last offline 189/189 (1360/1360 asserts). Not HMD-proven.
 
 ## Next
 
