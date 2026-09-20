@@ -1,14 +1,14 @@
-# Cycle 245 — 2026-09-20
+# Cycle 246 — 2026-09-20
 
 ## Focus
 
-`mailbox-drop-on-session-loss` — leftover XR mailbox on STOPPING/LOSS, not only skip-while-!ok.
+`copy-drop-on-session-loss` — in-flight swapchain harvest on STOPPING/LOSS, not only mailbox.
 
 ## Did
 
-- Recovered cycle 244 tip `8f5cd5d` (product `39e7aa3`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: cycle 235 skipped worker submit while !session_ok, but a mailbox dual sitting through STOPPING→READY submitted last-session rasters. Harvest still pushed on `XrWanted` during STOPPING.
-- `XrMailbox_Keep` / `Drop` / epoch `Accept`. Present DropMailbox with DropVkEyes. Harvest gated on session_ok. Worker rejects old epoch.
+- Recovered cycle 245 tip `32565a6` (product `04ad0b0`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: mailbox leftover is dropped, but a GPU copy started last session (or ppm-only during STOPPING) still HarvestCopy→PushXrFrame after READY.
+- `XrCopy_Take(keep, started_for_xr, epoch)`. Stamp `copy_for_xr` / `copy_epoch` when kicking the copy.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 186/186 (1281/1281 asserts). Not HMD-proven.
+offline 186/186 (1285/1285 asserts). Not HMD-proven.
 
 ## Next
 

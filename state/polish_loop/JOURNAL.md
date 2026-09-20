@@ -1016,6 +1016,10 @@ Drop Tick yaw / last-free / hand-vel on STOPPING/LOSS, not only cssvr_stop. Next
 
 Drop mailbox leftover on STOPPING/LOSS. Cycle 235 skip used to submit last-session rasters after READY. Offline 186/186. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 246
+
+Drop in-flight swapchain copy on STOPPING/LOSS. Harvest after READY used to push last-session pixels. Offline 186/186. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

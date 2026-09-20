@@ -93,6 +93,7 @@
 - [x] Stale VK dual pair drops on stop (cycle 228). `g_vk_eyes` used to PushXrDual last-session rasters on the next `cssvr_start`. Mailbox leftover does not submit.
 - [x] Stale VK dual pair drops on STOPPING/LOSS without cssvr_stop (cycle 235). `DropVkEyes` was WantXr-only; session_ok returning used to submit last rasters before two new paints. Worker skips leftover when reason is not session_ok.
 - [x] Mailbox leftover drops on STOPPING/LOSS (cycle 245). Cycle 235 skipped submit while !ok, but a mailbox sitting through READY submitted last-session rasters. Epoch + DropMailbox; harvest no longer pushes while !session_ok.
+- [x] In-flight swapchain copy drops on STOPPING/LOSS (cycle 246). Harvest after READY used to PushXrFrame last-session pixels / ppm-only copies. `XrCopy_Take` needs keep + started_for_xr + epoch.
 - [x] Worker still pumps OpenXR events while skipping leftover submit (cycle 237). Cycle 235 skip used to never PollEvents, so READY after STOPPING was never seen.
 - [x] CreateMove overlay drops on stop (cycle 123). Last stick/buttons used to keep walking after `cssvr_stop`.
 - [x] CreateMove overlay drops on STOPPING/LOSS (cycle 238). Peek gated WantXr only, so last stick kept walking while the headset was off. `UserCmd_NoteSessionOk` clears overlay unless session_ok.

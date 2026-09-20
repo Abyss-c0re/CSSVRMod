@@ -118,4 +118,10 @@ inline bool XrMailbox_Accept(bool keep, int push_epoch, int live_epoch) {
   return keep && push_epoch == live_epoch;
 }
 
+/// GPU swapchain copy started last session used to PushXrFrame after READY.
+/// ppm-only copies (STOPPING) must not become an XR push when session_ok returns.
+inline bool XrCopy_Take(bool keep_now, bool started_for_xr, int copy_epoch, int live_epoch) {
+  return keep_now && started_for_xr && copy_epoch == live_epoch;
+}
+
 } // namespace cssvr

@@ -136,6 +136,8 @@ struct DeviceState {
   VkCommandBuffer cmd = VK_NULL_HANDLE;
   VkFence fence = VK_NULL_HANDLE;
   bool copy_inflight = false;
+  bool copy_for_xr = false;
+  int copy_epoch = 0;
   uint32_t copy_w = 0, copy_h = 0;
   VkFormat copy_fmt = VK_FORMAT_UNDEFINED;
   VkBuffer eye_stage = VK_NULL_HANDLE;
@@ -459,7 +461,9 @@ void HarvestCopy(DeviceState* ds, VkDevice dev, bool want_ppm, bool painted_dual
   if (w < 2 || h < 2 || !ds->stage_mem) return;
   const VkDeviceSize bytes = (VkDeviceSize)w * h * 4;
   const bool take_xr =
-      XrMailbox_Keep(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason)) && !MailboxFull();
+      XrCopy_Take(XrMailbox_Keep(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason)),
+                  ds->copy_for_xr, ds->copy_epoch, XrHostEpoch()) &&
+      !MailboxFull();
   if (!take_xr && !want_ppm) return;
   void* mapped = nullptr;
   if (ds->fn.map(dev, ds->stage_mem, 0, bytes, 0, &mapped) != VK_SUCCESS || !mapped) return;
@@ -723,6 +727,8 @@ void DumpSwapchain(VkQueue queue, VkSwapchainKHR sc, uint32_t idx, bool want_ppm
   si.pCommandBuffers = &ds->cmd;
   if (ds->fn.submit(queue, 1, &si, ds->fence) != VK_SUCCESS) return;
   ds->copy_inflight = true;
+  ds->copy_for_xr = want_xr;
+  ds->copy_epoch = XrHostEpoch();
   ds->copy_w = ss->w;
   ds->copy_h = ss->h;
   ds->copy_fmt = ss->format;

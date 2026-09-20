@@ -134,6 +134,11 @@ TEST(xr_mailbox_drops_on_session_loss) {
   ASSERT_TRUE(XrMailbox_Accept(true, 1, 1));
   ASSERT_FALSE(XrMailbox_Accept(true, 0, 1)); // leftover from previous epoch
   ASSERT_FALSE(XrMailbox_Accept(false, 1, 1));
+
+  ASSERT_TRUE(XrCopy_Take(true, true, 1, 1));
+  ASSERT_FALSE(XrCopy_Take(true, true, 0, 1)); // last-session inflight
+  ASSERT_FALSE(XrCopy_Take(true, false, 1, 1)); // ppm-only during STOPPING
+  ASSERT_FALSE(XrCopy_Take(false, true, 1, 1));
 }
 
 TEST(xr_begin_miss_keeps_stopping_and_loss) {
