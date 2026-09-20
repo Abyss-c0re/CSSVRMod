@@ -1,11 +1,11 @@
 {
-  "cycle": 264,
+  "cycle": 265,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-20T13:48:34Z",
-  "last_focus": "xr-leave-keeps-waited-on-begin-miss",
+  "started_at": "2026-09-20T14:01:29Z",
+  "last_focus": "xr-pump-stopping-retry-endsession",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "96b38aa",
+  "last_commit": "9ee38a5",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }

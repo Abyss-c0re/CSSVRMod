@@ -1,14 +1,14 @@
-# Cycle 264 — 2026-09-20
+# Cycle 265 — 2026-09-20
 
 ## Focus
 
-`xr-leave-keeps-waited-on-begin-miss` — LeaveRunning must not clear waited if Begin failed to close Wait.
+`xr-pump-stopping-retry-endsession` — STOPPING must retry Leave+EndSession on later pumps after Begin miss.
 
 ## Did
 
-- Recovered cycle 263 tip `1cabe06` (record `5d3a51e`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession-after-Leave already drop. LeaveRunning still cleared waited on Begin fail, so CanEndSession EndSession'd an open Wait.
-- `XrFrame_KeepWaited`. Dual paint stays HMD-gated.
+- Recovered cycle 264 tip `96b38aa` (record `a50d545`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession-after-Leave / KeepWaited already drop. STOPPING fired once; Begin miss skipped EndSession; cssvr_stop froze pump (`session_ok` false).
+- `XrFrame_RetryLeave` / `XrFrame_ShouldEndSession` / drain pump. Dual paint stays HMD-gated.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 189/189 (1335/1335 asserts). Not HMD-proven.
+offline 189/189 (1345/1345 asserts). Not HMD-proven.
 
 ## Next
 
