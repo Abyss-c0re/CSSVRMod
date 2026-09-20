@@ -1100,6 +1100,10 @@ STOPPING retries Leave+EndSession on later pumps. Event fires once; Begin miss s
 
 LOSS_PENDING destroys the session. Dead g_sess used to keep g_info.session so Init never CreateSess'd again. Offline 189/189. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 267
+
+Init-fail latch resets on LOSS destroy. Static init_fails > 3 used to block CreateSess after DropLostSession even when the HMD returned. Offline 189/189. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
