@@ -1,13 +1,13 @@
-# Cycle 236 — 2026-09-20
+# Cycle 237 — 2026-09-20
 
 ## Focus
 
-`hmd-cache-drop-on-session-loss` — last locate must not drive look after stop / STOPPING / LOSS.
+`worker-pump-on-session-loss` — skip leftover submit, still PollEvents so READY after STOPPING is seen.
 
 ## Did
 
-- Recovered cycle 235 tip `ab81d37` (`8788c77` on origin). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt found: `XrHostLastHmd` kept the last locate across cssvr_stop and session loss, so the next `session_ok` dual paints inherited last-session yaw until a new locate. ViewHookOnSwap now clears the cache when dual-paint should not run. Invalid HMD keeps the game view. Offline 182/182.
+- Recovered cycle 236 tip `60d1c6b` (`93663c0` on origin). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt found: cycle 235 skipped the worker mailbox on STOPPING/LOSS without pumping events, so READY after EndSession was never seen. Worker now PollEvents while XR is wanted and still refuses leftover submit. Offline 183/183.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 182 passed, 0 failed
+`cssvrmod_tests` 183 passed, 0 failed
 
 ## Next
 
