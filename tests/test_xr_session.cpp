@@ -141,6 +141,18 @@ TEST(xr_mailbox_drops_on_session_loss) {
   ASSERT_FALSE(XrCopy_Take(false, true, 1, 1));
 }
 
+TEST(xr_begun_frame_ends_on_abort) {
+  ASSERT_FALSE(XrFrame_EndOnAbort(false, false));
+  ASSERT_FALSE(XrFrame_EndOnAbort(false, true));
+  ASSERT_FALSE(XrFrame_EndOnAbort(true, true)); // success path EndFrames itself
+  ASSERT_TRUE(XrFrame_EndOnAbort(true, false)); // swapchain/blit miss
+  // skip: Wait+Begin ran, shouldRender=false. Caller must still EndFrame.
+  ASSERT_EQ((int)XrSession_BeginKind(true, true, false), (int)XrBeginKind::skip);
+  ASSERT_TRUE(XrFrame_EndOnAbort(true, false));
+  // STOPPING/LOSS: EndFrame before EndSession. Next READY Wait+Begin is illegal if begun.
+  ASSERT_TRUE(XrFrame_EndOnAbort(true, XrWorker_ShouldSubmit(true, false)));
+}
+
 TEST(xr_begin_miss_keeps_stopping_and_loss) {
   ASSERT_STREQ(XrSession_BeginMiss(false, false, "no_loader"), "no_loader");
   ASSERT_STREQ(XrSession_BeginMiss(false, false, nullptr), "no_session");

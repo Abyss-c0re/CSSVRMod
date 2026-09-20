@@ -1,9 +1,9 @@
 {
-  "cycle": 254,
+  "cycle": 256,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-20T11:38:28Z",
-  "last_focus": "menu3d-grip-drop-on-session-loss",
+  "started_at": "2026-09-20T12:04:35Z",
+  "last_focus": "xr-endframe-on-abort",
   "next_focus": "idle-no-shell-ladder",
   "last_commit": "b062f4a",
   "consecutive_no_commit": 0,

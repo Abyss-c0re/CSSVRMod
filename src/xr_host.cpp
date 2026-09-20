@@ -99,15 +99,17 @@ bool g_prev_trig = false;
 XrSessionState g_state = XR_SESSION_STATE_UNKNOWN;
 bool g_running = false;
 int g_epoch = 0;
+bool g_begun = false;
+bool g_last_skip = false;
 
 void LeaveRunning() {
+  // EndSession while a Wait+Begin is open is illegal. Next READY Wait+Begin
+  // used to run with g_begun still true (swapchain miss or skip without End).
+  if (XrFrame_EndOnAbort(g_begun, false)) XrHostEndFrame();
   g_epoch = XrSession_BumpEpoch(g_running, false, g_epoch);
   g_running = false;
   Menu3d_DropGrip(false, &g_menu3d);
 }
-
-bool g_begun = false;
-bool g_last_skip = false;
 XrFrameState g_fs{};
 XrHostInfo g_info{};
 
@@ -248,8 +250,8 @@ void PollEvents() {
         }
       }
       if (g_state == XR_SESSION_STATE_STOPPING && xrEndSession) {
+        LeaveRunning(); // EndFrame before EndSession if a begin was still open
         xrEndSession(g_sess);
-        LeaveRunning();
         g_info.reason = XrSession_Reason(XrSessionPhase::stopping);
       }
       if (g_state == XR_SESSION_STATE_LOSS_PENDING || g_state == XR_SESSION_STATE_EXITING) {
@@ -714,7 +716,10 @@ bool XrHostPaintedDual() { return g_note_dual; }
 bool XrHostSubmitEyes(unsigned int gl_l, unsigned int gl_r, int src_w, int src_h, bool vflip,
                       bool painted_dual) {
   if (!g_begun || !g_fs.shouldRender) return false;
-  if (!g_sc[0] || !g_sc[1]) return false;
+  if (!g_sc[0] || !g_sc[1]) {
+    if (XrFrame_EndOnAbort(g_begun, false)) XrHostEndFrame();
+    return false;
+  }
   const bool dual = painted_dual && g_note_dual && gl_l && gl_r && gl_l != gl_r;
   BlitToSwapchain(gl_l, src_w, src_h, 0, vflip, dual);
   BlitToSwapchain(dual ? gl_r : gl_l, src_w, src_h, 1, vflip, dual);
@@ -793,10 +798,12 @@ bool XrHostSubmitBackbuffer(unsigned int gl_tex, int src_w, int src_h, bool vfli
 
 void XrHostEndFrame() {
   if (!g_begun) return;
-  XrFrameEndInfo ei{XR_TYPE_FRAME_END_INFO};
-  ei.displayTime = g_fs.predictedDisplayTime ? g_fs.predictedDisplayTime : 1;
-  ei.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
-  xrEndFrame(g_sess, &ei);
+  if (xrEndFrame && g_sess) {
+    XrFrameEndInfo ei{XR_TYPE_FRAME_END_INFO};
+    ei.displayTime = g_fs.predictedDisplayTime ? g_fs.predictedDisplayTime : 1;
+    ei.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
+    xrEndFrame(g_sess, &ei);
+  }
   g_begun = false;
 }
 
@@ -1031,7 +1038,9 @@ bool XrHostSubmitPixels(const unsigned char* px, int w, int h, bool bgra) {
     return false;
   }
   // Vulkan copy is top-left; GL/XR blit wants a flip.
-  return XrHostSubmitBackbuffer(g_upload, w, h, true);
+  const bool ok = XrHostSubmitBackbuffer(g_upload, w, h, true);
+  if (XrFrame_EndOnAbort(true, ok)) XrHostEndFrame();
+  return ok;
 }
 
 static GLuint UploadEyeTex(GLuint* slot, const unsigned char* px, int w, int h, GLenum ext) {
@@ -1065,7 +1074,9 @@ bool XrHostSubmitEyePixels(const unsigned char* left, const unsigned char* right
     XrHostEndFrame();
     return false;
   }
-  return XrHostSubmitEyes(tl, tr, w, h, true, true);
+  const bool ok = XrHostSubmitEyes(tl, tr, w, h, true, true);
+  if (XrFrame_EndOnAbort(true, ok)) XrHostEndFrame();
+  return ok;
 }
 
 bool XrHostSubmitRgba(const unsigned char* rgba, int w, int h) {

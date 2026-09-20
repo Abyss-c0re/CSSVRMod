@@ -376,11 +376,11 @@ void HookOnSwap() {
   if (g_xr_ok) {
     unsigned el = 0, er = 0;
     int ew = 0, eh = 0;
-    if (ViewHookTakeEyes(&el, &er, &ew, &eh))
-      XrHostSubmitEyes(el, er, ew, eh, true, true);
-    else if (g_cap)
-      XrHostSubmitBackbuffer(g_cap, g_capW, g_capH, true);
-    else
+    if (ViewHookTakeEyes(&el, &er, &ew, &eh)) {
+      if (!XrHostSubmitEyes(el, er, ew, eh, true, true)) XrHostEndFrame();
+    } else if (g_cap) {
+      if (!XrHostSubmitBackbuffer(g_cap, g_capW, g_capH, true)) XrHostEndFrame();
+    } else
       XrHostEndFrame();
   }
   ViewHookOnSwap();

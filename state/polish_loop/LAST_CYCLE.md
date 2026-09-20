@@ -1,14 +1,14 @@
-# Cycle 254 — 2026-09-20
+# Cycle 256 — 2026-09-20
 
 ## Focus
 
-`menu3d-grip-drop-on-session-loss` — Vision-panel grip_off must not yank the quad after STOPPING/LOSS / cssvr_stop.
+`xr-endframe-on-abort` — begun OpenXR frame must EndFrame on swapchain miss / STOPPING, not only shutdown.
 
 ## Did
 
-- Recovered cycle 253 (uncommitted idle journal; tip `95eeb17` / product `a26c8c2`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: Tick / overlay / VK pair / mailbox / inflight copy / HMD cache already drop. Grip drag did not: next session_ok applied last grip_off to a new hand pose.
-- `Menu3d_KeepGrip` / `Menu3d_DropGrip`. Worker + present + LeaveRunning. Panel pose stays; next grab re-locks. Dual paint stays HMD-gated.
+- Recovered cycle 255 (uncommitted idle journal; tip `9635b54` / product `b062f4a`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: Tick / overlay / mailbox / copy / HMD cache / Vision grip already drop. A Wait+Begin could stay open: swapchain miss returned without EndFrame; STOPPING called EndSession first. Next READY Wait+Begin is illegal.
+- `XrFrame_EndOnAbort`. LeaveRunning EndFrames first; STOPPING EndSession after. Submit miss EndFrames. Dual paint stays HMD-gated.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 187/187 (1302/1302 asserts). Not HMD-proven.
+offline 188/188 (1309/1309 asserts). Not HMD-proven.
 
 ## Next
 

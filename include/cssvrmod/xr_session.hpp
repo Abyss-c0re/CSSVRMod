@@ -124,4 +124,9 @@ inline bool XrCopy_Take(bool keep_now, bool started_for_xr, int copy_epoch, int 
   return keep_now && started_for_xr && copy_epoch == live_epoch;
 }
 
+/// Once xrBeginFrame succeeds, xrEndFrame must run even if blit/swapchain misses
+/// or the session leaves running. STOPPING used to xrEndSession first; a stuck
+/// begun flag makes the next Wait+Begin illegal. Shutdown already EndFrames.
+inline bool XrFrame_EndOnAbort(bool begun, bool submit_ok) { return begun && !submit_ok; }
+
 } // namespace cssvr

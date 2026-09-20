@@ -95,6 +95,7 @@
 - [x] Mailbox leftover drops on STOPPING/LOSS (cycle 245). Cycle 235 skipped submit while !ok, but a mailbox sitting through READY submitted last-session rasters. Epoch + DropMailbox; harvest no longer pushes while !session_ok.
 - [x] In-flight swapchain copy drops on STOPPING/LOSS (cycle 246). Harvest after READY used to PushXrFrame last-session pixels / ppm-only copies. `XrCopy_Take` needs keep + started_for_xr + epoch.
 - [x] Vision-panel grip drops on STOPPING/LOSS / cssvr_stop (cycle 254). Last grip_off used to yank the quad to a new hand pose. Panel pose stays; next grab re-locks.
+- [x] Begun XR frame EndFrames on submit miss / STOPPING (cycle 256). Swapchain miss used to leave `g_begun`; STOPPING called EndSession first. Next READY Wait+Begin was illegal. Shutdown already ended.
 - [x] Worker still pumps OpenXR events while skipping leftover submit (cycle 237). Cycle 235 skip used to never PollEvents, so READY after STOPPING was never seen.
 - [x] CreateMove overlay drops on stop (cycle 123). Last stick/buttons used to keep walking after `cssvr_stop`.
 - [x] CreateMove overlay drops on STOPPING/LOSS (cycle 238). Peek gated WantXr only, so last stick kept walking while the headset was off. `UserCmd_NoteSessionOk` clears overlay unless session_ok.
