@@ -1,4 +1,5 @@
 #include "cssvrmod/view_hook.hpp"
+#include "cssvrmod/banner.hpp"
 #include "cssvrmod/calib.hpp"
 #include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/dual_paint.hpp"
@@ -253,6 +254,7 @@ void ViewHookOnSwap() {
   if (!DualPaint_ShouldRun(CssvrWantXr(), XrSession_IsOkReason(XrHostStatus().reason))) {
     g_have_eyes = DualPaint_Latch(false, false);
     XrHostNoteDualPaint(false);
+    Chrome_NoteStatus(Banner_ChromeLabel(XrHostStatus().reason, false));
   }
 }
 

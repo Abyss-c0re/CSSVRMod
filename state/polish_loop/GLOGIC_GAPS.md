@@ -74,6 +74,7 @@
 - [x] Honest no-HMD toast (cycle 13). One-shot `notify-send` + toast file; silent log-only is forbidden.
 - [x] Desktop XR status banner on the CSS present (cycle 14). Fail-only stamp + window title; never on dual-eye submit.
 - [x] Honest MONO desktop label until `painted_dual` (cycle 15). Not stamped onto dual-eye / lens submit.
+- [x] Window title drops CSS on stop (cycle 230). HarvestCopy skipped the MONO stamp when XR was off, so the title stayed `CSS` after `cssvr_stop`.
 - [ ] Optional GTK/Qt window (CLI host is enough to persist knobs).
 - [x] HMD look includes stick-turn yaw (cycle 113). RenderView used to SetViewAngles(HMD) and clobber CreateMove locomotion.
 - [x] ICvar vstdlib NOLOAD is lazy (cycle 112). NOW+NOLOAD can miss a no-SONAME libvstdlib; basename matches maps `(deleted)`.

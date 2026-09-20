@@ -1,4 +1,5 @@
 #include "cssvrmod/banner.hpp"
+#include "cssvrmod/dual_paint.hpp"
 #include "test_framework.h"
 #include <cstring>
 
@@ -12,6 +13,14 @@ TEST(banner_fail_only) {
   ASSERT_STREQ(Banner_Text("create_instance"), "NO XR");
   const auto fail = Banner_Decide("no_hmd", false);
   ASSERT_TRUE(fail.stamp_xr);
+}
+
+TEST(banner_chrome_label_drops_css_when_stopped) {
+  ASSERT_STREQ(Banner_ChromeLabel("session_ok", true), "CSS");
+  ASSERT_STREQ(Banner_ChromeLabel("session_ok", DualPaint_Latch(true, false)), "MONO");
+  ASSERT_STREQ(Banner_ChromeLabel("session_ok", false), "MONO");
+  ASSERT_STREQ(Banner_ChromeLabel("no_hmd", false), "NO HMD");
+  ASSERT_STREQ(Banner_ChromeLabel("idle", false), "MONO");
 }
 
 TEST(banner_mono_until_dual) {

@@ -42,6 +42,15 @@ inline const char* Banner_Text(const char* xr_reason, bool painted_dual = false)
   return Banner_Decide(xr_reason, painted_dual).text;
 }
 
+/// Window title. cssvr_stop used to leave "CSS" after the dual latch dropped
+/// because HarvestCopy returns before the MONO stamp when XR is off.
+inline const char* Banner_ChromeLabel(const char* xr_reason, bool painted_dual) {
+  const BannerPlan p = Banner_Decide(xr_reason, painted_dual);
+  if (p.should_stamp && p.text[0]) return p.text;
+  if (painted_dual) return "CSS";
+  return "MONO";
+}
+
 inline int Banner_Height(int h) { return std::max(16, std::min(40, h / 14)); }
 
 inline void Banner_Plot(unsigned char* px, int w, int h, bool bgra, bool flip_y, int x, int y, int r,
