@@ -70,6 +70,21 @@ TEST(vk_eye_identical_pixels_are_not_dual) {
   ASSERT_FALSE(DualPaint_AcceptPair(false, true));
 }
 
+TEST(vk_eye_stale_pair_does_not_submit_when_stopped) {
+  VkEyePair p;
+  std::vector<unsigned char> a(16, 3), b(16, 4);
+  ASSERT_TRUE(VkEye_Store(&p, 0, a.data(), 2, 2, false));
+  ASSERT_TRUE(VkEye_Store(&p, 1, b.data(), 2, 2, false));
+  ASSERT_TRUE(VkEye_WorldsDiffer(p));
+  ASSERT_TRUE(DualPaint_Latch(VkEye_WorldsDiffer(p), DualPaint_ShouldRun(true, true)));
+  // cssvr_stop: last L/R copies must not submit as this session's dual.
+  ASSERT_FALSE(DualPaint_Latch(VkEye_WorldsDiffer(p), DualPaint_ShouldRun(false, true)));
+  ASSERT_FALSE(DualPaint_Latch(VkEye_WorldsDiffer(p), DualPaint_ShouldRun(true, false)));
+  VkEye_Clear(&p);
+  ASSERT_FALSE(VkEye_WorldsDiffer(p));
+  ASSERT_FALSE(DualPaint_Latch(VkEye_WorldsDiffer(p), DualPaint_ShouldRun(true, true)));
+}
+
 TEST(vk_eye_ready_does_not_unlock_pose_ipd_alone) {
   // Storing two CPU frames is not a world paint. VIEW pose IPD stays 0 either way.
   Calib c;

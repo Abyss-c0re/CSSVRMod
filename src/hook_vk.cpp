@@ -4,6 +4,7 @@
 #include "cssvrmod/banner.hpp"
 #include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/collision.hpp"
+#include "cssvrmod/dual_paint.hpp"
 #include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/input.hpp"
@@ -218,6 +219,11 @@ bool MailboxFull() {
   return g_mb.have;
 }
 
+void DropVkEyes() {
+  std::lock_guard<std::mutex> lk(g_mu);
+  VkEye_Clear(&g_vk_eyes);
+}
+
 void* XrWorker(void*) {
   Log("xr worker start");
   TurnState turn;
@@ -254,6 +260,8 @@ void* XrWorker(void*) {
       g_mb.have = false;
       g_mb.dual = false;
     }
+    // cssvr_stop: leftover mailbox must not submit last-session rasters.
+    if (!XrWanted()) continue;
     const bool ok = (dual && !frame_r.empty())
                         ? XrHostSubmitEyePixels(frame.data(), frame_r.data(), w, h, bgra, true)
                         : XrHostSubmitPixels(frame.data(), w, h, bgra);
@@ -720,12 +728,14 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
   if (!XrWanted()) {
     ClientCmd_ReleaseHeld(g_eng, &g_prev_cmd, UserCmd_HookLive());
     UserCmd_ClearOverlay();
+    DropVkEyes();
   }
   const VkResult pr = real(queue, info);
   // After present: never wait. Harvest a finished GPU copy, kick the next if XR is hungry.
   VkEyePair dual{};
-  const bool have_dual = TakePairImpl(&dual) && VkEye_WorldsDiffer(dual);
-  if (have_dual && XrWanted() && !MailboxFull()) {
+  const bool run = DualPaint_ShouldRun(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason));
+  const bool have_dual = DualPaint_Latch(TakePairImpl(&dual) && VkEye_WorldsDiffer(dual), run);
+  if (have_dual && !MailboxFull()) {
     EnsureXrWorker();
     PushXrDual(dual);
   }
