@@ -164,6 +164,15 @@ TEST(xr_begun_frame_ends_on_abort) {
   ASSERT_TRUE(XrFrame_EndOnAbort(true, XrWorker_ShouldSubmit(true, false)));
 }
 
+TEST(xr_wait_needs_begin) {
+  ASSERT_FALSE(XrFrame_SkipWait(false));
+  ASSERT_TRUE(XrFrame_SkipWait(true));
+  ASSERT_FALSE(XrFrame_BeginBeforeLeave(false, false));
+  ASSERT_FALSE(XrFrame_BeginBeforeLeave(false, true));
+  ASSERT_FALSE(XrFrame_BeginBeforeLeave(true, true)); // already begun
+  ASSERT_TRUE(XrFrame_BeginBeforeLeave(true, false)); // Wait ok, Begin miss
+}
+
 TEST(xr_begin_miss_keeps_stopping_and_loss) {
   ASSERT_STREQ(XrSession_BeginMiss(false, false, "no_loader"), "no_loader");
   ASSERT_STREQ(XrSession_BeginMiss(false, false, nullptr), "no_session");

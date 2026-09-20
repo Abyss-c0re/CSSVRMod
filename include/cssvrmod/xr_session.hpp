@@ -145,4 +145,11 @@ inline bool XrCopy_Take(bool keep_now, bool started_for_xr, int copy_epoch, int 
 /// begun flag makes the next Wait+Begin illegal. Shutdown already EndFrames.
 inline bool XrFrame_EndOnAbort(bool begun, bool submit_ok) { return begun && !submit_ok; }
 
+/// WaitFrame success requires BeginFrame. A second Wait without Begin is illegal.
+/// BeginFrame fail used to return and Wait again on the next submit.
+inline bool XrFrame_SkipWait(bool waited) { return waited; }
+
+/// STOPPING/LOSS: Wait without Begin must Begin before EndSession (then EndOnAbort).
+inline bool XrFrame_BeginBeforeLeave(bool waited, bool begun) { return waited && !begun; }
+
 } // namespace cssvr

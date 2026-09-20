@@ -102,9 +102,16 @@ bool g_running = false;
 bool g_exit_req = false;
 int g_epoch = 0;
 bool g_begun = false;
+bool g_waited = false;
 bool g_last_skip = false;
 
 void LeaveRunning() {
+  // Wait without Begin: Begin first so EndFrame is legal, then EndSession.
+  if (XrFrame_BeginBeforeLeave(g_waited, g_begun) && xrBeginFrame && g_sess) {
+    XrFrameBeginInfo bi{XR_TYPE_FRAME_BEGIN_INFO};
+    if (xrBeginFrame(g_sess, &bi) == XR_SUCCESS) g_begun = true;
+  }
+  g_waited = false;
   // EndSession while a Wait+Begin is open is illegal. Next READY Wait+Begin
   // used to run with g_begun still true (swapchain miss or skip without End).
   if (XrFrame_EndOnAbort(g_begun, false)) XrHostEndFrame();
@@ -705,11 +712,15 @@ bool XrHostBeginFrame() {
     if (g_info.session) g_info.reason = XrSession_BeginMiss(true, g_running, g_info.reason);
     return false;
   }
-  g_fs = XrFrameState{XR_TYPE_FRAME_STATE};
-  XrFrameWaitInfo wi{XR_TYPE_FRAME_WAIT_INFO};
-  if (xrWaitFrame(g_sess, &wi, &g_fs) != XR_SUCCESS) return false;
+  if (!XrFrame_SkipWait(g_waited)) {
+    g_fs = XrFrameState{XR_TYPE_FRAME_STATE};
+    XrFrameWaitInfo wi{XR_TYPE_FRAME_WAIT_INFO};
+    if (xrWaitFrame(g_sess, &wi, &g_fs) != XR_SUCCESS) return false;
+    g_waited = true;
+  }
   XrFrameBeginInfo bi{XR_TYPE_FRAME_BEGIN_INFO};
-  if (xrBeginFrame(g_sess, &bi) != XR_SUCCESS) return false;
+  if (!xrBeginFrame || xrBeginFrame(g_sess, &bi) != XR_SUCCESS) return false;
+  g_waited = false;
   g_begun = true;
   CacheHmdFromViewSpace();
   if (!g_fs.shouldRender) {
@@ -816,6 +827,7 @@ void XrHostEndFrame() {
     xrEndFrame(g_sess, &ei);
   }
   g_begun = false;
+  g_waited = false;
 }
 
 bool XrHostPollInput(XrSample* out) {

@@ -1,14 +1,14 @@
-# Cycle 258 — 2026-09-20
+# Cycle 262 — 2026-09-20
 
 ## Focus
 
-`xr-exit-req-no-fail-latch` — failed xrRequestExitSession must not latch; cssvr_stop retries.
+`xr-wait-needs-begin` — WaitFrame success must BeginFrame before the next Wait or EndSession.
 
 ## Did
 
-- Recovered cycle 257 tip `4aaba7a` (product `d109cbc`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / WantXr pump already drop. Cycle 257 latched g_exit_req on any RequestExit call; a fail skipped every later cssvr_stop so last rasters could stay on the HMD.
-- `XrSession_LatchExitReq`. Live latches only on XR_SUCCESS. Dual paint stays HMD-gated.
+- Recovered cycle 261 (uncommitted idle journal; tip `101d004` / product `618ccc1`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / exit-req already drop. Wait+Begin miss used to Wait again (illegal) and STOPPING EndSession without Begin.
+- `XrFrame_SkipWait` / `XrFrame_BeginBeforeLeave`. Live retries Begin; LeaveRunning Begins then Ends. Dual paint stays HMD-gated.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 188/188 (1319/1319 asserts). Not HMD-proven.
+offline 189/189 (1325/1325 asserts). Not HMD-proven.
 
 ## Next
 
