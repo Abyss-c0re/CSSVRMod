@@ -1,14 +1,14 @@
-# Cycle 265 — 2026-09-20
+# Cycle 266 — 2026-09-20
 
 ## Focus
 
-`xr-pump-stopping-retry-endsession` — STOPPING must retry Leave+EndSession on later pumps after Begin miss.
+`xr-destroy-session-on-loss` — LOSS_PENDING / EXITING must DestroySession so Init can CreateSess again.
 
 ## Did
 
-- Recovered cycle 264 tip `96b38aa` (record `a50d545`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession-after-Leave / KeepWaited already drop. STOPPING fired once; Begin miss skipped EndSession; cssvr_stop froze pump (`session_ok` false).
-- `XrFrame_RetryLeave` / `XrFrame_ShouldEndSession` / drain pump. Dual paint stays HMD-gated.
+- Recovered cycle 265 tip `9ee38a5` (record `3adce59`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession-after-Leave / KeepWaited / STOPPING retry already drop. LOSS left a dead `g_sess` with `g_info.session` true, so Init skipped CreateSess.
+- `XrSession_ShouldDestroy` + DropLostSession. Dual paint stays HMD-gated.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 189/189 (1345/1345 asserts). Not HMD-proven.
+offline 189/189 (1348/1348 asserts). Not HMD-proven.
 
 ## Next
 

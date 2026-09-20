@@ -1096,6 +1096,10 @@ LeaveRunning keeps waited on Begin miss. Used to clear waited so CanEndSession E
 
 STOPPING retries Leave+EndSession on later pumps. Event fires once; Begin miss skipped EndSession and cssvr_stop froze pump. Offline 189/189. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 266
+
+LOSS_PENDING destroys the session. Dead g_sess used to keep g_info.session so Init never CreateSess'd again. Offline 189/189. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
