@@ -8,6 +8,7 @@
 #include "cssvrmod/usercmd.hpp"
 #include "cssvrmod/view_hook.hpp"
 #include "cssvrmod/weapons.hpp"
+#include "cssvrmod/xr_session.hpp"
 #include "xr_host.hpp"
 
 #define GL_GLEXT_PROTOTYPES 1
@@ -339,16 +340,13 @@ void HookOnSwap() {
   Once();
   ViewHookTryInstall();
   UserCmd_HookLive();
-  if (!CssvrWantXr()) {
+  const bool keep_tick =
+      Tick_KeepState(CssvrWantXr(), XrSession_IsOkReason(XrHostStatus().reason));
+  if (!keep_tick) {
     ClientCmd_ReleaseHeld(g_eng, &g_prevCmd, UserCmd_HookLive());
     UserCmd_ClearOverlay();
-    Turn_Reset(&g_turn);
-    Wall_Reset(&g_leftWall);
-    Wall_Reset(&g_rightWall);
-    HandVel_Reset(&g_leftVel);
-    HandVel_Reset(&g_rightVel);
-    g_nextMelee = 0.f;
-    g_now = 0.f;
+    Tick_DropState(false, &g_turn, &g_leftWall, &g_rightWall, &g_leftVel, &g_rightVel,
+                   &g_nextMelee, &g_now);
   }
   XrSample xr{};
   const bool got = g_xr_ok && XrHostPollInput(&xr);

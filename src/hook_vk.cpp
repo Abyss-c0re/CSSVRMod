@@ -232,15 +232,6 @@ void* XrWorker(void*) {
   float nextMelee = 0.f;
   float now = 0.f;
   while (true) {
-    if (!XrWanted()) {
-      Turn_Reset(&turn);
-      Wall_Reset(&leftWall);
-      Wall_Reset(&rightWall);
-      HandVel_Reset(&leftVel);
-      HandVel_Reset(&rightVel);
-      nextMelee = 0.f;
-      now = 0.f;
-    }
     std::vector<unsigned char> frame, frame_r;
     int w = 0, h = 0;
     bool bgra = false;
@@ -265,6 +256,9 @@ void* XrWorker(void*) {
     }
     // Skip leftover submit on STOPPING/LOSS, but still pump or READY is never seen.
     if (XrWorker_ShouldPump(XrWanted())) XrHostPumpEvents();
+    // Yaw / last-free / hand vel used to survive STOPPING while XR stayed wanted.
+    Tick_DropState(Tick_KeepState(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason)),
+                   &turn, &leftWall, &rightWall, &leftVel, &rightVel, &nextMelee, &now);
     if (!have) continue;
     if (!XrWorker_ShouldSubmit(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason))) continue;
     const bool ok = (dual && !frame_r.empty())

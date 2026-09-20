@@ -988,6 +988,30 @@ Pump OpenXR events while skipping leftover submit. Cycle 235 skip used to miss R
 
 Drop CreateMove overlay on STOPPING/LOSS, not only cssvr_stop. Last stick used to keep walking. Offline 184/184. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 239
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. Overlay/VK pair/HMD cache/pump already drop on session loss. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 240
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. Submit pose_x stays 0. Shared UV crop only. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 241
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. Identical-eye MONO still gated. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 242
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. SWAP is cameras only. VK-live CopyEye ignores GL blit. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 243
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. Dual world IPD ignores eyescale. pose_x stays 0. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 244
+
+Drop Tick yaw / last-free / hand-vel on STOPPING/LOSS, not only cssvr_stop. Next session_ok used to inherit last heading. Offline 185/185. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

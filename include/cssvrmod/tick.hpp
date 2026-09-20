@@ -42,6 +42,25 @@ struct TickOut {
   const char* status = "ok";
 };
 
+/// Worker Tick state used to survive STOPPING/LOSS because reset gated XrWanted
+/// only. Next session_ok inherited last heading, last-free hull, and a fake swing.
+inline bool Tick_KeepState(bool xr_wanted, bool session_ok) {
+  return xr_wanted && session_ok;
+}
+
+inline void Tick_DropState(bool keep, TurnState* turn, WallState* left, WallState* right,
+                           HandVelState* vel_l, HandVelState* vel_r, float* next_melee,
+                           float* now) {
+  if (keep) return;
+  Turn_Reset(turn);
+  Wall_Reset(left);
+  Wall_Reset(right);
+  HandVel_Reset(vel_l);
+  HandVel_Reset(vel_r);
+  if (next_melee) *next_melee = 0.f;
+  if (now) *now = 0.f;
+}
+
 inline TickOut Tick(TickIn in, WallState& leftWall, WallState& rightWall, float* next_melee) {
   TickOut o;
   o.left_resolved = in.xr.left;

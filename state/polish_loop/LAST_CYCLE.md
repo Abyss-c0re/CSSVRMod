@@ -1,13 +1,14 @@
-# Cycle 238 — 2026-09-20
+# Cycle 244 — 2026-09-20
 
 ## Focus
 
-`overlay-drop-on-session-loss` — last stick/buttons must not keep walking on STOPPING/LOSS.
+`tick-state-drop-on-session-loss` — worker Tick state on STOPPING/LOSS, not only cssvr_stop.
 
 ## Did
 
-- Recovered cycle 237 tip `0d21246` (`b55594b` on origin). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt found: CreateMove Peek gated WantXr only, so last stick/buttons kept walking while the headset was off. Present now `UserCmd_NoteSessionOk(run)` and clears overlay unless session_ok. Offline 184/184.
+- Recovered cycle 243 (uncommitted idle journal; tip still `9fc43ef` / product `347f563`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: VK worker reset yaw / last-free / hand vel only when `!XrWanted()`. STOPPING/LOSS skipped submit but kept Tick state, so the next session_ok inherited last heading and could yank hands / fake a melee swing. Overlay / VK pair / HMD cache already dropped (235–238).
+- `Tick_KeepState` / `Tick_DropState`; VK worker drops after pump; GL swap matches.
 
 ## Did not
 
@@ -17,8 +18,8 @@
 
 ## Tests
 
-`cssvrmod_tests` 184 passed, 0 failed
+offline 185/185 (1268/1268 asserts). Not HMD-proven.
 
 ## Next
 
-`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. With OpenXR (WiVRn is already up), type `cssvr_start`. Dual paint stays HMD-gated.
+`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. Dual paint stays HMD-gated.

@@ -698,3 +698,41 @@ TEST(tick_weapon_tip_blocks_muzzle) {
   ASSERT_TRUE(o.right_wall.clipped);
   ASSERT_TRUE(o.right_resolved.pos.x < 20.f); // wrist pulled off the barrel-in-wall
 }
+
+TEST(tick_state_drops_on_session_loss) {
+  ASSERT_TRUE(Tick_KeepState(true, true));
+  ASSERT_FALSE(Tick_KeepState(true, false)); // STOPPING/LOSS, XR still wanted
+  ASSERT_FALSE(Tick_KeepState(false, true)); // cssvr_stop
+  ASSERT_FALSE(Tick_KeepState(false, false));
+
+  TurnState t;
+  t.yaw_off = -90.f;
+  t.snap_latched = true;
+  WallState L, R;
+  L.has_free = true;
+  L.last_free = {50, 0, 40};
+  R.has_free = true;
+  R.last_free = {-20, 0, 40};
+  HandVelState vl, vr;
+  vl.have = true;
+  vl.last = {1, 0, 0};
+  vr.have = true;
+  float next = 1.5f, now = 12.f;
+
+  Tick_DropState(Tick_KeepState(true, true), &t, &L, &R, &vl, &vr, &next, &now);
+  ASSERT_NEAR(t.yaw_off, -90.f, 0.001);
+  ASSERT_TRUE(t.snap_latched);
+  ASSERT_TRUE(L.has_free);
+  ASSERT_NEAR(next, 1.5f, 0.001);
+
+  Tick_DropState(Tick_KeepState(true, false), &t, &L, &R, &vl, &vr, &next, &now);
+  ASSERT_NEAR(t.yaw_off, 0.f, 0.001);
+  ASSERT_FALSE(t.snap_latched);
+  ASSERT_FALSE(L.has_free);
+  ASSERT_FALSE(R.has_free);
+  ASSERT_FALSE(vl.have);
+  ASSERT_FALSE(vr.have);
+  ASSERT_NEAR(next, 0.f, 0.001);
+  ASSERT_NEAR(now, 0.f, 0.001);
+  Tick_DropState(false, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+}
