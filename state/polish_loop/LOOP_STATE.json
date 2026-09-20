@@ -5,7 +5,7 @@
   "started_at": "2026-09-20T12:04:35Z",
   "last_focus": "xr-endframe-on-abort",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "b062f4a",
+  "last_commit": "d305a87",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
