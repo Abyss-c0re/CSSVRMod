@@ -171,6 +171,10 @@ TEST(xr_wait_needs_begin) {
   ASSERT_FALSE(XrFrame_BeginBeforeLeave(false, true));
   ASSERT_FALSE(XrFrame_BeginBeforeLeave(true, true)); // already begun
   ASSERT_TRUE(XrFrame_BeginBeforeLeave(true, false)); // Wait ok, Begin miss
+  ASSERT_TRUE(XrFrame_CanEndSession(false, false));
+  ASSERT_FALSE(XrFrame_CanEndSession(true, false));
+  ASSERT_FALSE(XrFrame_CanEndSession(false, true));
+  ASSERT_FALSE(XrFrame_CanEndSession(true, true));
 }
 
 TEST(xr_begin_miss_keeps_stopping_and_loss) {

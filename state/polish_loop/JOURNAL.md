@@ -1084,6 +1084,10 @@ Idle hunt. CSS not running. No icvar register line. WiVRn up. Tick/overlay/mailb
 
 WaitFrame success skips the next Wait until BeginFrame. Begin miss used to Wait again; STOPPING EndSession without Begin. Offline 189/189. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 263
+
+Shutdown EndSession after LeaveRunning. Used to EndSession first, so a Wait-without-Begin pair leaked. Offline 189/189. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

@@ -152,4 +152,8 @@ inline bool XrFrame_SkipWait(bool waited) { return waited; }
 /// STOPPING/LOSS: Wait without Begin must Begin before EndSession (then EndOnAbort).
 inline bool XrFrame_BeginBeforeLeave(bool waited, bool begun) { return waited && !begun; }
 
+/// EndSession is illegal while a Wait or Begin is still open. Shutdown used to
+/// EndSession before LeaveRunning closed the pair (Wait-without-Begin leaked).
+inline bool XrFrame_CanEndSession(bool waited, bool begun) { return !waited && !begun; }
+
 } // namespace cssvr

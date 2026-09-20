@@ -261,8 +261,8 @@ void PollEvents() {
         }
       }
       if (g_state == XR_SESSION_STATE_STOPPING && xrEndSession) {
-        LeaveRunning(); // EndFrame before EndSession if a begin was still open
-        xrEndSession(g_sess);
+        LeaveRunning(); // Begin+End before EndSession if a Wait/Begin was still open
+        if (XrFrame_CanEndSession(g_waited, g_begun)) xrEndSession(g_sess);
         g_info.reason = XrSession_Reason(XrSessionPhase::stopping);
       }
       if (g_state == XR_SESSION_STATE_LOSS_PENDING || g_state == XR_SESSION_STATE_EXITING) {
@@ -642,16 +642,11 @@ bool XrHostInit() {
 }
 
 void XrHostShutdown() {
-  // Orderly: no mid-frame destroy.
-  if (g_begun && xrEndFrame && g_sess) {
-    XrFrameEndInfo ei{XR_TYPE_FRAME_END_INFO};
-    ei.displayTime = g_fs.predictedDisplayTime ? g_fs.predictedDisplayTime : 1;
-    ei.environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
-    xrEndFrame(g_sess, &ei);
-    g_begun = false;
-  }
-  if (g_running && xrEndSession && g_sess) xrEndSession(g_sess);
+  // LeaveRunning Begins a Wait-without-Begin pair then EndFrames. EndSession after.
+  const bool running = g_running;
   LeaveRunning();
+  if (running && XrFrame_CanEndSession(g_waited, g_begun) && xrEndSession && g_sess)
+    xrEndSession(g_sess);
   if (g_inst && xrDestroyInstance) xrDestroyInstance(g_inst);
   g_inst = XR_NULL_HANDLE;
   g_sess = XR_NULL_HANDLE;
