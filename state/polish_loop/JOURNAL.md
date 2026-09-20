@@ -948,6 +948,14 @@ Drop dual-paint latch on stop. g_have_eyes / g_note_dual used to skip MONO after
 
 Drop stale VK dual pair on stop. g_vk_eyes used to submit last-session rasters on cssvr_start. Offline 180/180. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 229
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. Dual latch + stale VK pair already drop on stop. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 230
+
+Window title MONO on stop. HarvestCopy skipped the stamp while XR was off, so the title stayed CSS. Offline 181/181. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

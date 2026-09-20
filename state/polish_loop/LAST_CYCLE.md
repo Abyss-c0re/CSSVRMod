@@ -1,13 +1,13 @@
-# Cycle 228 — 2026-09-20
+# Cycle 230 — 2026-09-20
 
 ## Focus
 
-`stale-vk-dual-drops-on-stop` — last-session L/R copies must not submit after cssvr_start.
+`title-mono-on-stop` — window title must not stay CSS after cssvr_stop.
 
 ## Did
 
-- Recovered cycle 227 tip `1891899` (`7c98327` on origin). CSS is not running. SteamVR is not running.
-- Dual latch (cycle 227) cleared the MONO banner, but `g_vk_eyes` still PushXrDual'd last-session rasters on the next start. Present drops the pair when XR is off; worker discards leftover mailbox. Offline 180/180.
+- Recovered cycle 229 tip `0843ce0` (`1f042d3` on origin). CSS is not running. SteamVR is not running.
+- Dual latch dropped (cycle 227) but HarvestCopy returned before the MONO stamp when XR was off, so the title stayed `CSS`. `Banner_ChromeLabel` + ViewHookOnSwap now set MONO. Offline 181/181.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 180 passed, 0 failed
+`cssvrmod_tests` 181 passed, 0 failed
 
 ## Next
 
