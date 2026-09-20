@@ -944,6 +944,10 @@ Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unch
 
 Drop dual-paint latch on stop. g_have_eyes / g_note_dual used to skip MONO after cssvr_stop. Offline 179/179. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 228
+
+Drop stale VK dual pair on stop. g_vk_eyes used to submit last-session rasters on cssvr_start. Offline 180/180. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
