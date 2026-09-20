@@ -730,14 +730,13 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
     ProbeLiveEngine(g_eng);
   ViewHookTryInstall();
   UserCmd_HookLive();
-  if (!XrWanted()) {
-    ClientCmd_ReleaseHeld(g_eng, &g_prev_cmd, UserCmd_HookLive());
-    UserCmd_ClearOverlay();
-  }
+  const bool run = DualPaint_ShouldRun(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason));
+  // STOPPING/LOSS used to keep last stick/buttons walking (Peek gated WantXr only).
+  if (!run) ClientCmd_ReleaseHeld(g_eng, &g_prev_cmd, UserCmd_HookLive());
+  UserCmd_NoteSessionOk(run);
   const VkResult pr = real(queue, info);
   // After present: never wait. Harvest a finished GPU copy, kick the next if XR is hungry.
   VkEyePair dual{};
-  const bool run = DualPaint_ShouldRun(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason));
   // STOPPING/LOSS without cssvr_stop used to keep g_vk_eyes, so the next session_ok
   // submitted last-session rasters before two new world paints.
   if (!run) DropVkEyes();

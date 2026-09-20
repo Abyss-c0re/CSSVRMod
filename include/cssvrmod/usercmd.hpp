@@ -142,6 +142,12 @@ inline void ClientCmd_ApplyEdges(const EngineIf& eng, const UserCmdOverlay& cmd,
   if (cmd.lastinv && !prev.lastinv) EngineClientCmd(eng, "lastinv");
 }
 
+/// CreateMove overlay is live only while XR is wanted and session_ok.
+/// STOPPING/LOSS used to keep last stick/buttons walking (Peek gated WantXr only).
+inline bool UserCmd_OverlayLive(bool xr_wanted, bool session_ok) {
+  return xr_wanted && session_ok;
+}
+
 /// cssvr_stop used to leave +attack/+duck held (CreateMove overlay dropped, minus never sent).
 inline bool ClientCmd_ReleaseHeld(const EngineIf& eng, UserCmdOverlay* prev, bool usercmd_live) {
   if (!prev) return false;
@@ -155,6 +161,7 @@ inline bool ClientCmd_ReleaseHeld(const EngineIf& eng, UserCmdOverlay* prev, boo
 void UserCmd_NoteOverlay(const UserCmdOverlay& o);
 bool UserCmd_PeekOverlay(UserCmdOverlay* o);
 void UserCmd_ClearOverlay();
+void UserCmd_NoteSessionOk(bool session_ok);
 void Turn_NoteYawOff(float yaw_off);
 float Turn_PeekYawOff();
 bool UserCmd_HookLive();

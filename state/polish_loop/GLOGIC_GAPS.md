@@ -94,6 +94,7 @@
 - [x] Stale VK dual pair drops on STOPPING/LOSS without cssvr_stop (cycle 235). `DropVkEyes` was WantXr-only; session_ok returning used to submit last rasters before two new paints. Worker skips leftover when reason is not session_ok.
 - [x] Worker still pumps OpenXR events while skipping leftover submit (cycle 237). Cycle 235 skip used to never PollEvents, so READY after STOPPING was never seen.
 - [x] CreateMove overlay drops on stop (cycle 123). Last stick/buttons used to keep walking after `cssvr_stop`.
+- [x] CreateMove overlay drops on STOPPING/LOSS (cycle 238). Peek gated WantXr only, so last stick kept walking while the headset was off. `UserCmd_NoteSessionOk` clears overlay unless session_ok.
 - [x] ClientCmd minus on stop (cycle 124). Overlay drop left `+attack`/`+duck` held; present now releases edges.
 - [x] Stick-turn yaw resets on stop (cycle 128). Worker/GL TurnState used to keep heading across cssvr_stop; next start inherited it.
 - [x] Hand vel + last-free reset on stop (cycle 129). Restart used to finite-diff a fake melee swing and yank hands to the old map pose.

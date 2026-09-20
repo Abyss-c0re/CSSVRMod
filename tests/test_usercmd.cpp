@@ -93,6 +93,25 @@ TEST(clientcmd_release_held_clears_prev) {
   ASSERT_FALSE(ClientCmd_ReleaseHeld(e, nullptr, true));
 }
 
+TEST(usercmd_overlay_drops_when_session_not_ok) {
+  ASSERT_TRUE(UserCmd_OverlayLive(true, true));
+  ASSERT_FALSE(UserCmd_OverlayLive(true, false));
+  ASSERT_FALSE(UserCmd_OverlayLive(false, true));
+  UserCmdOverlay o;
+  o.forwardmove = 450.f;
+  o.buttons = kInForward;
+  UserCmd_NoteOverlay(o);
+  UserCmd_NoteSessionOk(true);
+  UserCmdOverlay b{};
+  ASSERT_TRUE(UserCmd_PeekOverlay(&b));
+  UserCmd_NoteSessionOk(false);
+  ASSERT_FALSE(UserCmd_PeekOverlay(&b));
+  ASSERT_NEAR(Turn_PeekYawOff(), 0.f, 0.001);
+  UserCmd_NoteSessionOk(true);
+  ASSERT_FALSE(UserCmd_PeekOverlay(&b));
+  CssvrOverride().store(-1);
+}
+
 TEST(usercmd_overlay_drops_when_xr_off) {
   UserCmdOverlay o;
   o.forwardmove = 450.f;
