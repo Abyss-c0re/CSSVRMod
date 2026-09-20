@@ -8,6 +8,7 @@
 #include "cssvrmod/hook_api.hpp"
 #include "cssvrmod/launch.hpp"
 #include "cssvrmod/input.hpp"
+#include "cssvrmod/menu3d.hpp"
 #include "cssvrmod/source_if.hpp"
 #include "cssvrmod/tick.hpp"
 #include "cssvrmod/usercmd.hpp"
@@ -276,6 +277,7 @@ void* XrWorker(void*) {
     // Yaw / last-free / hand vel used to survive STOPPING while XR stayed wanted.
     Tick_DropState(Tick_KeepState(XrWanted(), session_ok), &turn, &leftWall, &rightWall,
                    &leftVel, &rightVel, &nextMelee, &now);
+    if (!Menu3d_KeepGrip(XrWanted(), session_ok)) XrHostDropMenuGrip();
     const bool keep_mb = XrMailbox_Keep(XrWanted(), session_ok);
     if (!keep_mb) DropMailbox();
     if (!XrMailbox_Accept(keep_mb, epoch, XrHostEpoch())) {

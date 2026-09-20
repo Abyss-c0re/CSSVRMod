@@ -255,6 +255,7 @@ void ViewHookOnSwap() {
     g_have_eyes = DualPaint_Latch(false, false);
     XrHostNoteDualPaint(false);
     XrHostClearHmd();
+    XrHostDropMenuGrip();
     Chrome_NoteStatus(Banner_ChromeLabel(XrHostStatus().reason, false));
   }
 }

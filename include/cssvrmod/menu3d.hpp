@@ -163,6 +163,18 @@ inline bool Menu3d_OffHome(const Menu3d& m) {
 
 inline bool Menu3d_TitleHot(const Menu3d& m) { return m.cursor && m.cv < 0.18f; }
 
+/// Grip drag used to survive STOPPING/LOSS / cssvr_stop. Next session_ok applied
+/// last-session grip_off to a new hand pose and yanked the Vision panel.
+inline bool Menu3d_KeepGrip(bool xr_wanted, bool session_ok) {
+  return xr_wanted && session_ok;
+}
+
+inline void Menu3d_DropGrip(bool keep, Menu3d* m) {
+  if (keep || !m) return;
+  m->gripping = false;
+  m->grip_off = {};
+}
+
 // World-locked default. Grab while the laser is on the quad starts a drag (offset = panel − hand).
 inline bool Menu3d_GripTick(Menu3d* m, bool grab, const Vec3& hand, bool on_quad) {
   if (!m) return false;

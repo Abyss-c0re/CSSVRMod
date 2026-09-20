@@ -1020,6 +1020,38 @@ Drop mailbox leftover on STOPPING/LOSS. Cycle 235 skip used to submit last-sessi
 
 Drop in-flight swapchain copy on STOPPING/LOSS. Harvest after READY used to push last-session pixels. Offline 186/186. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 247
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. Tick/overlay/VK pair/mailbox/copy/HMD cache already drop on session loss. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 248
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. Dual latch + title already drop on STOPPING. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 249
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. pose_x stays 0. Dual world IPD ignores eyescale. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 250
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. Identical-eye MONO still gated. VK-live CopyEye ignores GL blit. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 251
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. SWAP is cameras only. Shared UV crop only. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 252
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. Dual world IPD ignores eyescale. pose_x stays 0. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 253
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up. Tick/overlay/VK pair/mailbox/copy/HMD cache already drop on session loss. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 254
+
+Drop Vision-panel grip on STOPPING/LOSS / cssvr_stop. Last grip_off used to yank the quad. Offline 187/187. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

@@ -103,6 +103,7 @@ int g_epoch = 0;
 void LeaveRunning() {
   g_epoch = XrSession_BumpEpoch(g_running, false, g_epoch);
   g_running = false;
+  Menu3d_DropGrip(false, &g_menu3d);
 }
 
 bool g_begun = false;
@@ -677,6 +678,8 @@ void XrHostClearHmd() {
   std::lock_guard<std::mutex> lk(g_hmd_mu);
   g_hmd_cache = {};
 }
+
+void XrHostDropMenuGrip() { Menu3d_DropGrip(false, &g_menu3d); }
 
 bool XrHostLastFrameSkipped() { return g_last_skip; }
 

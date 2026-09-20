@@ -159,6 +159,39 @@ TEST(menu3d_title_hot) {
   ASSERT_FALSE(Menu3d_TitleHot(m));
 }
 
+TEST(menu3d_grip_drops_on_session_loss) {
+  ASSERT_TRUE(Menu3d_KeepGrip(true, true));
+  ASSERT_FALSE(Menu3d_KeepGrip(true, false)); // STOPPING/LOSS, XR still wanted
+  ASSERT_FALSE(Menu3d_KeepGrip(false, true)); // cssvr_stop
+  ASSERT_FALSE(Menu3d_KeepGrip(false, false));
+
+  Menu3d m;
+  const Vec3 home = m.pos;
+  m.gripping = true;
+  m.grip_off = {0.4f, -0.2f, 0.3f};
+  Menu3d_DropGrip(Menu3d_KeepGrip(true, true), &m);
+  ASSERT_TRUE(m.gripping);
+  ASSERT_NEAR(m.grip_off.x, 0.4f, 0.001);
+
+  Menu3d_DropGrip(Menu3d_KeepGrip(true, false), &m);
+  ASSERT_FALSE(m.gripping);
+  ASSERT_NEAR(m.grip_off.x, 0.f, 0.001);
+  ASSERT_NEAR(m.grip_off.y, 0.f, 0.001);
+  ASSERT_NEAR(m.grip_off.z, 0.f, 0.001);
+  ASSERT_NEAR(m.pos.x, home.x, 0.001);
+  ASSERT_NEAR(m.pos.y, home.y, 0.001);
+  ASSERT_NEAR(m.pos.z, home.z, 0.001);
+
+  // Next grab must re-lock offset. Stale gripping used last grip_off vs a new hand.
+  const Vec3 hand0{0.f, kMenuY, 0.f};
+  ASSERT_TRUE(Menu3d_GripTick(&m, true, hand0, true));
+  ASSERT_TRUE(m.gripping);
+  const Vec3 hand1{0.5f, kMenuY, 0.2f};
+  ASSERT_TRUE(Menu3d_GripTick(&m, true, hand1, true));
+  ASSERT_NEAR(m.pos.x, 0.5f, 0.001);
+  Menu3d_DropGrip(false, nullptr);
+}
+
 TEST(menu3d_home_hint) {
   Menu3d m;
   ASSERT_FALSE(Menu3d_OffHome(m));

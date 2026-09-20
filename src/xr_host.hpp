@@ -38,6 +38,8 @@ void XrHostEndFrame();
 bool XrHostPollInput(struct XrSample* out);
 Pose XrHostLastHmd();
 void XrHostClearHmd();
+/// STOPPING/LOSS / cssvr_stop used to keep a Vision-panel grip_off across sessions.
+void XrHostDropMenuGrip();
 const XrHostInfo& XrHostStatus();
 /// Bumps when leaving session_ok. Mailbox leftover from the old epoch must not submit.
 int XrHostEpoch();
