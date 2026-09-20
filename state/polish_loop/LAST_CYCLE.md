@@ -1,14 +1,14 @@
-# Cycle 267 — 2026-09-20
+# Cycle 268 — 2026-09-20
 
 ## Focus
 
-`xr-init-fails-reset-on-destroy` — LOSS destroy must clear the SubmitPixels init-fail latch so CreateSess can retry.
+`xr-init-no-hmd-does-not-latch` — GetSystem no_hmd must not burn the init-fail cap before the HMD appears.
 
 ## Did
 
-- Recovered cycle 266 tip `20060d4` (record `e2cd0bc`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession / KeepWaited / STOPPING retry / DropLostSession already drop. Static `init_fails > 3` still blocked CreateSess after LOSS.
-- `XrSession_AllowInit` / `XrSession_InitFailsAfter`. Dual paint stays HMD-gated.
+- Recovered cycle 267 tip `eeb1782` (record `f390980`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession / KeepWaited / STOPPING retry / DropLostSession / init-fail reset already drop. Splash no_hmd still incremented the cap so four presents blocked CreateSess.
+- `XrSession_CountInitFail`. Dual paint stays HMD-gated.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 189/189 (1355/1355 asserts). Not HMD-proven.
+offline 189/189 (1360/1360 asserts). Not HMD-proven.
 
 ## Next
 

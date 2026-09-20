@@ -1104,6 +1104,10 @@ LOSS_PENDING destroys the session. Dead g_sess used to keep g_info.session so In
 
 Init-fail latch resets on LOSS destroy. Static init_fails > 3 used to block CreateSess after DropLostSession even when the HMD returned. Offline 189/189. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 268
+
+no_hmd GetSystem miss does not burn the init-fail cap. Splash presents used to latch CreateSess off before the HMD appeared. Offline 189/189. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
