@@ -5,7 +5,7 @@
   "started_at": "2026-09-20T13:35:53Z",
   "last_focus": "xr-shutdown-endsession-after-leave",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "b44e9c5",
+  "last_commit": "1cabe06",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
