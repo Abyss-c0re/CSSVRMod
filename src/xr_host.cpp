@@ -673,6 +673,8 @@ void XrHostClearHmd() {
 
 bool XrHostLastFrameSkipped() { return g_last_skip; }
 
+void XrHostPumpEvents() { PollEvents(); }
+
 bool XrHostBeginFrame() {
   g_last_skip = false;
   PollEvents();

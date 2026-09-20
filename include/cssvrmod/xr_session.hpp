@@ -91,4 +91,11 @@ inline bool XrSubmit_CountFail(const char* reason, bool submit_ok, bool skipped)
 /// Shutdown must not re-arm the no-HMD toast (one-shot per process).
 inline bool XrSession_ResetToastOnShutdown() { return false; }
 
+/// Leftover mailbox must not submit when !session_ok (cycle 235).
+/// Events must still be pumped while XR is wanted, or READY after STOPPING is never seen.
+inline bool XrWorker_ShouldSubmit(bool xr_wanted, bool session_ok) {
+  return xr_wanted && session_ok;
+}
+inline bool XrWorker_ShouldPump(bool xr_wanted) { return xr_wanted; }
+
 } // namespace cssvr

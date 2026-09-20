@@ -245,23 +245,28 @@ void* XrWorker(void*) {
     int w = 0, h = 0;
     bool bgra = false;
     bool dual = false;
+    bool have = false;
     {
       std::unique_lock<std::mutex> lk(g_mb.mu);
       g_mb.cv.wait_for(lk, std::chrono::milliseconds(50),
                        [] { return g_mb.have || g_mb.stop; });
       if (g_mb.stop) break;
-      if (!g_mb.have) continue;
-      frame.swap(g_mb.rgba);
-      frame_r.swap(g_mb.rgba_r);
-      w = g_mb.w;
-      h = g_mb.h;
-      bgra = g_mb.bgra;
-      dual = g_mb.dual;
-      g_mb.have = false;
-      g_mb.dual = false;
+      have = g_mb.have;
+      if (have) {
+        frame.swap(g_mb.rgba);
+        frame_r.swap(g_mb.rgba_r);
+        w = g_mb.w;
+        h = g_mb.h;
+        bgra = g_mb.bgra;
+        dual = g_mb.dual;
+        g_mb.have = false;
+        g_mb.dual = false;
+      }
     }
-    // cssvr_stop / STOPPING / LOSS: leftover mailbox must not submit last-session rasters.
-    if (!XrWanted() || !XrSession_IsOkReason(XrHostStatus().reason)) continue;
+    // Skip leftover submit on STOPPING/LOSS, but still pump or READY is never seen.
+    if (XrWorker_ShouldPump(XrWanted())) XrHostPumpEvents();
+    if (!have) continue;
+    if (!XrWorker_ShouldSubmit(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason))) continue;
     const bool ok = (dual && !frame_r.empty())
                         ? XrHostSubmitEyePixels(frame.data(), frame_r.data(), w, h, bgra, true)
                         : XrHostSubmitPixels(frame.data(), w, h, bgra);

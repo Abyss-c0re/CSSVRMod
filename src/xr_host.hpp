@@ -18,6 +18,9 @@ struct XrHostInfo {
 bool XrHostInit();
 void XrHostShutdown();
 bool XrHostBeginFrame();
+/// Poll session events without Wait/Begin. STOPPING→READY is lost if the worker
+/// skips leftover submit and never pumps.
+void XrHostPumpEvents();
 /// Last BeginFrame waited but shouldRender was false (skip, not a submit fail).
 bool XrHostLastFrameSkipped();
 // Submit the CSS present. Identity VIEW pose; IPD is in the two world paints.

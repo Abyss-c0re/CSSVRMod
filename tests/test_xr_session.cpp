@@ -98,6 +98,19 @@ TEST(xr_submit_fail_not_counted_on_warmup_or_skip) {
   ASSERT_EQ((int)XrSession_BeginKind(true, false, true), (int)XrBeginKind::miss);
 }
 
+TEST(xr_worker_pumps_while_skipping_leftover_submit) {
+  ASSERT_TRUE(XrWorker_ShouldPump(true));
+  ASSERT_FALSE(XrWorker_ShouldPump(false));
+  ASSERT_TRUE(XrWorker_ShouldSubmit(true, true));
+  ASSERT_FALSE(XrWorker_ShouldSubmit(true, false));
+  ASSERT_FALSE(XrWorker_ShouldSubmit(false, true));
+  ASSERT_FALSE(XrWorker_ShouldSubmit(false, false));
+  // STOPPING must still pump: otherwise READY after EndSession is never seen.
+  ASSERT_TRUE(XrWorker_ShouldPump(true) && !XrWorker_ShouldSubmit(true, false));
+  ASSERT_FALSE(XrSession_IsOkReason("session_stopping"));
+  ASSERT_TRUE(XrSession_IsOkReason("session_ok"));
+}
+
 TEST(xr_begin_miss_keeps_stopping_and_loss) {
   ASSERT_STREQ(XrSession_BeginMiss(false, false, "no_loader"), "no_loader");
   ASSERT_STREQ(XrSession_BeginMiss(false, false, nullptr), "no_session");
