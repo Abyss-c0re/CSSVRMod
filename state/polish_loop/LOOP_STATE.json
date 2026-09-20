@@ -5,7 +5,7 @@
   "started_at": "2026-09-20T12:30:40Z",
   "last_focus": "xr-exit-req-no-fail-latch",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "d109cbc",
+  "last_commit": "618ccc1",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }
