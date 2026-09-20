@@ -635,6 +635,7 @@ void XrHostShutdown() {
   g_sess = XR_NULL_HANDLE;
   g_info = XrHostInfo{};
   g_info.reason = "shutdown";
+  XrHostNoteDualPaint(false);
   UserCmd_ClearOverlay();
   if (XrSession_ResetToastOnShutdown()) g_toast_shown = false;
 }

@@ -148,6 +148,8 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
     return;
   }
   if (!DualPaint_ShouldRun(CssvrWantXr(), XrSession_IsOkReason(XrHostStatus().reason))) {
+    g_have_eyes = DualPaint_Latch(false, false);
+    XrHostNoteDualPaint(false);
     g_orig(self, view, clear, draw);
     return;
   }
@@ -179,8 +181,8 @@ void HookedRenderView(void* self, void* view, int clear, int draw) {
       r.reason = "identical_eyes";
     }
   }
-  g_have_eyes = r.painted_dual;
-  XrHostNoteDualPaint(r.painted_dual);
+  g_have_eyes = DualPaint_Latch(r.painted_dual, true);
+  XrHostNoteDualPaint(g_have_eyes);
   g_frame.did_frame = true;
   g_in = false;
   static int n = 0;
@@ -244,7 +246,15 @@ void ViewHookTryInstall() {
        g_eng.set_angles_idx, g_eng.reason);
 }
 
-void ViewHookOnSwap() { DualPaint_OnPresent(&g_frame); }
+void ViewHookOnSwap() {
+  DualPaint_OnPresent(&g_frame);
+  // Present still runs after cssvr_stop; RenderView may not. Drop the dual latch
+  // so the next session's desktop stamp is MONO until two new world paints.
+  if (!DualPaint_ShouldRun(CssvrWantXr(), XrSession_IsOkReason(XrHostStatus().reason))) {
+    g_have_eyes = DualPaint_Latch(false, false);
+    XrHostNoteDualPaint(false);
+  }
+}
 
 bool ViewHookTakeEyes(unsigned* l, unsigned* r, int* w, int* h) {
   if (!g_have_eyes || !g_eye[0] || !g_eye[1]) return false;

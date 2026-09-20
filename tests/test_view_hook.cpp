@@ -1,3 +1,4 @@
+#include "cssvrmod/banner.hpp"
 #include "cssvrmod/create_move.hpp"
 #include "cssvrmod/dual_paint.hpp"
 #include "cssvrmod/launch.hpp"
@@ -48,6 +49,16 @@ TEST(dual_paint_only_when_session_ok) {
   ASSERT_FALSE(XrSession_IsOkReason("no_hmd"));
   ASSERT_FALSE(XrSession_IsOkReason("session_created"));
   ASSERT_TRUE(XrSession_IsOkReason("session_ok"));
+}
+
+TEST(dual_latch_drops_when_stopped) {
+  ASSERT_TRUE(DualPaint_Latch(true, true));
+  ASSERT_FALSE(DualPaint_Latch(true, false));
+  ASSERT_FALSE(DualPaint_Latch(false, true));
+  ASSERT_FALSE(DualPaint_Latch(false, false));
+  // cssvr_stop / warmup: last dual must not skip MONO on the next session.
+  ASSERT_TRUE(Banner_ShouldStamp("session_ok", DualPaint_Latch(true, false)));
+  ASSERT_FALSE(Banner_ShouldStamp("session_ok", DualPaint_Latch(true, true)));
 }
 
 TEST(dual_paint_gate_needs_present) {

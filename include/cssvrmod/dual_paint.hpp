@@ -23,6 +23,12 @@ inline bool DualPaint_ShouldRun(bool xr_wanted, bool session_ok) {
   return xr_wanted && session_ok;
 }
 
+/// Last dual capture must not survive cssvr_stop / warmup.
+/// g_have_eyes / g_note_dual used to skip the MONO banner on the next session.
+inline bool DualPaint_Latch(bool painted_dual, bool should_run) {
+  return painted_dual && should_run;
+}
+
 /// paint(eye) must draw that camera. capture(eye) must copy that framebuffer.
 /// One paint or a failed capture leaves painted_dual false (heresy gate).
 inline DualPaintResult DualPaint_Run(const StereoViewIn& in, const DualPaintFn& paint,
