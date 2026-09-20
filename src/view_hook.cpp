@@ -254,6 +254,7 @@ void ViewHookOnSwap() {
   if (!DualPaint_ShouldRun(CssvrWantXr(), XrSession_IsOkReason(XrHostStatus().reason))) {
     g_have_eyes = DualPaint_Latch(false, false);
     XrHostNoteDualPaint(false);
+    XrHostClearHmd();
     Chrome_NoteStatus(Banner_ChromeLabel(XrHostStatus().reason, false));
   }
 }

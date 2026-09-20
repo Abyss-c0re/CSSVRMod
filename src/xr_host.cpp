@@ -2,6 +2,7 @@
 #include "cssvrmod/calib.hpp"
 #include "cssvrmod/cssvr_ctl.hpp"
 #include "cssvrmod/input.hpp"
+#include "cssvrmod/look.hpp"
 #include "cssvrmod/menu3d.hpp"
 #include "cssvrmod/settings.hpp"
 #include "cssvrmod/stereo_view.hpp"
@@ -659,9 +660,15 @@ static void CacheHmdFromViewSpace() {
 }
 
 Pose XrHostLastHmd() {
-  if (!g_running) return {};
   std::lock_guard<std::mutex> lk(g_hmd_mu);
-  return g_hmd_cache;
+  const bool live = CssvrWantXr() && g_running;
+  Look_DropHmd(live, &g_hmd_cache);
+  return Look_TakeHmd(live, g_hmd_cache);
+}
+
+void XrHostClearHmd() {
+  std::lock_guard<std::mutex> lk(g_hmd_mu);
+  g_hmd_cache = {};
 }
 
 bool XrHostLastFrameSkipped() { return g_last_skip; }

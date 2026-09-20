@@ -38,6 +38,24 @@ TEST(look_stick_turn_wraps_sane) {
   ASSERT_NEAR(d.angles.y, AngleNormalize(810.f), 0.01f);
 }
 
+TEST(look_hmd_cache_drops_when_not_running) {
+  Pose cache;
+  cache.valid = true;
+  cache.ang = {12.f, 80.f, 0.f};
+  ASSERT_TRUE(Look_TakeHmd(true, cache).valid);
+  ASSERT_NEAR(Look_TakeHmd(true, cache).ang.y, 80.f, 0.001);
+  ASSERT_FALSE(Look_TakeHmd(false, cache).valid);
+  Look_DropHmd(true, &cache);
+  ASSERT_TRUE(cache.valid);
+  Look_DropHmd(false, &cache);
+  ASSERT_FALSE(cache.valid);
+  ASSERT_FALSE(Look_TakeHmd(true, cache).valid);
+  auto d = Look_Decide(Look_TakeHmd(true, cache), nullptr, false, Ang3{0.f, 200.f, 0.f});
+  ASSERT_FALSE(d.applied);
+  ASSERT_STREQ(d.reason, "game");
+  ASSERT_NEAR(d.angles.y, 200.f, 0.001);
+}
+
 TEST(look_invalid_hmd_keeps_game) {
   Pose hmd;
   hmd.ang = {9.f, 9.f, 0.f};

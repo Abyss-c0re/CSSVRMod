@@ -10,6 +10,17 @@ struct LookDecision {
   const char* reason = "game";
 };
 
+/// cssvr_stop / STOPPING / LOSS used to keep the last HMD sample, so the next
+/// session_ok applied last-session look before the first locate.
+inline void Look_DropHmd(bool should_run, Pose* cache) {
+  if (!should_run && cache) *cache = {};
+}
+
+inline Pose Look_TakeHmd(bool should_run, const Pose& cache) {
+  if (!should_run) return {};
+  return cache;
+}
+
 inline LookDecision Look_Decide(const Pose& hmd, const GunPose* gun, bool firing,
                                 const Ang3& game, float yaw_off = 0.f) {
   LookDecision d;

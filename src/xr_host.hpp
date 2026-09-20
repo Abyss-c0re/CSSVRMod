@@ -34,6 +34,7 @@ bool XrHostSubmitEyePixels(const unsigned char* left, const unsigned char* right
 void XrHostEndFrame();
 bool XrHostPollInput(struct XrSample* out);
 Pose XrHostLastHmd();
+void XrHostClearHmd();
 const XrHostInfo& XrHostStatus();
 
 } // namespace cssvr

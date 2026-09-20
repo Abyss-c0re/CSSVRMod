@@ -88,6 +88,7 @@
 - [x] Vision panel freezes stick-turn (cycle 127). Menu owns stick-Y/X; turn used to spin the world under the quad. Existing yaw_off stays.
 - [x] Menu is Vision, not scoreboard (cycle 121). Menu click used to hold `IN_SCORE` while toggling the 3D panel. Right stick-click is TAB.
 - [x] Dual paint only when session_ok (cycle 122). Hook-in-CSS IPD-offset the desktop with no HMD / after stop. Stale HMD look dropped when not running.
+- [x] HMD cache drops on stop / STOPPING / LOSS (cycle 236). Last locate used to survive until the next session_ok, so the first dual paints inherited last-session look. Invalid HMD keeps the game view until the first new locate.
 - [x] Dual latch drops on stop (cycle 227). `g_have_eyes` / `g_note_dual` used to skip the MONO banner after `cssvr_stop` until two new paints.
 - [x] Stale VK dual pair drops on stop (cycle 228). `g_vk_eyes` used to PushXrDual last-session rasters on the next `cssvr_start`. Mailbox leftover does not submit.
 - [x] Stale VK dual pair drops on STOPPING/LOSS without cssvr_stop (cycle 235). `DropVkEyes` was WantXr-only; session_ok returning used to submit last rasters before two new paints. Worker skips leftover when reason is not session_ok.
