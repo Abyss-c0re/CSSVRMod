@@ -1,11 +1,11 @@
 {
-  "cycle": 235,
+  "cycle": 236,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-20T07:32:18Z",
-  "last_focus": "stale-vk-pair-on-session-loss",
+  "started_at": "2026-09-20T07:44:35Z",
+  "last_focus": "hmd-cache-drop-on-session-loss",
   "next_focus": "idle-no-shell-ladder",
-  "last_commit": "ab81d37",
+  "last_commit": "60d1c6b",
   "consecutive_no_commit": 0,
   "heresy": "same-frame pose IPD = two planes"
 }

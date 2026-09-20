@@ -1,13 +1,13 @@
-# Cycle 235 — 2026-09-20
+# Cycle 236 — 2026-09-20
 
 ## Focus
 
-`stale-vk-pair-on-session-loss` — DropVkEyes on STOPPING/LOSS, not only cssvr_stop.
+`hmd-cache-drop-on-session-loss` — last locate must not drive look after stop / STOPPING / LOSS.
 
 ## Did
 
-- Recovered cycle 234 tip `51246f1` (`8c3397e` on origin). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt found: `DropVkEyes` was WantXr-only. Session STOPPING/LOSS while XR is still wanted kept `g_vk_eyes`, so the next `session_ok` could PushXrDual last-session rasters before two new world paints. WrapPresent now drops the pair whenever dual-paint should not run. Worker skips leftover mailbox unless `session_ok`. Offline 181/181.
+- Recovered cycle 235 tip `ab81d37` (`8788c77` on origin). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt found: `XrHostLastHmd` kept the last locate across cssvr_stop and session loss, so the next `session_ok` dual paints inherited last-session yaw until a new locate. ViewHookOnSwap now clears the cache when dual-paint should not run. Invalid HMD keeps the game view. Offline 182/182.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 181 passed, 0 failed
+`cssvrmod_tests` 182 passed, 0 failed
 
 ## Next
 

@@ -976,6 +976,10 @@ Idle hunt. CSS not running. No icvar register line. WiVRn up, SteamVR down. Stop
 
 Drop stale VK dual pair on STOPPING/LOSS, not only cssvr_stop. Next session_ok used to submit last-session rasters. Offline 181/181. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 236
+
+Drop HMD look cache on stop / STOPPING / LOSS. Next session_ok used to inherit last-session yaw. Offline 182/182. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
