@@ -1,4 +1,4 @@
-# Cycle 271 — 2026-09-20
+# Cycle 272 — 2026-09-20
 
 ## Focus
 
@@ -6,7 +6,7 @@
 
 ## Did
 
-- Recovered cycle 270 record `e2fa9a7` (product `18be126`). CSS is not running. SteamVR is not running. WiVRn is **down** (was up through cycle 270). Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Recovered cycle 271 record `b5b97f3` (product `18be126`). CSS is not running. SteamVR is not running. WiVRn is still down. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
 - Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession / KeepWaited / STOPPING retry / DropLostSession / init-fail reset / no_hmd cap already drop. pose_x stays 0. Remaining gaps HMD-gated.
 - No code. Dual paint stays HMD-gated.
 
