@@ -98,6 +98,7 @@
 - [x] Begun XR frame EndFrames on submit miss / STOPPING (cycle 256). Swapchain miss used to leave `g_begun`; STOPPING called EndSession first. Next READY Wait+Begin was illegal. Shutdown already ended.
 - [x] WaitFrame success skips the next Wait until BeginFrame (cycle 262). Begin miss used to Wait again (illegal) and STOPPING EndSession without Begin. `XrFrame_SkipWait` / `XrFrame_BeginBeforeLeave`.
 - [x] Shutdown EndSession after LeaveRunning (cycle 263). Used to EndSession first, so a Wait-without-Begin pair leaked. `XrFrame_CanEndSession`.
+- [x] LeaveRunning keeps waited on Begin miss (cycle 264). Used to clear waited so CanEndSession EndSession'd an open Wait. `XrFrame_KeepWaited`.
 - [x] cssvr_stop requests XR exit and pumps while still running (cycle 257). Pump gated WantXr only, so STOPPING never ran and last rasters stayed on the HMD. `xrRequestExitSession`; EndSession still waits for STOPPING.
 - [x] Failed xrRequestExitSession does not latch (cycle 258). Cycle 257 set the flag on any call; a fail used to skip every later cssvr_stop.
 - [x] Worker still pumps OpenXR events while skipping leftover submit (cycle 237). Cycle 235 skip used to never PollEvents, so READY after STOPPING was never seen.

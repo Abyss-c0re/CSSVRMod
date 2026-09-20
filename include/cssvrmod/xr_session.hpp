@@ -156,4 +156,9 @@ inline bool XrFrame_BeginBeforeLeave(bool waited, bool begun) { return waited &&
 /// EndSession before LeaveRunning closed the pair (Wait-without-Begin leaked).
 inline bool XrFrame_CanEndSession(bool waited, bool begun) { return !waited && !begun; }
 
+/// After a Begin-to-close-Wait attempt, keep waited only if Begin still missed.
+/// LeaveRunning used to clear waited on Begin fail so CanEndSession leaked
+/// EndSession with an unclosed Wait.
+inline bool XrFrame_KeepWaited(bool waited, bool begun) { return waited && !begun; }
+
 } // namespace cssvr

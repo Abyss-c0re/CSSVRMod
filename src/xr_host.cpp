@@ -111,7 +111,8 @@ void LeaveRunning() {
     XrFrameBeginInfo bi{XR_TYPE_FRAME_BEGIN_INFO};
     if (xrBeginFrame(g_sess, &bi) == XR_SUCCESS) g_begun = true;
   }
-  g_waited = false;
+  // Begin miss must keep waited so CanEndSession does not EndSession on an open Wait.
+  g_waited = XrFrame_KeepWaited(g_waited, g_begun);
   // EndSession while a Wait+Begin is open is illegal. Next READY Wait+Begin
   // used to run with g_begun still true (swapchain miss or skip without End).
   if (XrFrame_EndOnAbort(g_begun, false)) XrHostEndFrame();

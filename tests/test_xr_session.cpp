@@ -175,6 +175,13 @@ TEST(xr_wait_needs_begin) {
   ASSERT_FALSE(XrFrame_CanEndSession(true, false));
   ASSERT_FALSE(XrFrame_CanEndSession(false, true));
   ASSERT_FALSE(XrFrame_CanEndSession(true, true));
+  ASSERT_FALSE(XrFrame_KeepWaited(false, false));
+  ASSERT_FALSE(XrFrame_KeepWaited(false, true));
+  ASSERT_FALSE(XrFrame_KeepWaited(true, true)); // Begin closed Wait
+  ASSERT_TRUE(XrFrame_KeepWaited(true, false)); // Begin miss — do not lie
+  // LeaveRunning used to clear waited on Begin fail; EndSession then leaked.
+  ASSERT_FALSE(XrFrame_CanEndSession(XrFrame_KeepWaited(true, false), false));
+  ASSERT_TRUE(XrFrame_CanEndSession(XrFrame_KeepWaited(true, true), false));
 }
 
 TEST(xr_begin_miss_keeps_stopping_and_loss) {
