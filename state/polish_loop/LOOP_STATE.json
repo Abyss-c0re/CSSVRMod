@@ -1,9 +1,9 @@
 {
-  "cycle": 256,
+  "cycle": 257,
   "interval_min": 13,
   "repo": "CSSVRMod",
-  "started_at": "2026-09-20T12:04:35Z",
-  "last_focus": "xr-endframe-on-abort",
+  "started_at": "2026-09-20T12:17:40Z",
+  "last_focus": "xr-exit-on-cssvr-stop",
   "next_focus": "idle-no-shell-ladder",
   "last_commit": "d305a87",
   "consecutive_no_commit": 0,

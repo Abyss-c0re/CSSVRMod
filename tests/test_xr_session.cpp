@@ -109,6 +109,13 @@ TEST(xr_worker_pumps_while_skipping_leftover_submit) {
   ASSERT_TRUE(XrWorker_ShouldPump(true) && !XrWorker_ShouldSubmit(true, false));
   ASSERT_FALSE(XrSession_IsOkReason("session_stopping"));
   ASSERT_TRUE(XrSession_IsOkReason("session_ok"));
+  // cssvr_stop: still pump while running so RequestExit can reach STOPPING.
+  ASSERT_TRUE(XrWorker_ShouldPump(false, true));
+  ASSERT_FALSE(XrWorker_ShouldPump(false, false));
+  ASSERT_TRUE(XrSession_RequestExit(false, true));
+  ASSERT_FALSE(XrSession_RequestExit(true, true));
+  ASSERT_FALSE(XrSession_RequestExit(false, false));
+  ASSERT_FALSE(XrWorker_ShouldSubmit(false, true));
 }
 
 TEST(xr_mailbox_drops_on_session_loss) {

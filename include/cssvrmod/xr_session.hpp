@@ -93,10 +93,20 @@ inline bool XrSession_ResetToastOnShutdown() { return false; }
 
 /// Leftover mailbox must not submit when !session_ok (cycle 235).
 /// Events must still be pumped while XR is wanted, or READY after STOPPING is never seen.
+/// cssvr_stop used to freeze PollEvents (pump gated WantXr only), so RequestExit
+/// never reached STOPPING and last rasters stayed on the HMD.
 inline bool XrWorker_ShouldSubmit(bool xr_wanted, bool session_ok) {
   return xr_wanted && session_ok;
 }
-inline bool XrWorker_ShouldPump(bool xr_wanted) { return xr_wanted; }
+inline bool XrWorker_ShouldPump(bool xr_wanted, bool running = false) {
+  return xr_wanted || running;
+}
+
+/// User turned XR off while a session is running. Ask the runtime to STOPPING
+/// (`xrRequestExitSession`). EndSession still waits for that event.
+inline bool XrSession_RequestExit(bool xr_wanted, bool running) {
+  return !xr_wanted && running;
+}
 
 /// Cycle 235 skipped submit while !ok, but a mailbox sitting through STOPPING→READY
 /// submitted last-session rasters. Drop have/dual so session_ok cannot resurrect them.

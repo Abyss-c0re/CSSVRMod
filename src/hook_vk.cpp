@@ -272,8 +272,11 @@ void* XrWorker(void*) {
       }
     }
     // Skip leftover submit on STOPPING/LOSS, but still pump or READY is never seen.
-    if (XrWorker_ShouldPump(XrWanted())) XrHostPumpEvents();
-    const bool session_ok = XrSession_IsOkReason(XrHostStatus().reason);
+    // cssvr_stop used to freeze pump (WantXr only); RequestExit never reached STOPPING.
+    bool session_ok = XrSession_IsOkReason(XrHostStatus().reason);
+    if (XrWorker_ShouldPump(XrWanted(), session_ok)) XrHostPumpEvents();
+    session_ok = XrSession_IsOkReason(XrHostStatus().reason);
+    if (XrSession_RequestExit(XrWanted(), session_ok)) XrHostRequestExit();
     // Yaw / last-free / hand vel used to survive STOPPING while XR stayed wanted.
     Tick_DropState(Tick_KeepState(XrWanted(), session_ok), &turn, &leftWall, &rightWall,
                    &leftVel, &rightVel, &nextMelee, &now);

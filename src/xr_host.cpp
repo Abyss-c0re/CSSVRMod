@@ -48,6 +48,7 @@ XR_FN(xrCreateSession);
 XR_FN(xrDestroySession);
 XR_FN(xrBeginSession);
 XR_FN(xrEndSession);
+XR_FN(xrRequestExitSession);
 XR_FN(xrPollEvent);
 XR_FN(xrWaitFrame);
 XR_FN(xrBeginFrame);
@@ -98,6 +99,7 @@ bool g_prev_menu_btn = false;
 bool g_prev_trig = false;
 XrSessionState g_state = XR_SESSION_STATE_UNKNOWN;
 bool g_running = false;
+bool g_exit_req = false;
 int g_epoch = 0;
 bool g_begun = false;
 bool g_last_skip = false;
@@ -201,6 +203,7 @@ bool CreateInst() {
   LOAD(g_inst, xrDestroySession);
   LOAD(g_inst, xrBeginSession);
   LOAD(g_inst, xrEndSession);
+  LOAD(g_inst, xrRequestExitSession);
   LOAD(g_inst, xrPollEvent);
   LOAD(g_inst, xrWaitFrame);
   LOAD(g_inst, xrBeginFrame);
@@ -244,6 +247,7 @@ void PollEvents() {
         bi.primaryViewConfigurationType = XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO;
         if (xrBeginSession(g_sess, &bi) == XR_SUCCESS) {
           g_running = true;
+          g_exit_req = false;
           g_info.reason = XrSession_Reason(XrSessionPhase::running);
         } else {
           g_info.reason = XrSession_Reason(XrSessionPhase::ready);
@@ -686,6 +690,13 @@ void XrHostDropMenuGrip() { Menu3d_DropGrip(false, &g_menu3d); }
 bool XrHostLastFrameSkipped() { return g_last_skip; }
 
 void XrHostPumpEvents() { PollEvents(); }
+
+void XrHostRequestExit() {
+  if (g_exit_req || !g_running || !g_sess || !xrRequestExitSession) return;
+  xrRequestExitSession(g_sess);
+  g_exit_req = true;
+  Log("cssvr xr request exit");
+}
 
 bool XrHostBeginFrame() {
   g_last_skip = false;

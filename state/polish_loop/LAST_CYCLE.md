@@ -1,14 +1,14 @@
-# Cycle 256 — 2026-09-20
+# Cycle 257 — 2026-09-20
 
 ## Focus
 
-`xr-endframe-on-abort` — begun OpenXR frame must EndFrame on swapchain miss / STOPPING, not only shutdown.
+`xr-exit-on-cssvr-stop` — cssvr_stop must RequestExit and keep pumping while the session is running.
 
 ## Did
 
-- Recovered cycle 255 (uncommitted idle journal; tip `9635b54` / product `b062f4a`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: Tick / overlay / mailbox / copy / HMD cache / Vision grip already drop. A Wait+Begin could stay open: swapchain miss returned without EndFrame; STOPPING called EndSession first. Next READY Wait+Begin is illegal.
-- `XrFrame_EndOnAbort`. LeaveRunning EndFrames first; STOPPING EndSession after. Submit miss EndFrames. Dual paint stays HMD-gated.
+- Recovered cycle 256 tip `44bb6ad` (product `d305a87`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame already drop. Pump gated WantXr only, so cssvr_stop froze PollEvents: STOPPING never ran and last rasters stayed on the HMD.
+- `XrWorker_ShouldPump(wanted, running)` + `XrSession_RequestExit`. Worker `xrRequestExitSession`; EndSession still waits for STOPPING. Dual paint stays HMD-gated.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 188/188 (1309/1309 asserts). Not HMD-proven.
+offline 188/188 (1315/1315 asserts). Not HMD-proven.
 
 ## Next
 
