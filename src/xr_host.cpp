@@ -132,6 +132,25 @@ XrAction g_stick_click = XR_NULL_HANDLE;
 XrPath g_hand[2]{};
 XrSpace g_aim[2]{};
 
+void DropLostSession() {
+  if (!XrSession_ShouldDestroy(true, g_sess != XR_NULL_HANDLE)) return;
+  if (xrDestroySession) xrDestroySession(g_sess);
+  g_sess = XR_NULL_HANDLE;
+  g_stage = XR_NULL_HANDLE;
+  g_view = XR_NULL_HANDLE;
+  g_sc[0] = g_sc[1] = XR_NULL_HANDLE;
+  g_menu_sc = XR_NULL_HANDLE;
+  g_aim[0] = g_aim[1] = XR_NULL_HANDLE;
+  g_img[0] = {};
+  g_img[1] = {};
+  g_menu_img = {};
+  g_info.session = false;
+  g_info.swapchain = false;
+  g_end_sess = false;
+  g_waited = false;
+  g_begun = false;
+}
+
 void Log(const char* fmt, ...) {
   FILE* f = std::fopen("/tmp/cssvrmod.log", "a");
   if (!f) return;
@@ -271,11 +290,17 @@ void PollEvents() {
         LeaveRunning();
         g_info.reason = XrSession_Reason(XrSessionPhase::lost);
         HonestToastIfNeeded(g_info.reason);
+        DropLostSession();
       }
     } else if (ev.type == XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING) {
       LeaveRunning();
       g_info.reason = XrSession_Reason(XrSessionPhase::lost);
       HonestToastIfNeeded(g_info.reason);
+      DropLostSession();
+      if (g_inst && xrDestroyInstance) xrDestroyInstance(g_inst);
+      g_inst = XR_NULL_HANDLE;
+      g_set = XR_NULL_HANDLE;
+      g_info.instance = false;
     }
     ev = XrEventDataBuffer{XR_TYPE_EVENT_DATA_BUFFER};
   }
@@ -440,62 +465,64 @@ bool CreateSess() {
 
 bool SetupInput() {
   if (!xrCreateActionSet) return false;
-  XrActionSetCreateInfo asci{XR_TYPE_ACTION_SET_CREATE_INFO};
-  std::strncpy(asci.actionSetName, "cssvr", XR_MAX_ACTION_SET_NAME_SIZE);
-  std::strncpy(asci.localizedActionSetName, "CSSVR", XR_MAX_LOCALIZED_ACTION_SET_NAME_SIZE);
-  if (xrCreateActionSet(g_inst, &asci, &g_set) != XR_SUCCESS) return false;
-  xrStringToPath(g_inst, "/user/hand/left", &g_hand[0]);
-  xrStringToPath(g_inst, "/user/hand/right", &g_hand[1]);
-  auto mk = [&](XrActionType t, const char* n, XrAction* a) {
-    XrActionCreateInfo ai{XR_TYPE_ACTION_CREATE_INFO};
-    ai.actionType = t;
-    std::strncpy(ai.actionName, n, XR_MAX_ACTION_NAME_SIZE);
-    std::strncpy(ai.localizedActionName, n, XR_MAX_LOCALIZED_ACTION_NAME_SIZE);
-    ai.countSubactionPaths = 2;
-    ai.subactionPaths = g_hand;
-    return xrCreateAction(g_set, &ai, a) == XR_SUCCESS;
-  };
-  mk(XR_ACTION_TYPE_POSE_INPUT, "aim", &g_pose);
-  mk(XR_ACTION_TYPE_FLOAT_INPUT, "trigger", &g_trig);
-  mk(XR_ACTION_TYPE_FLOAT_INPUT, "grab", &g_grab);
-  mk(XR_ACTION_TYPE_VECTOR2F_INPUT, "stick", &g_stick);
-  mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "menu", &g_menu);
-  mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "abxy", &g_abxy);
-  mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "click_b", &g_click_b);
-  mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "click_x", &g_click_x);
-  mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "click_y", &g_click_y);
-  mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "stick_click", &g_stick_click);
+  if (!g_set) {
+    XrActionSetCreateInfo asci{XR_TYPE_ACTION_SET_CREATE_INFO};
+    std::strncpy(asci.actionSetName, "cssvr", XR_MAX_ACTION_SET_NAME_SIZE);
+    std::strncpy(asci.localizedActionSetName, "CSSVR", XR_MAX_LOCALIZED_ACTION_SET_NAME_SIZE);
+    if (xrCreateActionSet(g_inst, &asci, &g_set) != XR_SUCCESS) return false;
+    xrStringToPath(g_inst, "/user/hand/left", &g_hand[0]);
+    xrStringToPath(g_inst, "/user/hand/right", &g_hand[1]);
+    auto mk = [&](XrActionType t, const char* n, XrAction* a) {
+      XrActionCreateInfo ai{XR_TYPE_ACTION_CREATE_INFO};
+      ai.actionType = t;
+      std::strncpy(ai.actionName, n, XR_MAX_ACTION_NAME_SIZE);
+      std::strncpy(ai.localizedActionName, n, XR_MAX_LOCALIZED_ACTION_NAME_SIZE);
+      ai.countSubactionPaths = 2;
+      ai.subactionPaths = g_hand;
+      return xrCreateAction(g_set, &ai, a) == XR_SUCCESS;
+    };
+    mk(XR_ACTION_TYPE_POSE_INPUT, "aim", &g_pose);
+    mk(XR_ACTION_TYPE_FLOAT_INPUT, "trigger", &g_trig);
+    mk(XR_ACTION_TYPE_FLOAT_INPUT, "grab", &g_grab);
+    mk(XR_ACTION_TYPE_VECTOR2F_INPUT, "stick", &g_stick);
+    mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "menu", &g_menu);
+    mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "abxy", &g_abxy);
+    mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "click_b", &g_click_b);
+    mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "click_x", &g_click_x);
+    mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "click_y", &g_click_y);
+    mk(XR_ACTION_TYPE_BOOLEAN_INPUT, "stick_click", &g_stick_click);
 
-  XrPath prof{};
-  xrStringToPath(g_inst, cube_xr::kProfileOculusTouch, &prof);
-  XrActionSuggestedBinding binds[16];
-  int nb = 0;
-  auto bind = [&](XrAction a, const char* p) {
-    XrPath path{};
-    xrStringToPath(g_inst, p, &path);
-    binds[nb++] = {a, path};
-  };
-  bind(g_pose, cube_xr::path::leftAimPose);
-  bind(g_pose, cube_xr::path::rightAimPose);
-  bind(g_trig, cube_xr::path::leftTriggerValue);
-  bind(g_trig, cube_xr::path::rightTriggerValue);
-  bind(g_grab, cube_xr::path::leftSqueezeValue);
-  bind(g_grab, cube_xr::path::rightSqueezeValue);
-  bind(g_stick, cube_xr::path::leftThumbstick);
-  bind(g_stick, cube_xr::path::rightThumbstick);
-  bind(g_menu, cube_xr::path::leftMenuClick);
-  bind(g_abxy, cube_xr::path::rightAClick);
-  bind(g_click_b, cube_xr::path::rightBClick);
-  bind(g_click_x, cube_xr::path::leftXClick);
-  bind(g_click_y, cube_xr::path::leftYClick);
-  bind(g_stick_click, cube_xr::path::leftThumbClick);
-  bind(g_stick_click, cube_xr::path::rightThumbClick);
-  XrInteractionProfileSuggestedBinding sug{XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING};
-  sug.interactionProfile = prof;
-  sug.countSuggestedBindings = static_cast<uint32_t>(nb);
-  sug.suggestedBindings = binds;
-  xrSuggestInteractionProfileBindings(g_inst, &sug);
-
+    XrPath prof{};
+    xrStringToPath(g_inst, cube_xr::kProfileOculusTouch, &prof);
+    XrActionSuggestedBinding binds[16];
+    int nb = 0;
+    auto bind = [&](XrAction a, const char* p) {
+      XrPath path{};
+      xrStringToPath(g_inst, p, &path);
+      binds[nb++] = {a, path};
+    };
+    bind(g_pose, cube_xr::path::leftAimPose);
+    bind(g_pose, cube_xr::path::rightAimPose);
+    bind(g_trig, cube_xr::path::leftTriggerValue);
+    bind(g_trig, cube_xr::path::rightTriggerValue);
+    bind(g_grab, cube_xr::path::leftSqueezeValue);
+    bind(g_grab, cube_xr::path::rightSqueezeValue);
+    bind(g_stick, cube_xr::path::leftThumbstick);
+    bind(g_stick, cube_xr::path::rightThumbstick);
+    bind(g_menu, cube_xr::path::leftMenuClick);
+    bind(g_abxy, cube_xr::path::rightAClick);
+    bind(g_click_b, cube_xr::path::rightBClick);
+    bind(g_click_x, cube_xr::path::leftXClick);
+    bind(g_click_y, cube_xr::path::leftYClick);
+    bind(g_stick_click, cube_xr::path::leftThumbClick);
+    bind(g_stick_click, cube_xr::path::rightThumbClick);
+    XrInteractionProfileSuggestedBinding sug{XR_TYPE_INTERACTION_PROFILE_SUGGESTED_BINDING};
+    sug.interactionProfile = prof;
+    sug.countSuggestedBindings = static_cast<uint32_t>(nb);
+    sug.suggestedBindings = binds;
+    xrSuggestInteractionProfileBindings(g_inst, &sug);
+  }
+  if (!g_sess) return false;
   XrSessionActionSetsAttachInfo ai{XR_TYPE_SESSION_ACTION_SETS_ATTACH_INFO};
   ai.countActionSets = 1;
   ai.actionSets = &g_set;

@@ -80,6 +80,9 @@ TEST(xr_session_stop_and_loss_are_not_ok) {
   const auto exit = XrSession_FromState(kXrStateExiting, true, false);
   ASSERT_EQ((int)exit, (int)XrSessionPhase::lost);
   ASSERT_STREQ(XrSession_Reason(exit), "no_hmd");
+  ASSERT_TRUE(XrSession_ShouldDestroy(true, true));
+  ASSERT_FALSE(XrSession_ShouldDestroy(true, false)); // already dropped
+  ASSERT_FALSE(XrSession_ShouldDestroy(false, true)); // STOPPING is EndSession
 }
 
 TEST(xr_submit_fail_not_counted_on_warmup_or_skip) {

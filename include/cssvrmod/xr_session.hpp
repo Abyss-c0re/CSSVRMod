@@ -172,4 +172,10 @@ inline bool XrFrame_ShouldEndSession(bool want_end, bool can_end, bool already) 
   return want_end && can_end && !already;
 }
 
+/// LOSS_PENDING / EXITING / instance loss: the session handle is dead.
+/// Init used to keep g_info.session so `if (!g_sess)` skipped CreateSess forever.
+inline bool XrSession_ShouldDestroy(bool lost, bool have_session) {
+  return lost && have_session;
+}
+
 } // namespace cssvr
