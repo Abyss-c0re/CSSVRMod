@@ -103,6 +103,7 @@ bool g_exit_req = false;
 int g_epoch = 0;
 bool g_begun = false;
 bool g_waited = false;
+bool g_end_sess = false;
 bool g_last_skip = false;
 
 void LeaveRunning() {
@@ -256,14 +257,14 @@ void PollEvents() {
         if (xrBeginSession(g_sess, &bi) == XR_SUCCESS) {
           g_running = true;
           g_exit_req = false;
+          g_end_sess = false;
           g_info.reason = XrSession_Reason(XrSessionPhase::running);
         } else {
           g_info.reason = XrSession_Reason(XrSessionPhase::ready);
         }
       }
-      if (g_state == XR_SESSION_STATE_STOPPING && xrEndSession) {
+      if (g_state == XR_SESSION_STATE_STOPPING) {
         LeaveRunning(); // Begin+End before EndSession if a Wait/Begin was still open
-        if (XrFrame_CanEndSession(g_waited, g_begun)) xrEndSession(g_sess);
         g_info.reason = XrSession_Reason(XrSessionPhase::stopping);
       }
       if (g_state == XR_SESSION_STATE_LOSS_PENDING || g_state == XR_SESSION_STATE_EXITING) {
@@ -277,6 +278,14 @@ void PollEvents() {
       HonestToastIfNeeded(g_info.reason);
     }
     ev = XrEventDataBuffer{XR_TYPE_EVENT_DATA_BUFFER};
+  }
+  // STOPPING event fires once. Begin miss used to skip EndSession forever.
+  if (XrFrame_RetryLeave(g_state == XR_SESSION_STATE_STOPPING, g_waited, g_begun)) LeaveRunning();
+  if (XrFrame_ShouldEndSession(g_state == XR_SESSION_STATE_STOPPING,
+                               XrFrame_CanEndSession(g_waited, g_begun), g_end_sess) &&
+      xrEndSession && g_sess) {
+    xrEndSession(g_sess);
+    g_end_sess = true;
   }
 }
 
@@ -646,8 +655,11 @@ void XrHostShutdown() {
   // LeaveRunning Begins a Wait-without-Begin pair then EndFrames. EndSession after.
   const bool running = g_running;
   LeaveRunning();
-  if (running && XrFrame_CanEndSession(g_waited, g_begun) && xrEndSession && g_sess)
+  if (XrFrame_ShouldEndSession(running, XrFrame_CanEndSession(g_waited, g_begun), g_end_sess) &&
+      xrEndSession && g_sess) {
     xrEndSession(g_sess);
+    g_end_sess = true;
+  }
   if (g_inst && xrDestroyInstance) xrDestroyInstance(g_inst);
   g_inst = XR_NULL_HANDLE;
   g_sess = XR_NULL_HANDLE;
@@ -693,6 +705,10 @@ void XrHostDropMenuGrip() { Menu3d_DropGrip(false, &g_menu3d); }
 bool XrHostLastFrameSkipped() { return g_last_skip; }
 
 void XrHostPumpEvents() { PollEvents(); }
+
+bool XrHostEndSessionPending() {
+  return g_state == XR_SESSION_STATE_STOPPING && !g_end_sess;
+}
 
 void XrHostRequestExit() {
   if (g_exit_req || !g_running || !g_sess || !xrRequestExitSession) return;

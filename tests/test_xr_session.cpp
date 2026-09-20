@@ -112,6 +112,10 @@ TEST(xr_worker_pumps_while_skipping_leftover_submit) {
   // cssvr_stop: still pump while running so RequestExit can reach STOPPING.
   ASSERT_TRUE(XrWorker_ShouldPump(false, true));
   ASSERT_FALSE(XrWorker_ShouldPump(false, false));
+  // After LeaveRunning, session_ok is false. Drain until EndSession or the
+  // session sticks STOPPING (KeepWaited skipped EndSession on Begin miss).
+  ASSERT_TRUE(XrWorker_ShouldPump(false, false, true));
+  ASSERT_FALSE(XrWorker_ShouldPump(false, false, false));
   ASSERT_TRUE(XrSession_RequestExit(false, true));
   ASSERT_FALSE(XrSession_RequestExit(true, true));
   ASSERT_FALSE(XrSession_RequestExit(false, false));
@@ -182,6 +186,14 @@ TEST(xr_wait_needs_begin) {
   // LeaveRunning used to clear waited on Begin fail; EndSession then leaked.
   ASSERT_FALSE(XrFrame_CanEndSession(XrFrame_KeepWaited(true, false), false));
   ASSERT_TRUE(XrFrame_CanEndSession(XrFrame_KeepWaited(true, true), false));
+  ASSERT_TRUE(XrFrame_RetryLeave(true, true, false)); // Begin miss — pump again
+  ASSERT_TRUE(XrFrame_RetryLeave(true, false, true)); // begun still open
+  ASSERT_FALSE(XrFrame_RetryLeave(true, false, false)); // pair closed
+  ASSERT_FALSE(XrFrame_RetryLeave(false, true, false));
+  ASSERT_TRUE(XrFrame_ShouldEndSession(true, true, false));
+  ASSERT_FALSE(XrFrame_ShouldEndSession(true, true, true)); // already ended
+  ASSERT_FALSE(XrFrame_ShouldEndSession(true, false, false)); // Wait still open
+  ASSERT_FALSE(XrFrame_ShouldEndSession(false, true, false));
 }
 
 TEST(xr_begin_miss_keeps_stopping_and_loss) {

@@ -21,6 +21,8 @@ bool XrHostBeginFrame();
 /// Poll session events without Wait/Begin. STOPPING→READY is lost if the worker
 /// skips leftover submit and never pumps.
 void XrHostPumpEvents();
+/// cssvr_stop used to freeze pump after LeaveRunning. Drain until EndSession.
+bool XrHostEndSessionPending();
 /// cssvr_stop used to leave the session running (last rasters on the HMD).
 void XrHostRequestExit();
 /// Last BeginFrame waited but shouldRender was false (skip, not a submit fail).

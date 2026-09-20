@@ -274,7 +274,8 @@ void* XrWorker(void*) {
     // Skip leftover submit on STOPPING/LOSS, but still pump or READY is never seen.
     // cssvr_stop used to freeze pump (WantXr only); RequestExit never reached STOPPING.
     bool session_ok = XrSession_IsOkReason(XrHostStatus().reason);
-    if (XrWorker_ShouldPump(XrWanted(), session_ok)) XrHostPumpEvents();
+    if (XrWorker_ShouldPump(XrWanted(), session_ok, XrHostEndSessionPending()))
+      XrHostPumpEvents();
     session_ok = XrSession_IsOkReason(XrHostStatus().reason);
     if (XrSession_RequestExit(XrWanted(), session_ok)) XrHostRequestExit();
     // Yaw / last-free / hand vel used to survive STOPPING while XR stayed wanted.

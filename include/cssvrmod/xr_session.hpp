@@ -98,8 +98,8 @@ inline bool XrSession_ResetToastOnShutdown() { return false; }
 inline bool XrWorker_ShouldSubmit(bool xr_wanted, bool session_ok) {
   return xr_wanted && session_ok;
 }
-inline bool XrWorker_ShouldPump(bool xr_wanted, bool running = false) {
-  return xr_wanted || running;
+inline bool XrWorker_ShouldPump(bool xr_wanted, bool running = false, bool drain_stop = false) {
+  return xr_wanted || running || drain_stop;
 }
 
 /// User turned XR off while a session is running. Ask the runtime to STOPPING
@@ -160,5 +160,16 @@ inline bool XrFrame_CanEndSession(bool waited, bool begun) { return !waited && !
 /// LeaveRunning used to clear waited on Begin fail so CanEndSession leaked
 /// EndSession with an unclosed Wait.
 inline bool XrFrame_KeepWaited(bool waited, bool begun) { return waited && !begun; }
+
+/// STOPPING fires once. Begin miss used to skip EndSession forever (KeepWaited).
+/// Later pumps must Leave again while Wait/Begin is still open.
+inline bool XrFrame_RetryLeave(bool stopping, bool waited, bool begun) {
+  return stopping && (waited || begun);
+}
+
+/// EndSession once the pair is closed. A second call after success is illegal.
+inline bool XrFrame_ShouldEndSession(bool want_end, bool can_end, bool already) {
+  return want_end && can_end && !already;
+}
 
 } // namespace cssvr
