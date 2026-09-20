@@ -104,6 +104,7 @@ int g_epoch = 0;
 bool g_begun = false;
 bool g_waited = false;
 bool g_end_sess = false;
+int g_init_fails = 0;
 bool g_last_skip = false;
 
 void LeaveRunning() {
@@ -149,6 +150,7 @@ void DropLostSession() {
   g_end_sess = false;
   g_waited = false;
   g_begun = false;
+  g_init_fails = XrSession_InitFailsAfter(false, true, g_init_fails);
 }
 
 void Log(const char* fmt, ...) {
@@ -675,6 +677,7 @@ bool XrHostInit() {
     Log("cssvr xr init %s stereo-offset %ux%u calib=%s eye=%.2f", g_info.reason, g_info.width,
         g_info.height, CalibPath(), c.eyescale);
   }
+  if (g_info.session) g_init_fails = XrSession_InitFailsAfter(true, false, g_init_fails);
   return g_info.session;
 }
 
@@ -1071,14 +1074,14 @@ bool XrHostSubmitPixels(const unsigned char* px, int w, int h, bool bgra) {
     HonestToastIfNeeded(g_info.reason);
     return false;
   }
-  static int init_fails = 0;
   if (!g_info.session) {
-    if (init_fails > 3) return false; // do not hammer create_session
+    if (!XrSession_AllowInit(false, g_init_fails)) return false;
     if (!XrHostInit()) {
-      init_fails++;
-      Log("cssvr xr init fail %s (n=%d)", g_info.reason, init_fails);
+      g_init_fails = XrSession_InitFailsAfter(false, false, g_init_fails);
+      Log("cssvr xr init fail %s (n=%d)", g_info.reason, g_init_fails);
       return false;
     }
+    g_init_fails = XrSession_InitFailsAfter(true, false, g_init_fails);
   }
   const GLenum ext = bgra ? GL_BGRA : GL_RGBA;
   if (!g_upload || g_upload_w != w || g_upload_h != h || g_upload_bgra != (int)bgra) {

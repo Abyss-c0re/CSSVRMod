@@ -178,4 +178,14 @@ inline bool XrSession_ShouldDestroy(bool lost, bool have_session) {
   return lost && have_session;
 }
 
+/// SubmitPixels used a static init_fails latch. After LOSS destroyed the session,
+/// four no_hmd misses blocked CreateSess even when the HMD came back.
+inline bool XrSession_AllowInit(bool have_session, int fails, int cap = 4) {
+  return !have_session && fails < cap;
+}
+inline int XrSession_InitFailsAfter(bool init_ok, bool session_dropped, int fails) {
+  if (init_ok || session_dropped) return 0;
+  return fails + 1;
+}
+
 } // namespace cssvr

@@ -83,6 +83,13 @@ TEST(xr_session_stop_and_loss_are_not_ok) {
   ASSERT_TRUE(XrSession_ShouldDestroy(true, true));
   ASSERT_FALSE(XrSession_ShouldDestroy(true, false)); // already dropped
   ASSERT_FALSE(XrSession_ShouldDestroy(false, true)); // STOPPING is EndSession
+  ASSERT_TRUE(XrSession_AllowInit(false, 0));
+  ASSERT_TRUE(XrSession_AllowInit(false, 3));
+  ASSERT_FALSE(XrSession_AllowInit(false, 4)); // hammer-guard
+  ASSERT_FALSE(XrSession_AllowInit(true, 0));
+  ASSERT_EQ(XrSession_InitFailsAfter(true, false, 3), 0); // live session
+  ASSERT_EQ(XrSession_InitFailsAfter(false, true, 4), 0); // LOSS dropped
+  ASSERT_EQ(XrSession_InitFailsAfter(false, false, 3), 4);
 }
 
 TEST(xr_submit_fail_not_counted_on_warmup_or_skip) {
