@@ -693,9 +693,9 @@ void XrHostPumpEvents() { PollEvents(); }
 
 void XrHostRequestExit() {
   if (g_exit_req || !g_running || !g_sess || !xrRequestExitSession) return;
-  xrRequestExitSession(g_sess);
-  g_exit_req = true;
-  Log("cssvr xr request exit");
+  const bool ok = xrRequestExitSession(g_sess) == XR_SUCCESS;
+  g_exit_req = XrSession_LatchExitReq(g_exit_req, ok);
+  Log("cssvr xr request exit %s", ok ? "ok" : "fail");
 }
 
 bool XrHostBeginFrame() {

@@ -116,6 +116,10 @@ TEST(xr_worker_pumps_while_skipping_leftover_submit) {
   ASSERT_FALSE(XrSession_RequestExit(true, true));
   ASSERT_FALSE(XrSession_RequestExit(false, false));
   ASSERT_FALSE(XrWorker_ShouldSubmit(false, true));
+  ASSERT_FALSE(XrSession_LatchExitReq(false, false)); // fail must retry
+  ASSERT_TRUE(XrSession_LatchExitReq(false, true));
+  ASSERT_TRUE(XrSession_LatchExitReq(true, false));
+  ASSERT_TRUE(XrSession_LatchExitReq(true, true));
 }
 
 TEST(xr_mailbox_drops_on_session_loss) {

@@ -108,6 +108,12 @@ inline bool XrSession_RequestExit(bool xr_wanted, bool running) {
   return !xr_wanted && running;
 }
 
+/// Failed xrRequestExitSession must not latch. cssvr_stop used to set the flag
+/// on any call and never retry, so last rasters could stay on the HMD.
+inline bool XrSession_LatchExitReq(bool already, bool request_ok) {
+  return already || request_ok;
+}
+
 /// Cycle 235 skipped submit while !ok, but a mailbox sitting through STOPPING→READY
 /// submitted last-session rasters. Drop have/dual so session_ok cannot resurrect them.
 inline bool XrMailbox_Keep(bool xr_wanted, bool session_ok) {

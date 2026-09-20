@@ -1064,6 +1064,10 @@ End begun XR frame on submit miss / STOPPING. Swapchain miss used to leave g_beg
 
 cssvr_stop requests XR exit and pumps while still running. WantXr-only pump used to freeze STOPPING; last rasters stayed on the HMD. Offline 188/188. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 258
+
+Failed xrRequestExitSession does not latch. Cycle 257 set the flag on any call so a fail skipped later cssvr_stop. Offline 188/188. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

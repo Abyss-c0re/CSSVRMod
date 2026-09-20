@@ -1,14 +1,14 @@
-# Cycle 257 — 2026-09-20
+# Cycle 258 — 2026-09-20
 
 ## Focus
 
-`xr-exit-on-cssvr-stop` — cssvr_stop must RequestExit and keep pumping while the session is running.
+`xr-exit-req-no-fail-latch` — failed xrRequestExitSession must not latch; cssvr_stop retries.
 
 ## Did
 
-- Recovered cycle 256 tip `44bb6ad` (product `d305a87`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame already drop. Pump gated WantXr only, so cssvr_stop froze PollEvents: STOPPING never ran and last rasters stayed on the HMD.
-- `XrWorker_ShouldPump(wanted, running)` + `XrSession_RequestExit`. Worker `xrRequestExitSession`; EndSession still waits for STOPPING. Dual paint stays HMD-gated.
+- Recovered cycle 257 tip `4aaba7a` (product `d109cbc`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / WantXr pump already drop. Cycle 257 latched g_exit_req on any RequestExit call; a fail skipped every later cssvr_stop so last rasters could stay on the HMD.
+- `XrSession_LatchExitReq`. Live latches only on XR_SUCCESS. Dual paint stays HMD-gated.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 188/188 (1315/1315 asserts). Not HMD-proven.
+offline 188/188 (1319/1319 asserts). Not HMD-proven.
 
 ## Next
 
