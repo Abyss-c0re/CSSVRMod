@@ -1,4 +1,4 @@
-# Cycle 270 — 2026-09-20
+# Cycle 271 — 2026-09-20
 
 ## Focus
 
@@ -6,7 +6,7 @@
 
 ## Did
 
-- Recovered cycle 269 record `22344be` (product `18be126`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Recovered cycle 270 record `e2fa9a7` (product `18be126`). CSS is not running. SteamVR is not running. WiVRn is **down** (was up through cycle 270). Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
 - Hunt: Tick / overlay / mailbox / copy / HMD / grip / begun-frame / Wait-needs-Begin / EndSession / KeepWaited / STOPPING retry / DropLostSession / init-fail reset / no_hmd cap already drop. pose_x stays 0. Remaining gaps HMD-gated.
 - No code. Dual paint stays HMD-gated.
 
@@ -22,4 +22,4 @@ no rebuild (no code). Last offline 189/189 (1360/1360 asserts). Not HMD-proven.
 
 ## Next
 
-`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. With OpenXR (WiVRn is already up), type `cssvr_start`. Dual paint stays HMD-gated.
+`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. Start OpenXR (WiVRn/SteamVR) first, then type `cssvr_start`. Dual paint stays HMD-gated.
