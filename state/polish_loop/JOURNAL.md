@@ -1148,6 +1148,10 @@ Idle hunt. CSS not running. No icvar register line. WiVRn down. SteamVR not. Tic
 
 Idle hunt. CSS not running. No icvar register line. WiVRn down. SteamVR not. Tick/overlay/mailbox/copy/HMD/grip/session pairing/init-fail already drop. Existing tests 189/189. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start OpenXR, then CSS from the menu.
 
+## 2026-09-20 cycle 279
+
+Idle hunt. CSS not running now. Log grew (splash/late-attach, cmd wrap, Help). Still no icvar register / dual paint. WiVRn down. SteamVR not. Session pairing already drop. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start OpenXR, then CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.
