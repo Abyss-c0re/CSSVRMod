@@ -90,6 +90,7 @@
 - [x] Dual paint only when session_ok (cycle 122). Hook-in-CSS IPD-offset the desktop with no HMD / after stop. Stale HMD look dropped when not running.
 - [x] Dual latch drops on stop (cycle 227). `g_have_eyes` / `g_note_dual` used to skip the MONO banner after `cssvr_stop` until two new paints.
 - [x] Stale VK dual pair drops on stop (cycle 228). `g_vk_eyes` used to PushXrDual last-session rasters on the next `cssvr_start`. Mailbox leftover does not submit.
+- [x] Stale VK dual pair drops on STOPPING/LOSS without cssvr_stop (cycle 235). `DropVkEyes` was WantXr-only; session_ok returning used to submit last rasters before two new paints. Worker skips leftover when reason is not session_ok.
 - [x] CreateMove overlay drops on stop (cycle 123). Last stick/buttons used to keep walking after `cssvr_stop`.
 - [x] ClientCmd minus on stop (cycle 124). Overlay drop left `+attack`/`+duck` held; present now releases edges.
 - [x] Stick-turn yaw resets on stop (cycle 128). Worker/GL TurnState used to keep heading across cssvr_stop; next start inherited it.

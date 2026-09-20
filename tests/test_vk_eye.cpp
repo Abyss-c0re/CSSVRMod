@@ -80,6 +80,10 @@ TEST(vk_eye_stale_pair_does_not_submit_when_stopped) {
   // cssvr_stop: last L/R copies must not submit as this session's dual.
   ASSERT_FALSE(DualPaint_Latch(VkEye_WorldsDiffer(p), DualPaint_ShouldRun(false, true)));
   ASSERT_FALSE(DualPaint_Latch(VkEye_WorldsDiffer(p), DualPaint_ShouldRun(true, false)));
+  // STOPPING/LOSS without cssvr_stop: pair still differs, so the next session_ok
+  // would Latch unless the live path DropVkEyes when !should_run.
+  ASSERT_TRUE(VkEye_WorldsDiffer(p));
+  ASSERT_TRUE(DualPaint_Latch(VkEye_WorldsDiffer(p), DualPaint_ShouldRun(true, true)));
   VkEye_Clear(&p);
   ASSERT_FALSE(VkEye_WorldsDiffer(p));
   ASSERT_FALSE(DualPaint_Latch(VkEye_WorldsDiffer(p), DualPaint_ShouldRun(true, true)));

@@ -23,8 +23,9 @@ inline bool DualPaint_ShouldRun(bool xr_wanted, bool session_ok) {
   return xr_wanted && session_ok;
 }
 
-/// Last dual capture must not survive cssvr_stop / warmup.
-/// g_have_eyes / g_note_dual used to skip MONO; g_vk_eyes used to submit last-session rasters.
+/// Last dual capture must not survive cssvr_stop / warmup / STOPPING / LOSS.
+/// g_have_eyes / g_note_dual used to skip MONO; g_vk_eyes used to submit last-session rasters
+/// (cssvr_stop and session loss while XR is still wanted).
 inline bool DualPaint_Latch(bool painted_dual, bool should_run) {
   return painted_dual && should_run;
 }

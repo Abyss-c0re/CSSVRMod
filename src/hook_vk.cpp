@@ -260,8 +260,8 @@ void* XrWorker(void*) {
       g_mb.have = false;
       g_mb.dual = false;
     }
-    // cssvr_stop: leftover mailbox must not submit last-session rasters.
-    if (!XrWanted()) continue;
+    // cssvr_stop / STOPPING / LOSS: leftover mailbox must not submit last-session rasters.
+    if (!XrWanted() || !XrSession_IsOkReason(XrHostStatus().reason)) continue;
     const bool ok = (dual && !frame_r.empty())
                         ? XrHostSubmitEyePixels(frame.data(), frame_r.data(), w, h, bgra, true)
                         : XrHostSubmitPixels(frame.data(), w, h, bgra);
@@ -728,12 +728,14 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
   if (!XrWanted()) {
     ClientCmd_ReleaseHeld(g_eng, &g_prev_cmd, UserCmd_HookLive());
     UserCmd_ClearOverlay();
-    DropVkEyes();
   }
   const VkResult pr = real(queue, info);
   // After present: never wait. Harvest a finished GPU copy, kick the next if XR is hungry.
   VkEyePair dual{};
   const bool run = DualPaint_ShouldRun(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason));
+  // STOPPING/LOSS without cssvr_stop used to keep g_vk_eyes, so the next session_ok
+  // submitted last-session rasters before two new world paints.
+  if (!run) DropVkEyes();
   const bool have_dual = DualPaint_Latch(TakePairImpl(&dual) && VkEye_WorldsDiffer(dual), run);
   if (have_dual && !MailboxFull()) {
     EnsureXrWorker();
