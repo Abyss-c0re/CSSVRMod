@@ -1077,7 +1077,8 @@ bool XrHostSubmitPixels(const unsigned char* px, int w, int h, bool bgra) {
   if (!g_info.session) {
     if (!XrSession_AllowInit(false, g_init_fails)) return false;
     if (!XrHostInit()) {
-      g_init_fails = XrSession_InitFailsAfter(false, false, g_init_fails);
+      g_init_fails = XrSession_InitFailsAfter(false, false, g_init_fails,
+                                             XrSession_CountInitFail(g_info.reason));
       Log("cssvr xr init fail %s (n=%d)", g_info.reason, g_init_fails);
       return false;
     }

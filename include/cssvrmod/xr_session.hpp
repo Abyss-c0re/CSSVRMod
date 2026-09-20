@@ -183,8 +183,15 @@ inline bool XrSession_ShouldDestroy(bool lost, bool have_session) {
 inline bool XrSession_AllowInit(bool have_session, int fails, int cap = 4) {
   return !have_session && fails < cap;
 }
-inline int XrSession_InitFailsAfter(bool init_ok, bool session_dropped, int fails) {
+/// GetSystem no_hmd is not a latch-worthy fail. Splash presents used to burn
+/// the cap before the HMD appeared.
+inline bool XrSession_CountInitFail(const char* reason) {
+  return !reason || std::strcmp(reason, "no_hmd") != 0;
+}
+inline int XrSession_InitFailsAfter(bool init_ok, bool session_dropped, int fails,
+                                    bool count_fail = true) {
   if (init_ok || session_dropped) return 0;
+  if (!count_fail) return fails;
   return fails + 1;
 }
 

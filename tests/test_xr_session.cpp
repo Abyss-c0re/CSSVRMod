@@ -90,6 +90,11 @@ TEST(xr_session_stop_and_loss_are_not_ok) {
   ASSERT_EQ(XrSession_InitFailsAfter(true, false, 3), 0); // live session
   ASSERT_EQ(XrSession_InitFailsAfter(false, true, 4), 0); // LOSS dropped
   ASSERT_EQ(XrSession_InitFailsAfter(false, false, 3), 4);
+  ASSERT_FALSE(XrSession_CountInitFail("no_hmd"));
+  ASSERT_TRUE(XrSession_CountInitFail("create_session"));
+  ASSERT_TRUE(XrSession_CountInitFail("create_instance"));
+  ASSERT_EQ(XrSession_InitFailsAfter(false, false, 3, false), 3); // no_hmd keeps trying
+  ASSERT_TRUE(XrSession_AllowInit(false, XrSession_InitFailsAfter(false, false, 3, false)));
 }
 
 TEST(xr_submit_fail_not_counted_on_warmup_or_skip) {

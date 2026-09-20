@@ -102,6 +102,7 @@
 - [x] STOPPING retries Leave+EndSession on later pumps (cycle 265). Event fires once; Begin miss skipped EndSession and cssvr_stop froze pump. `XrFrame_RetryLeave` / `XrFrame_ShouldEndSession`.
 - [x] LOSS_PENDING destroys the session (cycle 266). Dead `g_sess` used to keep `g_info.session` so Init never CreateSess'd again. `XrSession_ShouldDestroy`.
 - [x] Init-fail latch resets on LOSS destroy (cycle 267). Static `init_fails > 3` used to block CreateSess after DropLostSession even when the HMD returned. `XrSession_AllowInit` / `XrSession_InitFailsAfter`.
+- [x] no_hmd GetSystem miss does not burn the init-fail cap (cycle 268). Splash presents used to latch CreateSess off before the HMD appeared. `XrSession_CountInitFail`.
 - [x] cssvr_stop requests XR exit and pumps while still running (cycle 257). Pump gated WantXr only, so STOPPING never ran and last rasters stayed on the HMD. `xrRequestExitSession`; EndSession still waits for STOPPING.
 - [x] Failed xrRequestExitSession does not latch (cycle 258). Cycle 257 set the flag on any call; a fail used to skip every later cssvr_stop.
 - [x] Worker still pumps OpenXR events while skipping leftover submit (cycle 237). Cycle 235 skip used to never PollEvents, so READY after STOPPING was never seen.
