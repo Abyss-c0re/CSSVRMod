@@ -956,6 +956,26 @@ Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. Du
 
 Window title MONO on stop. HarvestCopy skipped the stamp while XR was off, so the title stayed CSS. Offline 181/181. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-20 cycle 231
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. Latch + stale VK pair + MONO title already drop on stop. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 232
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. VK worker already skips leftover Tick/submit. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 233
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. Submit pose_x stays 0. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 234
+
+Idle hunt. CSS not running. No icvar register line. WiVRn up, SteamVR down. Stop/title/pose/UV already match Cube. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 235
+
+Drop stale VK dual pair on STOPPING/LOSS, not only cssvr_stop. Next session_ok used to submit last-session rasters. Offline 181/181. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

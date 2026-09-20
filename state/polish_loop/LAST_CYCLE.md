@@ -1,13 +1,13 @@
-# Cycle 230 — 2026-09-20
+# Cycle 235 — 2026-09-20
 
 ## Focus
 
-`title-mono-on-stop` — window title must not stay CSS after cssvr_stop.
+`stale-vk-pair-on-session-loss` — DropVkEyes on STOPPING/LOSS, not only cssvr_stop.
 
 ## Did
 
-- Recovered cycle 229 tip `0843ce0` (`1f042d3` on origin). CSS is not running. SteamVR is not running.
-- Dual latch dropped (cycle 227) but HarvestCopy returned before the MONO stamp when XR was off, so the title stayed `CSS`. `Banner_ChromeLabel` + ViewHookOnSwap now set MONO. Offline 181/181.
+- Recovered cycle 234 tip `51246f1` (`8c3397e` on origin). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt found: `DropVkEyes` was WantXr-only. Session STOPPING/LOSS while XR is still wanted kept `g_vk_eyes`, so the next `session_ok` could PushXrDual last-session rasters before two new world paints. WrapPresent now drops the pair whenever dual-paint should not run. Worker skips leftover mailbox unless `session_ok`. Offline 181/181.
 
 ## Did not
 
@@ -21,4 +21,4 @@
 
 ## Next
 
-`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. With SteamVR on, type `cssvr_start`. Dual paint stays HMD-gated.
+`idle-no-shell-ladder` — start CSS from the menu so ICvar can log `ver=` / `cssvr_start=`. With OpenXR (WiVRn is already up), type `cssvr_start`. Dual paint stays HMD-gated.
