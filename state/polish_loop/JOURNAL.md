@@ -716,6 +716,234 @@ Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No
 
 Melee vel tracks between swings (`94d7b29`). Fist finite-diff used to sample only while melee_intent; next punch inherited a stale delta. Offline 178/178. Not HMD-proven. Next: start CSS from the menu.
 
+## 2026-09-19 cycle 171
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 172
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 173
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 174
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 175
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 176
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 177
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 178
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 179
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 180
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 181
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 182
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 183
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 184
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 185
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 186
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 187
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 188
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. Existing tests 178/178. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 189
+
+Idle hunt. CSS not running. Log grew with hook-load / no-HMD toasts; still no icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 190
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 191
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 192
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 193
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 194
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 195
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 196
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 197
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 198
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 199
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 200
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-19 cycle 201
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 202
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 203
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 204
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 205
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 206
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 207
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 208
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 209
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. Existing tests 178/178. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 210
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 211
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. vstdlib VEngineCvar004 factory works offline. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 212
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 213
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. Submit pose_x stays 0. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 214
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 215
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. Cube rigid IPD already matches. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 216
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 217
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 218
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 219
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 220
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. Submit pose_x stays 0. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 221
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. Identical-eye MONO still gated. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 222
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. Cube rigid IPD already matches. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 223
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. No guessed CSS melee dispatch. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 224
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. Live Tick already per-hand vel. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 225
+
+Idle hunt. CSS not running. No icvar register line. Remaining gaps HMD-gated. Submit pose_x stays 0. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 226
+
+Idle hunt. CSS not running. No icvar register line. Input/look/submit gates unchanged. Floor last-free already matches Lua. No code. Not HMD-proven. Next: start CSS from the menu.
+
+## 2026-09-20 cycle 227
+
+Drop dual-paint latch on stop. g_have_eyes / g_note_dual used to skip MONO after cssvr_stop. Offline 179/179. Not HMD-proven. Next: start CSS from the menu.
+
 ## 2026-09-18 cycle 57 follow
 
 Only wrap a ClientCmd slot if dladdr says engine.so. Guessed 106 must not patch a non-engine pointer.

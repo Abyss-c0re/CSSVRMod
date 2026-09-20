@@ -1,25 +1,23 @@
-# Cycle 170 — 2026-09-19
+# Cycle 227 — 2026-09-20
 
 ## Focus
 
-`melee-vel-tracks-between-swings` — Lua samples relative vel every frame.
+`dual-latch-drops-on-stop` — last dual capture must not skip MONO after cssvr_stop.
 
 ## Did
 
-- Recovered cycle 169 tip `e925357` (`9d08ff1` on origin). CSS is not running.
-- Fist finite-diff used to sample only while `melee_intent`. Live Tick is empty-handed, so the next punch inherited a stale delta. Per-hand states now update every tick. Commit `94d7b29`.
-- Offline test `tick_melee_vel_tracks_between_swings`.
+- Recovered cycle 226 tip `94d7b29` (`6d1d57f` on origin). CSS is not running. SteamVR is not running.
+- Dual latch (`g_have_eyes` / `g_note_dual`) survived `cssvr_stop` / warmup, so Banner skipped MONO on the next session_ok until two new paints. `DualPaint_Latch` drops it when ShouldRun is false; ViewHookOnSwap and shutdown clear it. Offline 179/179.
 
 ## Did not
 
 - HMD walk. Stereo unproven.
 - Queue `dual-renderview-ipd-origin`.
 - Invent print/help/menu/toast/cfg chrome.
-- Live weapon query (still nullptr).
 
 ## Tests
 
-`cssvrmod_tests` 178/178 (1206 asserts)
+`cssvrmod_tests` 179 passed, 0 failed
 
 ## Next
 
