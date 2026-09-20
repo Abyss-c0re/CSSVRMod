@@ -1,13 +1,13 @@
-# Cycle 237 — 2026-09-20
+# Cycle 238 — 2026-09-20
 
 ## Focus
 
-`worker-pump-on-session-loss` — skip leftover submit, still PollEvents so READY after STOPPING is seen.
+`overlay-drop-on-session-loss` — last stick/buttons must not keep walking on STOPPING/LOSS.
 
 ## Did
 
-- Recovered cycle 236 tip `60d1c6b` (`93663c0` on origin). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt found: cycle 235 skipped the worker mailbox on STOPPING/LOSS without pumping events, so READY after EndSession was never seen. Worker now PollEvents while XR is wanted and still refuses leftover submit. Offline 183/183.
+- Recovered cycle 237 tip `0d21246` (`b55594b` on origin). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt found: CreateMove Peek gated WantXr only, so last stick/buttons kept walking while the headset was off. Present now `UserCmd_NoteSessionOk(run)` and clears overlay unless session_ok. Offline 184/184.
 
 ## Did not
 
@@ -17,7 +17,7 @@
 
 ## Tests
 
-`cssvrmod_tests` 183 passed, 0 failed
+`cssvrmod_tests` 184 passed, 0 failed
 
 ## Next
 
