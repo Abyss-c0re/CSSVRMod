@@ -111,6 +111,31 @@ TEST(xr_worker_pumps_while_skipping_leftover_submit) {
   ASSERT_TRUE(XrSession_IsOkReason("session_ok"));
 }
 
+TEST(xr_mailbox_drops_on_session_loss) {
+  bool have = true, dual = true;
+  XrMailbox_Drop(XrMailbox_Keep(true, true), &have, &dual);
+  ASSERT_TRUE(have);
+  ASSERT_TRUE(dual);
+  // STOPPING/LOSS: leftover dual must not sit until READY submits it.
+  XrMailbox_Drop(XrMailbox_Keep(true, false), &have, &dual);
+  ASSERT_FALSE(have);
+  ASSERT_FALSE(dual);
+  ASSERT_FALSE(XrMailbox_Keep(true, true) && have);
+  have = true;
+  dual = true;
+  XrMailbox_Drop(XrMailbox_Keep(false, true), &have, &dual);
+  ASSERT_FALSE(have);
+  ASSERT_FALSE(dual);
+  XrMailbox_Drop(false, nullptr, nullptr);
+
+  ASSERT_EQ(XrSession_BumpEpoch(true, false, 0), 1);
+  ASSERT_EQ(XrSession_BumpEpoch(false, true, 1), 1); // READY does not bump
+  ASSERT_EQ(XrSession_BumpEpoch(true, true, 1), 1);
+  ASSERT_TRUE(XrMailbox_Accept(true, 1, 1));
+  ASSERT_FALSE(XrMailbox_Accept(true, 0, 1)); // leftover from previous epoch
+  ASSERT_FALSE(XrMailbox_Accept(false, 1, 1));
+}
+
 TEST(xr_begin_miss_keeps_stopping_and_loss) {
   ASSERT_STREQ(XrSession_BeginMiss(false, false, "no_loader"), "no_loader");
   ASSERT_STREQ(XrSession_BeginMiss(false, false, nullptr), "no_session");

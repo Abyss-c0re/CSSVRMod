@@ -1,14 +1,14 @@
-# Cycle 244 — 2026-09-20
+# Cycle 245 — 2026-09-20
 
 ## Focus
 
-`tick-state-drop-on-session-loss` — worker Tick state on STOPPING/LOSS, not only cssvr_stop.
+`mailbox-drop-on-session-loss` — leftover XR mailbox on STOPPING/LOSS, not only skip-while-!ok.
 
 ## Did
 
-- Recovered cycle 243 (uncommitted idle journal; tip still `9fc43ef` / product `347f563`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
-- Hunt: VK worker reset yaw / last-free / hand vel only when `!XrWanted()`. STOPPING/LOSS skipped submit but kept Tick state, so the next session_ok inherited last heading and could yank hands / fake a melee swing. Overlay / VK pair / HMD cache already dropped (235–238).
-- `Tick_KeepState` / `Tick_DropState`; VK worker drops after pump; GL swap matches.
+- Recovered cycle 244 tip `8f5cd5d` (product `39e7aa3`). CSS is not running. SteamVR is not running. WiVRn is up. Log still has no `icvar ver=` / `register cssvr_start=` / `renderview dual`.
+- Hunt: cycle 235 skipped worker submit while !session_ok, but a mailbox dual sitting through STOPPING→READY submitted last-session rasters. Harvest still pushed on `XrWanted` during STOPPING.
+- `XrMailbox_Keep` / `Drop` / epoch `Accept`. Present DropMailbox with DropVkEyes. Harvest gated on session_ok. Worker rejects old epoch.
 
 ## Did not
 
@@ -18,7 +18,7 @@
 
 ## Tests
 
-offline 185/185 (1268/1268 asserts). Not HMD-proven.
+offline 186/186 (1281/1281 asserts). Not HMD-proven.
 
 ## Next
 

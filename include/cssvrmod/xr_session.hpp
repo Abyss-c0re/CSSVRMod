@@ -98,4 +98,24 @@ inline bool XrWorker_ShouldSubmit(bool xr_wanted, bool session_ok) {
 }
 inline bool XrWorker_ShouldPump(bool xr_wanted) { return xr_wanted; }
 
+/// Cycle 235 skipped submit while !ok, but a mailbox sitting through STOPPING→READY
+/// submitted last-session rasters. Drop have/dual so session_ok cannot resurrect them.
+inline bool XrMailbox_Keep(bool xr_wanted, bool session_ok) {
+  return XrWorker_ShouldSubmit(xr_wanted, session_ok);
+}
+inline void XrMailbox_Drop(bool keep, bool* have, bool* dual) {
+  if (keep) return;
+  if (have) *have = false;
+  if (dual) *dual = false;
+}
+
+/// Epoch bumps when leaving session_ok. READY must not accept a push from the old epoch.
+inline int XrSession_BumpEpoch(bool was_ok, bool now_ok, int epoch) {
+  if (was_ok && !now_ok) return epoch + 1;
+  return epoch;
+}
+inline bool XrMailbox_Accept(bool keep, int push_epoch, int live_epoch) {
+  return keep && push_epoch == live_epoch;
+}
+
 } // namespace cssvr

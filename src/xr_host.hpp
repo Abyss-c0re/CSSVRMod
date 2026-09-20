@@ -39,5 +39,7 @@ bool XrHostPollInput(struct XrSample* out);
 Pose XrHostLastHmd();
 void XrHostClearHmd();
 const XrHostInfo& XrHostStatus();
+/// Bumps when leaving session_ok. Mailbox leftover from the old epoch must not submit.
+int XrHostEpoch();
 
 } // namespace cssvr

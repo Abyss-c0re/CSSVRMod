@@ -98,6 +98,13 @@ bool g_prev_menu_btn = false;
 bool g_prev_trig = false;
 XrSessionState g_state = XR_SESSION_STATE_UNKNOWN;
 bool g_running = false;
+int g_epoch = 0;
+
+void LeaveRunning() {
+  g_epoch = XrSession_BumpEpoch(g_running, false, g_epoch);
+  g_running = false;
+}
+
 bool g_begun = false;
 bool g_last_skip = false;
 XrFrameState g_fs{};
@@ -241,16 +248,16 @@ void PollEvents() {
       }
       if (g_state == XR_SESSION_STATE_STOPPING && xrEndSession) {
         xrEndSession(g_sess);
-        g_running = false;
+        LeaveRunning();
         g_info.reason = XrSession_Reason(XrSessionPhase::stopping);
       }
       if (g_state == XR_SESSION_STATE_LOSS_PENDING || g_state == XR_SESSION_STATE_EXITING) {
-        g_running = false;
+        LeaveRunning();
         g_info.reason = XrSession_Reason(XrSessionPhase::lost);
         HonestToastIfNeeded(g_info.reason);
       }
     } else if (ev.type == XR_TYPE_EVENT_DATA_INSTANCE_LOSS_PENDING) {
-      g_running = false;
+      LeaveRunning();
       g_info.reason = XrSession_Reason(XrSessionPhase::lost);
       HonestToastIfNeeded(g_info.reason);
     }
@@ -630,7 +637,7 @@ void XrHostShutdown() {
     g_begun = false;
   }
   if (g_running && xrEndSession && g_sess) xrEndSession(g_sess);
-  g_running = false;
+  LeaveRunning();
   if (g_inst && xrDestroyInstance) xrDestroyInstance(g_inst);
   g_inst = XR_NULL_HANDLE;
   g_sess = XR_NULL_HANDLE;
@@ -906,6 +913,8 @@ bool XrHostPollInput(XrSample* out) {
 }
 
 const XrHostInfo& XrHostStatus() { return g_info; }
+
+int XrHostEpoch() { return g_epoch; }
 
 namespace {
 Display* g_xr_dpy = nullptr;

@@ -179,6 +179,7 @@ struct XrMailbox {
   std::vector<unsigned char> rgba;
   std::vector<unsigned char> rgba_r;
   int w = 0, h = 0;
+  int epoch = 0;
   bool bgra = false;
   bool dual = false;
   bool have = false;
@@ -197,6 +198,7 @@ void PushXrFrame(const unsigned char* rgba, int w, int h, bool bgra) {
   g_mb.h = h;
   g_mb.bgra = bgra;
   g_mb.dual = false;
+  g_mb.epoch = XrHostEpoch();
   g_mb.have = true;
   g_mb.cv.notify_one();
 }
@@ -210,6 +212,7 @@ void PushXrDual(const VkEyePair& p) {
   g_mb.h = p.eye[0].h;
   g_mb.bgra = p.eye[0].bgra;
   g_mb.dual = true;
+  g_mb.epoch = XrHostEpoch();
   g_mb.have = true;
   g_mb.cv.notify_one();
 }
@@ -222,6 +225,15 @@ bool MailboxFull() {
 void DropVkEyes() {
   std::lock_guard<std::mutex> lk(g_mu);
   VkEye_Clear(&g_vk_eyes);
+}
+
+void DropMailbox() {
+  std::lock_guard<std::mutex> lk(g_mb.mu);
+  g_mb.have = false;
+  g_mb.dual = false;
+  g_mb.epoch = 0;
+  g_mb.rgba.clear();
+  g_mb.rgba_r.clear();
 }
 
 void* XrWorker(void*) {
@@ -237,6 +249,7 @@ void* XrWorker(void*) {
     bool bgra = false;
     bool dual = false;
     bool have = false;
+    int epoch = 0;
     {
       std::unique_lock<std::mutex> lk(g_mb.mu);
       g_mb.cv.wait_for(lk, std::chrono::milliseconds(50),
@@ -250,17 +263,26 @@ void* XrWorker(void*) {
         h = g_mb.h;
         bgra = g_mb.bgra;
         dual = g_mb.dual;
+        epoch = g_mb.epoch;
         g_mb.have = false;
         g_mb.dual = false;
       }
     }
     // Skip leftover submit on STOPPING/LOSS, but still pump or READY is never seen.
     if (XrWorker_ShouldPump(XrWanted())) XrHostPumpEvents();
+    const bool session_ok = XrSession_IsOkReason(XrHostStatus().reason);
     // Yaw / last-free / hand vel used to survive STOPPING while XR stayed wanted.
-    Tick_DropState(Tick_KeepState(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason)),
-                   &turn, &leftWall, &rightWall, &leftVel, &rightVel, &nextMelee, &now);
+    Tick_DropState(Tick_KeepState(XrWanted(), session_ok), &turn, &leftWall, &rightWall,
+                   &leftVel, &rightVel, &nextMelee, &now);
+    const bool keep_mb = XrMailbox_Keep(XrWanted(), session_ok);
+    if (!keep_mb) DropMailbox();
+    if (!XrMailbox_Accept(keep_mb, epoch, XrHostEpoch())) {
+      have = false;
+      dual = false;
+    }
+    XrMailbox_Drop(keep_mb, &have, &dual);
     if (!have) continue;
-    if (!XrWorker_ShouldSubmit(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason))) continue;
+    if (!XrWorker_ShouldSubmit(XrWanted(), session_ok)) continue;
     const bool ok = (dual && !frame_r.empty())
                         ? XrHostSubmitEyePixels(frame.data(), frame_r.data(), w, h, bgra, true)
                         : XrHostSubmitPixels(frame.data(), w, h, bgra);
@@ -436,7 +458,8 @@ void HarvestCopy(DeviceState* ds, VkDevice dev, bool want_ppm, bool painted_dual
   const uint32_t w = ds->copy_w, h = ds->copy_h;
   if (w < 2 || h < 2 || !ds->stage_mem) return;
   const VkDeviceSize bytes = (VkDeviceSize)w * h * 4;
-  const bool take_xr = XrWanted() && !MailboxFull();
+  const bool take_xr =
+      XrMailbox_Keep(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason)) && !MailboxFull();
   if (!take_xr && !want_ppm) return;
   void* mapped = nullptr;
   if (ds->fn.map(dev, ds->stage_mem, 0, bytes, 0, &mapped) != VK_SUCCESS || !mapped) return;
@@ -666,7 +689,8 @@ void DumpSwapchain(VkQueue queue, VkSwapchainKHR sc, uint32_t idx, bool want_ppm
   if (!ds->fn.copy || idx >= ss->images.size() || ss->w == 0 || ss->h == 0 || !ds->fn.memProps) return;
   VkDevice dev = ss->device;
   HarvestCopy(ds, dev, want_ppm, painted_dual);
-  const bool want_xr = XrWanted() && !MailboxFull();
+  const bool want_xr =
+      XrMailbox_Keep(XrWanted(), XrSession_IsOkReason(XrHostStatus().reason)) && !MailboxFull();
   if (!want_xr && !want_ppm) return;
   if (ds->copy_inflight) return; // previous GPU copy still running — never stall present
   const VkDeviceSize bytes = (VkDeviceSize)ss->w * ss->h * 4;
@@ -733,7 +757,11 @@ VKAPI_ATTR VkResult VKAPI_CALL WrapPresent(VkQueue queue, const VkPresentInfoKHR
   VkEyePair dual{};
   // STOPPING/LOSS without cssvr_stop used to keep g_vk_eyes, so the next session_ok
   // submitted last-session rasters before two new world paints.
-  if (!run) DropVkEyes();
+  // STOPPING/LOSS used to leave mailbox dual sitting until READY submitted it.
+  if (!run) {
+    DropVkEyes();
+    DropMailbox();
+  }
   const bool have_dual = DualPaint_Latch(TakePairImpl(&dual) && VkEye_WorldsDiffer(dual), run);
   if (have_dual && !MailboxFull()) {
     EnsureXrWorker();
